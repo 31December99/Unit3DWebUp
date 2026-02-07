@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from config.settings import Load
+
 config_settings = Load().load_config()
 
 # Same as the old 0.8.21. Set the priority based on the config file
