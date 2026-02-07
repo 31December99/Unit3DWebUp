@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # 07/02/2026
 import asyncio
-import datetime
 import hashlib
 import json
 import os
@@ -11,7 +10,9 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from config.settings import Load, DEFAULT_JSON_PATH
-from config.constants import DB_IDENTIFIED
+from config.constants import MediaStatus
+from config import logger
+
 from repositories.db_online import Tmdb, Tvdb
 
 from services.interfaces import TrackerServiceInterface, TorrentClientServiceInterface
@@ -91,7 +92,7 @@ async def redis_event_consumer(app: FastAPI):
                 "message": f"{app.state.folder_event['type']} {new_path}",
             })
         except Exception as e:
-            print("Consumer Folder error", e)
+            logger.debug("Consumer Folder error", e)
         finally:
             queue.task_done()
 
@@ -101,10 +102,10 @@ async def update_poster(msg: str, job_id: str, field_id: str, new_id: str):
     await update_job_field(job=app.state.job, job_id=job_id, field_id=field_id, new_data=new_id)
 
     # Update the Media status
-    await update_job_field(job=app.state.job, job_id=job_id, field_id='status', new_data=str(DB_IDENTIFIED))
+    await update_job_field(job=app.state.job, job_id=job_id, field_id='status', new_data=str(MediaStatus.DB_IDENTIFIED))
 
     # Console message
-    print(f"\n{datetime.datetime.now()} -> Update {msg} JOB_ID: {job_id}\n")
+    logger.info(f"-> Update {msg} JOB_ID: {job_id}\n")
 
     # Send log to the client
     await app.state.ws_manager.broadcast({
@@ -157,7 +158,7 @@ async def lifespan(app: FastAPI):
     observer.schedule(handler, "/home/parzival/ts watcher", recursive=True)
     observer.start()
 
-    # --- consumer ---
+    # Create a consumer that works in the background
     consumer_task = asyncio.create_task(redis_event_consumer(app))
 
     # Goes..
@@ -246,14 +247,14 @@ async def clear_job_list_id(payload: HttpRequest):
             "level": "success",
             "message": f"Clear JobList {payload.job_list_id} {results[0]['folder']}",
         })
-        print(f"\n{datetime.datetime.now()} -> Clear JobList ID° {payload.job_list_id} {results[0]['folder']}\n")
+        logger.info(f"-> Clear JobList ID° {payload.job_list_id} {results[0]['folder']}\n")
     else:
         await app.state.ws_manager.broadcast({
             "type": "log",
             "level": "error",
             "message": f"Clear JobList : JobList id not found",
         })
-        print(f"\n{datetime.datetime.now()} -> Clear JobList : JobList ID non trovato\n")
+        logger.info(f"-> Clear JobList : JobList ID non trovato\n")
 
 
 @app.post("/scan")
@@ -392,7 +393,8 @@ async def process_all(payload: HttpRequest):
     torrent_service = TorrentService(media_list=media_list, app=app)
     await torrent_service.start()
     end_time = time.perf_counter()
-    print(f"Terminato in {end_time - start_time:.2f} secondi\n")
+    logger.debug(f"Terminato in {end_time - start_time:.2f} secondi\n")
+
 
     # UPLOAD: Upload one or more torrent file based on media_list list
     upload_service = UploadService(media_list=media_list, app=app)
@@ -553,12 +555,11 @@ async def filter_search(payload: HttpRequest):
 # Same as in the old code 0.8.21
 config = Load().load_config()
 if __name__ == "__main__":
-    print(f"\nChecking Unit3D configuration file.. \n")
-    print(f"Configuration       -> '{DEFAULT_JSON_PATH}'")
-    print(f"torrent Archive     -> '{config.user_preferences.TORRENT_ARCHIVE_PATH}'")
-    print(f"Images,Tmdb cache   -> '{config.user_preferences.CACHE_PATH}'")
-    print(f"Watcher Path        -> '{config.user_preferences.WATCHER_PATH}'")
-    print(f"Watcher Dest. Path  -> '{config.user_preferences.WATCHER_DESTINATION_PATH}'")
-    print()
+    logger.info(f"\nChecking Unit3D configuration file.. \n")
+    logger.info(f"Configuration       -> '{DEFAULT_JSON_PATH}'")
+    logger.info(f"torrent Archive     -> '{config.user_preferences.TORRENT_ARCHIVE_PATH}'")
+    logger.info(f"Images,Tmdb cache   -> '{config.user_preferences.CACHE_PATH}'")
+    logger.info(f"Watcher Path        -> '{config.user_preferences.WATCHER_PATH}'")
+    logger.info(f"Watcher Dest. Path  -> '{config.user_preferences.WATCHER_DESTINATION_PATH}'\n")
 
     uvicorn.run("start24:app", host="127.0.0.1", port=8000, reload=False)
