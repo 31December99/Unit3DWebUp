@@ -19,10 +19,10 @@ class Title:
     title: str
     type: str | None = None
 
-    def __post_init__(self):
-        """
-        method invoked right after  the __init__ method !
-        """
+    # def __post_init__(self):
+    #     """
+    #     method invoked right after  the __init__ method !
+    #     """
 
     @staticmethod
     def from_data(data: dict[str, any]) -> Title | None:
