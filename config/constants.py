@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from enum import IntEnum
 
+
 class MediaStatus(IntEnum):
     """
     It tracks the status during the creation of a media file
