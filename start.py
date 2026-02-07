@@ -562,4 +562,4 @@ if __name__ == "__main__":
     logger.info(f"Watcher Path        -> '{config.user_preferences.WATCHER_PATH}'")
     logger.info(f"Watcher Dest. Path  -> '{config.user_preferences.WATCHER_DESTINATION_PATH}'\n")
 
-    uvicorn.run("start24:app", host="127.0.0.1", port=8000, reload=False)
+    uvicorn.run("start:app", host="127.0.0.1", port=8000, reload=False)
