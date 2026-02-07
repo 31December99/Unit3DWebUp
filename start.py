@@ -12,11 +12,10 @@ from pathlib import Path
 from config.settings import Load, DEFAULT_JSON_PATH
 from config.constants import MediaStatus
 from config import logger
-
+from repositories.job_repos import JobRedisRepo
 from repositories.db_online import Tmdb, Tvdb
 
 from services.interfaces import TrackerServiceInterface, TorrentClientServiceInterface
-from services.boot_helper import init_job_repository, update_job_field
 from services.torrent_client_service import QbittorrentClientService
 from services.media_service import MediaService, MediaService2
 from services.itt_tracker_service import ITTtrackerService
@@ -41,6 +40,7 @@ import uvicorn
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
+REDIS_URL = "redis://localhost:6379"
 
 class RedisEventHandler(FileSystemEventHandler):
     """
@@ -99,10 +99,10 @@ async def redis_event_consumer(app: FastAPI):
 
 async def update_poster(msg: str, job_id: str, field_id: str, new_id: str):
     # Fix the DB ID with the received one
-    await update_job_field(job=app.state.job, job_id=job_id, field_id=field_id, new_data=new_id)
+    await app.state.job.update_job(job_id=job_id, new_data={field_id: new_id})
 
     # Update the Media status
-    await update_job_field(job=app.state.job, job_id=job_id, field_id='status', new_data=str(MediaStatus.DB_IDENTIFIED))
+    await app.state.job.update_job(job_id=job_id, new_data={'status': str(MediaStatus.DB_IDENTIFIED)})
 
     # Console message
     logger.info(f"-> Update {msg} JOB_ID: {job_id}\n")
@@ -132,8 +132,9 @@ async def lifespan(app: FastAPI):
     # Create a new state for the watcher queue
     app.state.redis_events = asyncio.Queue()
 
-    # Connect and get reference to the cache (redis)
-    job = await init_job_repository(app)
+    # Connect to redis
+    job = JobRedisRepo(url=REDIS_URL)
+    await job.connect(app=app)
 
     # Store the job reference to app.state
     app.state.job = job
