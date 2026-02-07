@@ -6,12 +6,12 @@ import json
 import os
 import shutil
 
+import config
 from pydantic import BaseModel, model_validator
 from urllib.parse import urlparse
 from pathlib import Path
 from pathvalidate import sanitize_filepath
 from services.utility import ManageTitles
-from trackers import trackers
 
 config_file = "Unit3Dbot.json"
 version = "0.0"
@@ -245,7 +245,7 @@ class Validate:
             return None
 
         for tracker in multi_tracker_list:
-            if tracker.upper() not in trackers.tracker_list:
+            if tracker.upper() not in config.tracker_list:
                 print(f"-> Invalid Multi Tracker '{tracker}'. Please fix your configuration file")
                 exit(1)
         return multi_tracker_list
