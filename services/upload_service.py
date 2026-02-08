@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from services.interfaces import TrackerServiceInterface
 from services.itt_tracker_service import ITTtrackerService
 from models.media import Media
@@ -24,20 +23,9 @@ class UploadService:
             logger.debug(f"Start Uploaded Torrents {uploaded_torrents}")
 
             for torrent in uploaded_torrents:
-                if torrent['status'] == '409':
-                    await self.app.state.ws_manager.broadcast({
-                        "type": "progress",
-                        "level": "progress",
-                        "job_id": torrent['job_id'],
-                        "process": "error",
-                        "progress": 100.0,
-                        "message": f"{torrent['message']} {torrent['file']}"})
+                await self.app.state.ws_manager.broadcast({
+                    "type": "posterLogMessage",
+                    "job_id": torrent['job_id'],
+                    "message": f"{torrent['message']} {torrent['file']}"})
 
-                if torrent['status'] == '200':
-                    await self.app.state.ws_manager.broadcast({
-                        "type": "progress",
-                        "level": "progress",
-                        "job_id": torrent['job_id'],
-                        "process": "Uploaded",
-                        "progress": 100.0,
-                        "message": f"{torrent['message']} {torrent['file']}"})
+
