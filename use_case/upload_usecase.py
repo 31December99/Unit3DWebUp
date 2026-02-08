@@ -1,0 +1,58 @@
+# -*- coding: utf-8 -*-
+import json
+
+from services.interfaces import TrackerServiceInterface
+from services.itt_tracker_service import ITTtrackerService
+from models.media import Media
+
+import asyncio
+import aiohttp
+from fastapi import FastAPI
+from config import logger
+
+
+class UploadUseCase:
+
+    def __init__(self, app: FastAPI, media_list: list[Media] | None = None, job_id: str | None = None):
+        """
+        :param media_list: list of media to upload used when shared with other services
+        :param app: the FastAPI app
+        :param job_id: the job id. Used for a single service upload
+        """
+        self.media_list = media_list
+        self.app = app
+        self.job_id = job_id
+
+    async def execute(self) -> bool:
+        """
+        Upload one or more torrents
+        :return: true or false
+        """
+
+        # Create the media list for single torrent
+        if self.job_id and not self.media_list:
+            results = await self.app.state.job.get_job(job_id=self.job_id)
+            self.media_list = [
+                Media.from_dict(item)
+                for item in [json.loads(results)]
+            ]
+
+        async with aiohttp.ClientSession() as session:
+
+            # Tracker instance
+            tracker_service: TrackerServiceInterface = ITTtrackerService(session, self.app)
+
+            # Build a list of media
+            tasks = [tracker_service.upload(media) for media in self.media_list]
+
+            # Concurrent execution
+            uploaded_torrents = await asyncio.gather(*tasks)
+            logger.debug(f"Start Uploaded Torrents {uploaded_torrents}")
+
+            # Send a message to frontend for each uploaded media
+            for torrent in uploaded_torrents:
+                await self.app.state.ws_manager.broadcast({
+                    "type": "posterLogMessage",
+                    "job_id": torrent['job_id'],
+                    "message": f"{torrent['message']}"})
+        return True

@@ -21,10 +21,10 @@ from services.media_service import MediaService, MediaService2
 from services.itt_tracker_service import ITTtrackerService
 from services.auto_async_service import AsyncMediaManager
 from services.torrent_service import TorrentService
-from services.upload_service import UploadService
 
 from use_case.scan_media_usecase import ScanMediaUseCase
 from use_case.seed_usecase import SeedUseCase
+from use_case.upload_usecase import UploadUseCase
 
 from external.websocket import WebSocketManager
 from models.media import Media
@@ -399,8 +399,8 @@ async def process_all(payload: HttpRequest):
     logger.debug(f"Terminato in {end_time - start_time:.2f} secondi\n")
 
     # UPLOAD: Upload one or more torrent file based on media_list list
-    upload_service = UploadService(media_list=media_list, app=app)
-    await upload_service.start()
+    upload_service = UploadUseCase(media_list=media_list, app=app)
+    await upload_service.execute()
 
 
 @app.post("/maketorrent")
@@ -421,22 +421,12 @@ async def upload(payload: HttpRequest):
      Upload a single torrent file
 
     :param payload: - job_id: Identifies each poster. Corresponds to Media.job_id -
-                    - job_list_id: Identifies the list created by the scan endpoint
-
-    :prerequisite: A torrent file stored on the sdd
     :return: none
     """
 
-    # Load a single poster based on the job_id
-    results = await app.state.job.get_job(job_id=payload.job_id)
-    media_list = [
-        Media.from_dict(item)
-        for item in [json.loads(results)]
-    ]
-
     # Upload the single poster
-    upload_service = UploadService(media_list=media_list, app=app)
-    await upload_service.start()
+    upload_service = UploadUseCase(app=app, job_id=payload.job_id)
+    await upload_service.execute()
 
 
 @app.post("/seed")
