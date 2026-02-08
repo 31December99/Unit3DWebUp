@@ -24,6 +24,8 @@ from services.torrent_service import TorrentService
 from use_case.scan_media_usecase import ScanMediaUseCase
 from use_case.seed_usecase import SeedUseCase
 from use_case.upload_usecase import UploadUseCase
+from use_case.process_all_usecase import ProcessAllUseCase
+
 
 from external.websocket import WebSocketManager
 from models.media import Media
@@ -370,37 +372,15 @@ async def process_all(payload: HttpRequest):
     Start a 'chain' : Load the joblist , Filter for existing torrent, create torrent, upload the complete joblist
 
     :param payload: HttpRequest payload
-        - job_id: Identifies each poster. Corresponds to Media.job_id
         - job_list_id: Identifies the list created by the scan endpoint
 
     :prerequisite: a valid Description status ( Media Class attribute)
     :return: none
     """
 
-    start_time = time.perf_counter()
-    # Load a list of jobs from the cache based on the job_list_id received from the frontend
-    job_list = await app.state.job.get_job_list(job_id=payload.job_list_id)
-
-    # Load each poster contained in the job list
-    results = [json.loads(await app.state.job.get_job(job_id)) for job_id in job_list]
-    media_list = [
-        Media.from_dict(item)
-        for item in results
-    ]
-
-    # TORRENT: Create one or more torrent file based on media_list list
-    torrent_service = TorrentService(app=app)
-    await torrent_service.start(media_list=media_list)
-    end_time = time.perf_counter()
-    logger.debug(f"Terminato in {end_time - start_time:.2f} secondi\n")
-
-    # UPLOAD: Upload one or more torrent file based on media_list list
-    upload_use_case = UploadUseCase(app=app)
-    await upload_use_case.execute(media_list=media_list)
-
-    # SEED: seed one or more torrent file based on media_list list
-    seed_use_case = SeedUseCase(app=app, client=config.torrent_client_config.TORRENT_CLIENT)
-    await seed_use_case.execute(media_list=media_list)
+    use_case = ProcessAllUseCase(app=app,job_list_id=payload.job_list_id,
+                                 torrent_client_name=config.torrent_client_config.TORRENT_CLIENT)
+    await use_case.execute()
 
 
 @app.post("/maketorrent")
