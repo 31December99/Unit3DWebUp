@@ -4,7 +4,7 @@ from typing import TypeVar
 from models.tvdb_search import TvdbSearchResult
 from models.interfaces import MediaRepoInterface
 
-from services.async_http_client_service import AsyncHttpClient
+from external.async_http_client_service import AsyncHttpClient
 from config.settings import Load
 
 import aiohttp

@@ -9,7 +9,7 @@ from PIL import Image
 
 from services.interfaces import VideoServiceInterface, DescriptionBuilderInterface
 from config.host_data import upload_hosts, priority_map, master_uploaders
-from services.async_http_client_service import AsyncHttpClient
+from external.async_http_client_service import AsyncHttpClient
 from config.constants import MediaStatus
 from config.settings import Load
 from models.media import Media

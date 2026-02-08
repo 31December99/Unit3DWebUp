@@ -9,7 +9,7 @@ from models.tv import (TVShowDetails, CreatedBy, Network, LastEpisodeToAir, Seas
 from models.videos import Videos, Data
 from models.keywords import Keyword
 
-from services.async_http_client_service import AsyncHttpClient
+from external.async_http_client_service import AsyncHttpClient
 
 from config.settings import Load
 

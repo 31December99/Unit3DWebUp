@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# 07/02/2026
 import asyncio
 import hashlib
 import json
@@ -15,27 +14,26 @@ from config import logger
 from repositories.job_repos import JobRedisRepo
 from repositories.db_online import Tmdb, Tvdb
 
-from services.interfaces import TrackerServiceInterface
 from services.media_service import MediaService, MediaService2
 from services.itt_tracker_service import ITTtrackerService
 from services.auto_async_service import AsyncMediaManager
+from services.interfaces import TrackerServiceInterface
 from services.torrent_service import TorrentService
 
 from use_case.scan_media_usecase import ScanMediaUseCase
-from use_case.seed_usecase import SeedUseCase
-from use_case.upload_usecase import UploadUseCase
 from use_case.process_all_usecase import ProcessAllUseCase
-
+from use_case.upload_usecase import UploadUseCase
+from use_case.seed_usecase import SeedUseCase
 
 from external.websocket import WebSocketManager
 from models.media import Media
 
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import WebSocket
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
+from fastapi import WebSocket
 from fastapi import FastAPI
 from fastapi import status
+from pydantic import BaseModel
 import aiohttp
 import uvicorn
 
