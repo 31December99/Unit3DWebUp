@@ -15,14 +15,13 @@ class TorrentService:
         TODO For the moment n° workers and batch_size are hardcoded
     """
 
-    def __init__(self, media_list: list[Media], app: FastAPI):
+    def __init__(self, app: FastAPI):
         """
-        :param media_list: a list of Media objects
         :param app: FastApi
         """
 
         # Process media
-        self.media_list = media_list
+        self.media_list : list[Media] | None = None
 
         # FastApi instance app
         self.app = app
@@ -51,11 +50,12 @@ class TorrentService:
         except Exception as e:
             print(e)
 
-    async def start(self):
+    async def start(self, media_list: list[Media]):
         """
             Start the torrent service
         :return:
         """
+        self.media_list = media_list
 
         # Run run_batch() in background
         thread = Thread(target=self.run_batch)
