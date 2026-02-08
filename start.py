@@ -25,7 +25,7 @@ from services.upload_service import UploadService
 
 from use_case.scan_media_usecase import ScanMediaUseCase
 
-from websocket import WebSocketManager
+from external.websocket import WebSocketManager
 from models.media import Media
 
 from fastapi.middleware.cors import CORSMiddleware
