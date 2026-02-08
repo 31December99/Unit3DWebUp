@@ -87,7 +87,7 @@ class ITTtrackerService(TrackerServiceInterface):
         else:
             media.status = MediaStatus.TRACKER_NOT_UPLOADED
             await self.app.state.job.update_job(job_id=media.job_id, new_data=media.to_dict())
-            return {'status': '409', 'message': response.get('data', {}).get('name', None),
+            return {'status': '409', 'message': response.get('data', None),
                     'file': torrent_filepath, 'job_id': media.job_id}
 
     async def search(self, query: str) -> dict:
