@@ -2,62 +2,67 @@
 import json
 from pathlib import Path
 
-from models.media import Media
 from services.interfaces import TorrentClientServiceInterface
 from services.torrent_client_service import QbittorrentClientService
+from models.media import Media
+from fastapi import FastAPI
 
 
 class SeedUseCase:
-    def __init__(self, app, job_list: list[str], client: str):
+    def __init__(self, app: FastAPI, client: str, media_list: list[Media] | None = None, job_id: str | None = None):
         """
         :param app: the fastapi app
-        :param job_list: list of jobs id
+        :param job_id: the job id
         :param client: torrent client name
         """
+        self.media_list = media_list
         self.app = app
-        self.job_list = job_list
+        self.job_id = job_id
         self.client = client
 
     async def execute(self) -> bool:
+        """
+        Execute the seed use case : load one or more jobs, login to client, verify torrent files,
+                                    add torrents file to the client
+        :return:
+        """
 
-        # Load each poster contained in the job list
-        results = [json.loads(await self.app.state.job.get_job(job_id)) for job_id in self.job_list]
-        media_list = [
-            Media.from_dict(item)
-            for item in results
-        ]
+        # Create the media list for single torrent
+        if self.job_id and not self.media_list:
+            results = await self.app.state.job.get_job(job_id=self.job_id)
+            self.media_list = [
+                Media.from_dict(item)
+                for item in [json.loads(results)]
+            ]
 
         torr_client_service: TorrentClientServiceInterface = await self.get_fact_client(name=self.client)
         response = await torr_client_service.login()
 
         # Login failed
         if not response:
-            for job_id in self.job_list:
-                await self.app.state.ws_manager.broadcast({
-                    "type": "posterLogMessage",
-                    "job_id": job_id,
-                    "message": f"{self.client} Login failed"})
+            await self.send_message(f"{self.client} Login failed")
             return False
 
         # Verify that the *.torrent file still exists
-        results = [m.torrent_file_path for m in media_list if Path.exists(Path(m.torrent_file_path))]
+        results = [m.torrent_file_path for m in self.media_list if Path.exists(Path(m.torrent_file_path))]
 
         # Get the data path ( scan path)
-        save_path = media_list[0].folder
+        save_path = self.media_list[0].folder
 
-        # Add to the torrent client
+        # Add torrents to the client
         execution = await torr_client_service.add_torrents(results, save_path, app=self.app)
         if execution:
-            for job_id in self.job_list:
-                await self.app.state.ws_manager.broadcast({
-                    "type": "posterLogMessage",
-                    "job_id": job_id,
-                    "message": f"added to seeding"})
+            await self.send_message(f"Added to {self.client}")
             return True
         return False
 
     @staticmethod
     async def get_fact_client(name: str) -> TorrentClientServiceInterface | None:
+        """
+        :param name: name of the default torrent client
+        :return:
+        """
+
         if name == "qbittorrent":
             return QbittorrentClientService()
         # TODO: aggiungere un altro client mantenendo gli stessi metodi
@@ -65,3 +70,14 @@ class SeedUseCase:
         # if name == "deluge": return DelugeClientService(...)
         # if name == "transmission": return TransmissionClientService(...)
         return None
+
+    async def send_message(self, message: str):
+        """
+        :param message: message to send to the frontend
+        :return:
+        """
+        for media in self.media_list:
+            await self.app.state.ws_manager.broadcast({
+                "type": "posterLogMessage",
+                "job_id": media.job_id,
+                "message": message})

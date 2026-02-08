@@ -399,6 +399,10 @@ async def process_all(payload: HttpRequest):
     upload_service = UploadUseCase(media_list=media_list, app=app)
     await upload_service.execute()
 
+    # SEED: seed one or more torrent file based on media_list list
+    use_case = SeedUseCase(app=app, media_list=media_list, client=config.torrent_client_config.TORRENT_CLIENT)
+    await use_case.execute()
+
 
 @app.post("/maketorrent")
 async def make(payload: HttpRequest):
@@ -432,8 +436,7 @@ async def seed(payload: HttpRequest):
     :param payload:  - job_id: Identifies each poster. Corresponds to Media.job_id
     :return:
     """
-
-    use_case = SeedUseCase(app=app, job_list=[payload.job_id], client=config.torrent_client_config.TORRENT_CLIENT)
+    use_case = SeedUseCase(app=app, client=config.torrent_client_config.TORRENT_CLIENT, job_id=payload.job_id)
     await use_case.execute()
 
 
