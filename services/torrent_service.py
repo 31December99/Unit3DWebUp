@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import asyncio
+import os
 
 from services.create_torrent_service import MyTorrentService
 from models.media import Media
@@ -39,11 +40,13 @@ class TorrentService:
              Try to process group of files to avoid ssd saturation
         :return:
         """
+        # FILTER: filter for existing torrent. Ensures that only new torrents are created
+        self.media_list = [m for m in self.media_list if not os.path.exists(m.torrent_file_path)]
 
-        #TODO: ha senso spingere con i workers se il mio ssd lavoro già al 100%?
+        # TODO: ha senso spingere con i workers se il mio ssd lavoro già al 100%?
         try:
             results = self.torr_service.start(self.media_list, batch_size=16, workers=4,
-                                                    progress_queue=self.progress_queue)
+                                              progress_queue=self.progress_queue)
             self.result_queue.put(results)
         except Exception as e:
             print(e)

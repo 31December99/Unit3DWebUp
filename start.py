@@ -389,9 +389,6 @@ async def process_all(payload: HttpRequest):
         for item in results
     ]
 
-    # FILTER: filter for existing torrent. Ensures that only new torrents are created
-    media_list = [m for m in media_list if not os.path.exists(m.torrent_file_path)]
-
     # TORRENT : Create one or more torrent file based on media_list list
     torrent_service = TorrentService(media_list=media_list, app=app)
     await torrent_service.start()
