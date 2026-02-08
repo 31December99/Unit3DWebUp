@@ -402,6 +402,18 @@ async def process_all(payload: HttpRequest):
     await upload_service.start()
 
 
+@app.post("/maketorrent")
+async def make(payload: HttpRequest):
+    results = [json.loads(await app.state.job.get_job(payload.job_id))]
+    media_list = [
+        Media.from_dict(item)
+        for item in results
+    ]
+
+    torrent_service = TorrentService(media_list=media_list, app=app)
+    await torrent_service.start()
+
+
 @app.post("/upload")
 async def upload(payload: HttpRequest):
     """
@@ -552,7 +564,10 @@ async def filter_search(payload: HttpRequest):
             }
         )
 
+
 config = Load().load_config()
+
+
 def main():
     logger.info("\nChecking Unit3D configuration file..\n")
     logger.info(f"Configuration       -> '{DEFAULT_JSON_PATH}'")
