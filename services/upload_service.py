@@ -21,7 +21,7 @@ class UploadService:
             tracker_service: TrackerServiceInterface = ITTtrackerService(session, self.app)
             tasks = [tracker_service.upload(media) for media in self.media_list]
             uploaded_torrents = await asyncio.gather(*tasks)
-            logger.debug("Start Uploaded Torrents", uploaded_torrents)
+            logger.debug(f"Start Uploaded Torrents {uploaded_torrents}")
 
             for torrent in uploaded_torrents:
                 if torrent['status'] == '409':
