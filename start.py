@@ -552,10 +552,8 @@ async def filter_search(payload: HttpRequest):
             }
         )
 
-
+config = Load().load_config()
 def main():
-    config = Load().load_config()
-
     logger.info("\nChecking Unit3D configuration file..\n")
     logger.info(f"Configuration       -> '{DEFAULT_JSON_PATH}'")
     logger.info(f"torrent Archive     -> '{config.user_preferences.TORRENT_ARCHIVE_PATH}'")
