@@ -44,7 +44,7 @@ class ITTtrackerService(TrackerServiceInterface):
             "name": media.display_name,
             "tmdb": media.tmdb_id,
             "imdb": media.imdb_id_from_tvdb or 0,
-            "tvdb": media.tvdb_id or 0,
+            "tvdb": media.tvdb_id if media.tvdb_id and media.category == 'series' else None,
             "keywords": media.keyword,
             "category_id": self.tracker_data.category.get(media.category),
             "anonymous": int(config.user_preferences.ANON),
