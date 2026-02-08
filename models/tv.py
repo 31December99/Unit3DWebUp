@@ -94,6 +94,7 @@ class SpokenLanguage:
 
 @dataclass(slots=True)
 class TVShowDetails(MediaRepoInterface):
+
     adult: bool
     first_air_date: str
     homepage: str
@@ -138,6 +139,15 @@ class TVShowDetails(MediaRepoInterface):
 
     def get_id(self) -> int:
         return self.id
+
+    def get_translations(self) -> dict[str, str] | None:
+        pass
+
+    def get_imdb(self) -> str | None:
+        pass
+
+    def get_poster_path(self) -> str:
+        pass
 
 
 @dataclass(slots=True)
