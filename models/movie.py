@@ -19,11 +19,6 @@ class Title:
     title: str
     type: str | None = None
 
-    # def __post_init__(self):
-    #     """
-    #     method invoked right after  the __init__ method !
-    #     """
-
     @staticmethod
     def from_data(data: dict[str, any]) -> Title | None:
         try:
@@ -125,6 +120,15 @@ class MovieDetails(MediaRepoInterface):
 
     def get_id(self) -> int:
         return self.id
+
+    def get_translations(self) -> dict[str, str] | None:
+        pass
+
+    def get_imdb(self) -> str | None:
+        pass
+
+    def get_poster_path(self) -> str:
+        pass
 
 
 @dataclass(slots=True)
