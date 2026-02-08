@@ -24,6 +24,7 @@ from services.torrent_service import TorrentService
 from services.upload_service import UploadService
 
 from use_case.scan_media_usecase import ScanMediaUseCase
+from use_case.seed_usecase import SeedUseCase
 
 from external.websocket import WebSocketManager
 from models.media import Media
@@ -444,58 +445,9 @@ async def seed(payload: HttpRequest):
     :param payload:  - job_id: Identifies each poster. Corresponds to Media.job_id
     :return:
     """
-    # Each poster has a job_id used to load data and send it elsewhere
-    # Load the Job ID
-    results = await app.state.job.get_job(job_id=payload.job_id)
 
-    # Get a list of Media (same as the old code 0.8.21)
-    media_list = [
-        Media.from_dict(item)
-        for item in [json.loads(results)]
-    ]
-
-    # Return the client that implements the same interface
-    async def get_fact_client(name: str) -> TorrentClientServiceInterface:
-        # Una funzione annidata in quanto viene utilizzata solo qui. Non vorrei "allontanarla" dalla funzione principale
-        if name == "qbittorrent":
-            return QbittorrentClientService()
-
-        # TODO: per aggiungere un altro client mantenendo gli stessi metodi (interfaccia)
-        # in attesa di essere aggiunti
-        # if name == "deluge": return DelugeClientService(...)
-        # if name == "transmission": return TransmissionClientService(...)
-
-        raise ValueError(f"Client {name} not supported")
-
-    # Torrent Client LOGIN
-    torr_client_service: TorrentClientServiceInterface = await get_fact_client(
-        config.torrent_client_config.TORRENT_CLIENT)
-    response = await torr_client_service.login()
-    if not response:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail={"message": "Unable to login to Client"}
-        )
-
-    # Verify that the path still exists
-    # this is the *.torrent path
-    results = [m.torrent_file_path for m in media_list if Path.exists(Path(m.torrent_file_path))]
-    if not results:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail={"message": "Torrent Seeding error"}
-        )
-
-    # Get the main path ( scan path). this is the data path (i.e. *.mkv)
-    save_path = media_list[0].folder
-
-    # Add to the torrent client
-    await torr_client_service.add_torrents(results, save_path, app=app)
-
-    return JSONResponse(
-        status_code=status.HTTP_200_OK,
-        content={"success": True}
-    )
+    use_case = SeedUseCase(app=app, job_list=[payload.job_id], client=config.torrent_client_config.TORRENT_CLIENT)
+    await use_case.execute()
 
 
 @app.post("/setting")
