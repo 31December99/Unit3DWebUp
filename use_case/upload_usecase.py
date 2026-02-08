@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+from typing import Any
 
 from services.interfaces import TrackerServiceInterface
 from services.itt_tracker_service import ITTtrackerService
@@ -25,7 +26,9 @@ class UploadUseCase:
 
     async def execute(self) -> bool:
         """
-        Upload one or more torrents
+        Execute the seed use case : load one or more jobs, login to tracker, upload the torrents,
+                                    send message to the frontend
+
         :return: true or false
         """
 
@@ -50,9 +53,22 @@ class UploadUseCase:
             logger.debug(f"Start Uploaded Torrents {uploaded_torrents}")
 
             # Send a message to frontend for each uploaded media
+            await self.send_message(uploaded_torrents=uploaded_torrents)
+
             for torrent in uploaded_torrents:
                 await self.app.state.ws_manager.broadcast({
                     "type": "posterLogMessage",
                     "job_id": torrent['job_id'],
                     "message": f"{torrent['message']}"})
         return True
+
+    async def send_message(self, uploaded_torrents: tuple[Any]) -> None:
+        """
+        :param uploaded_torrents: results message from the uploaded torrents
+        :return:
+        """
+        for torrent in uploaded_torrents:
+            await self.app.state.ws_manager.broadcast({
+                "type": "posterLogMessage",
+                "job_id": torrent['job_id'],
+                "message": f"{torrent['message']}"})
