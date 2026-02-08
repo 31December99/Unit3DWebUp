@@ -42,6 +42,7 @@ from watchdog.events import FileSystemEventHandler
 
 REDIS_URL = "redis://localhost:6379"
 
+
 class RedisEventHandler(FileSystemEventHandler):
     """
         Watch only a specific folder
@@ -80,7 +81,7 @@ async def redis_event_consumer(app: FastAPI):
         event = await queue.get()
         try:
             app.state.folder_event = event
-            #TODO:
+            # TODO:
             # For the moment the watcher folder is hardcoded
             relative = Path(app.state.folder_event['path']).relative_to(Path("/home/parzival/ts watcher"))
             new_path = os.path.join("/home/parzival/ts watcher", relative.parts[0])
@@ -154,7 +155,7 @@ async def lifespan(app: FastAPI):
     # Callback
     handler = RedisEventHandler(app)
     # Start to watch
-    #TODO:
+    # TODO:
     # For the moment the watcher folder is hardcoded
     observer.schedule(handler, "/home/parzival/ts watcher", recursive=True)
     observer.start()
@@ -396,7 +397,6 @@ async def process_all(payload: HttpRequest):
     end_time = time.perf_counter()
     logger.debug(f"Terminato in {end_time - start_time:.2f} secondi\n")
 
-
     # UPLOAD: Upload one or more torrent file based on media_list list
     upload_service = UploadService(media_list=media_list, app=app)
     await upload_service.start()
@@ -553,10 +553,10 @@ async def filter_search(payload: HttpRequest):
         )
 
 
-# Same as in the old code 0.8.21
-config = Load().load_config()
-if __name__ == "__main__":
-    logger.info(f"\nChecking Unit3D configuration file.. \n")
+def main():
+    config = Load().load_config()
+
+    logger.info("\nChecking Unit3D configuration file..\n")
     logger.info(f"Configuration       -> '{DEFAULT_JSON_PATH}'")
     logger.info(f"torrent Archive     -> '{config.user_preferences.TORRENT_ARCHIVE_PATH}'")
     logger.info(f"Images,Tmdb cache   -> '{config.user_preferences.CACHE_PATH}'")
@@ -564,3 +564,7 @@ if __name__ == "__main__":
     logger.info(f"Watcher Dest. Path  -> '{config.user_preferences.WATCHER_DESTINATION_PATH}'\n")
 
     uvicorn.run("start:app", host="127.0.0.1", port=8000, reload=False)
+
+
+if __name__ == "__main__":
+    main()
