@@ -15,8 +15,7 @@ from config import logger
 from repositories.job_repos import JobRedisRepo
 from repositories.db_online import Tmdb, Tvdb
 
-from services.interfaces import TrackerServiceInterface, TorrentClientServiceInterface
-from services.torrent_client_service import QbittorrentClientService
+from services.interfaces import TrackerServiceInterface
 from services.media_service import MediaService, MediaService2
 from services.itt_tracker_service import ITTtrackerService
 from services.auto_async_service import AsyncMediaManager
@@ -30,7 +29,7 @@ from external.websocket import WebSocketManager
 from models.media import Media
 
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import WebSocket, HTTPException
+from fastapi import WebSocket
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from fastapi import FastAPI
@@ -389,19 +388,19 @@ async def process_all(payload: HttpRequest):
         for item in results
     ]
 
-    # TORRENT : Create one or more torrent file based on media_list list
-    torrent_service = TorrentService(media_list=media_list, app=app)
-    await torrent_service.start()
+    # TORRENT: Create one or more torrent file based on media_list list
+    torrent_service = TorrentService(app=app)
+    await torrent_service.start(media_list=media_list)
     end_time = time.perf_counter()
     logger.debug(f"Terminato in {end_time - start_time:.2f} secondi\n")
 
     # UPLOAD: Upload one or more torrent file based on media_list list
-    upload_service = UploadUseCase(media_list=media_list, app=app)
-    await upload_service.execute()
+    upload_use_case = UploadUseCase(app=app)
+    await upload_use_case.execute(media_list=media_list)
 
     # SEED: seed one or more torrent file based on media_list list
-    use_case = SeedUseCase(app=app, media_list=media_list, client=config.torrent_client_config.TORRENT_CLIENT)
-    await use_case.execute()
+    seed_use_case = SeedUseCase(app=app, client=config.torrent_client_config.TORRENT_CLIENT)
+    await seed_use_case.execute(media_list=media_list)
 
 
 @app.post("/maketorrent")
@@ -412,8 +411,8 @@ async def make(payload: HttpRequest):
         for item in results
     ]
 
-    torrent_service = TorrentService(media_list=media_list, app=app)
-    await torrent_service.start()
+    torrent_service = TorrentService(app=app)
+    await torrent_service.start(media_list=media_list)
 
 
 @app.post("/upload")
