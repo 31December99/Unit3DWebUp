@@ -82,7 +82,7 @@ class ITTtrackerService(TrackerServiceInterface):
         if response.get('success', None):
             media.status = MediaStatus.TRACKER_UPLOADED
             await self.app.state.job.update_job(job_id=media.job_id, new_data=media.to_dict())
-            return {'status': '200', 'message': response.get('message'), 'file': torrent_filepath,
+            return {'status': '200', 'message': 'Torrent uploaded', 'file': torrent_filepath,
                     'job_id': media.job_id}
         else:
             media.status = MediaStatus.TRACKER_NOT_UPLOADED
