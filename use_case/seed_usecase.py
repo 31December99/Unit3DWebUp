@@ -29,34 +29,46 @@ class SeedUseCase:
         :return:
         """
 
-        self.media_list = media_list
-        # Create the media list for single torrent
-        if self.job_id and not self.media_list:
+        # Create the media list for single torrent based on the job_id
+        if self.job_id and not media_list:
             results = await self.app.state.job.get_job(job_id=self.job_id)
             self.media_list = [
                 Media.from_dict(item)
                 for item in [json.loads(results)]
             ]
+        else:
+            # Receive a list
+            self.media_list = media_list
 
-        torr_client_service: TorrentClientServiceInterface = await self.get_fact_client(name=self.client)
-        response = await torr_client_service.login()
-
-        # Login failed
-        if not response:
-            await self.send_message(f"{self.client} Login failed")
-            return False
-
-        # Verify that the *.torrent file still exists
-        results = [m.torrent_file_path for m in self.media_list if Path.exists(Path(m.torrent_file_path))]
+        # Verify if the *.torrent files still exist
+        filtered_torrent_list = []
+        for media in self.media_list:
+            if not Path.exists(Path(media.torrent_file_path)):
+                # notify the frontend
+                await self.send_message(media=media, message=f"Torrent file not found !")
+            else:
+                # discard the invalid torrent file
+                filtered_torrent_list.append(media)
 
         # Get the data path ( scan path)
         save_path = self.media_list[0].folder
 
         # Add torrents to the client
-        execution = await torr_client_service.add_torrents(results, save_path, app=self.app)
-        if execution:
-            await self.send_message(f"Added to {self.client}")
-            return True
+        if filtered_torrent_list:
+            # Ok - try to login
+            torr_client_service: TorrentClientServiceInterface = await self.get_fact_client(name=self.client)
+            response = await torr_client_service.login()
+
+            # Login failed
+            if not response:
+                await self.broadcast_messages(f"{self.client} Login failed")
+                return False
+
+            # Try to add torrents
+            execution = await torr_client_service.add_torrents(filtered_torrent_list, save_path, app=self.app)
+            if execution:
+                await self.broadcast_messages(f"Added to {self.client}")
+                return True
         return False
 
     @staticmethod
@@ -74,9 +86,9 @@ class SeedUseCase:
         # if name == "transmission": return TransmissionClientService(...)
         return None
 
-    async def send_message(self, message: str):
+    async def broadcast_messages(self, message: str):
         """
-        :param message: message to send to the frontend
+        :param message: Send the message to all posters
         :return:
         """
         for media in self.media_list:
@@ -84,3 +96,14 @@ class SeedUseCase:
                 "type": "posterLogMessage",
                 "job_id": media.job_id,
                 "message": message})
+
+    async def send_message(self, media: Media, message: str):
+        """
+        :param media: The current Media object
+        :param message: Send the message to single poster
+        :return:
+        """
+        await self.app.state.ws_manager.broadcast({
+            "type": "posterLogMessage",
+            "job_id": media.job_id,
+            "message": message})
