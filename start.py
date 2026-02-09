@@ -18,15 +18,14 @@ from services.media_service import MediaService, MediaService2
 from services.itt_tracker_service import ITTtrackerService
 from services.auto_async_service import AsyncMediaManager
 from services.interfaces import TrackerServiceInterface
-from services.torrent_service import TorrentService
 
 from use_case.scan_media_usecase import ScanMediaUseCase
 from use_case.process_all_usecase import ProcessAllUseCase
 from use_case.upload_usecase import UploadUseCase
 from use_case.seed_usecase import SeedUseCase
+from use_case.make_torrent_usecase import MakeTorrentUseCase
 
 from external.websocket import WebSocketManager
-from models.media import Media
 
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -376,21 +375,22 @@ async def process_all(payload: HttpRequest):
     :return: none
     """
 
-    use_case = ProcessAllUseCase(app=app,job_list_id=payload.job_list_id,
+    use_case = ProcessAllUseCase(app=app, job_list_id=payload.job_list_id,
                                  torrent_client_name=config.torrent_client_config.TORRENT_CLIENT)
     await use_case.execute()
 
 
 @app.post("/maketorrent")
 async def make(payload: HttpRequest):
-    results = [json.loads(await app.state.job.get_job(payload.job_id))]
-    media_list = [
-        Media.from_dict(item)
-        for item in results
-    ]
+    """
+    Create one or more torrent files
 
-    torrent_service = TorrentService(app=app)
-    await torrent_service.start(media_list=media_list)
+    :param payload: - job_id: Identifies each poster. Corresponds to Media.job_id -
+    :return: none
+    """
+
+    torrent_service = MakeTorrentUseCase(app=app, job_id=payload.job_id)
+    await torrent_service.execute()
 
 
 @app.post("/upload")
@@ -401,8 +401,6 @@ async def upload(payload: HttpRequest):
     :param payload: - job_id: Identifies each poster. Corresponds to Media.job_id -
     :return: none
     """
-
-    # Upload the single poster
     upload_service = UploadUseCase(app=app, job_id=payload.job_id)
     await upload_service.execute()
 
@@ -411,7 +409,7 @@ async def upload(payload: HttpRequest):
 async def seed(payload: HttpRequest):
     """
     :param payload:  - job_id: Identifies each poster. Corresponds to Media.job_id
-    :return:
+    :return: none
     """
     use_case = SeedUseCase(app=app, client=config.torrent_client_config.TORRENT_CLIENT, job_id=payload.job_id)
     await use_case.execute()
@@ -419,6 +417,13 @@ async def seed(payload: HttpRequest):
 
 @app.post("/setting")
 async def configuration(payload: HttpRequest):
+    """
+    load setting from the local configuration file
+
+    :param payload: - Job_id is fixed to zero
+    :return: none
+    """
+
     # Load json settings and return it to the client
     job_data = await app.state.job.get_job(job_id='0')
 
@@ -432,31 +437,62 @@ async def configuration(payload: HttpRequest):
 
 @app.post("/settmdbid")
 async def set_poster_id(payload: HttpRequest):
-    # Update TMDB ID
+    """
+    Set a Tmdb id ( for example when tmdb returns an empty result)
+
+    :param payload:  - job_id: Identifies each poster. Corresponds to Media.job_id
+    :return: none
+    """
+
     await update_poster(msg="TMDB", job_id=payload.job_id, field_id=payload.field_id, new_id=payload.new_id)
 
 
 @app.post("/settvdbid")
 async def set_tvdb_id(payload: HttpRequest):
-    # Update TVDB ID
+    """
+    Set a TVdb id (for example, when tvdb returns an empty result)
+
+    :param payload:  - job_id: Identifies each poster. Corresponds to Media.job_id
+    :return: none
+    """
+
     await update_poster(msg="TVDB", job_id=payload.job_id, field_id=payload.field_id, new_id=payload.new_id)
 
 
 @app.post("/setimdbid")
 async def set_imdb_id(payload: HttpRequest):
-    # Update IMDB ID
+    """
+    Set an Imdb id (for example, when the remote list of tvdb is empty)
+
+    :param payload:  - job_id: Identifies each poster. Corresponds to Media.job_id
+    :return: none
+    """
+
     await update_poster(msg="IMDB", job_id=payload.job_id, field_id=payload.field_id, new_id=payload.new_id)
 
 
 @app.post("/setposterurl")
 async def set_poster_url(payload: HttpRequest):
-    # Update TMDB Poster url
+    """
+    Set a poster url (for example, when tmdb returns an empty result. Only for fronte end)
+
+    :param payload:  - job_id: Identifies each poster. Corresponds to Media.job_id
+    :return: none
+    """
+
     await update_poster(msg="TMDB Poster Url", job_id=payload.job_id, field_id=payload.field_id, new_id=payload.new_id)
 
 
 @app.post("/setposterdname")
 async def set_poster_dname(payload: HttpRequest):
-    # Update TMDB Poster url
+    """
+    Set a poster display name (for example, if you dont like it)
+    Display name is the name shown on the dedicated torrent page
+
+    :param payload:  - job_id: Identifies each poster. Corresponds to Media.job_id
+    :return: none
+    """
+
     await update_poster(msg="Update DisplayName", job_id=payload.job_id, field_id=payload.field_id,
                         new_id=payload.new_id)
 
