@@ -86,9 +86,19 @@ class MediaService2:
             # Search for alternative title ( translations field)
             alternative = show.get_translations()
             title_ita = alternative.get('ita', None)
+            title_eng = alternative.get('eng', None)
+
             if title_ita:
                 if ManageTitles.fuzzyit(str1=media.guess_title, str2=ManageTitles.clean_text(title_ita)) > 95:
                     media.imdb_id_from_tvdb = show.get_imdb()
                     media.tvdb_id = show.get_id()
                     return True
+
+            # The result is not always in english
+            if title_eng:
+                if ManageTitles.fuzzyit(str1=media.guess_title, str2=ManageTitles.clean_text(title_eng)) > 95:
+                    media.imdb_id_from_tvdb = show.get_imdb()
+                    media.tvdb_id = show.get_id()
+                    return True
+
         return False
