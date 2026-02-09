@@ -64,8 +64,12 @@ class SeedUseCase:
                 await self.broadcast_messages(f"{self.client} Login failed")
                 return False
 
+            # Create a list of torrent paths
+            torrent_path_list = [m.torrent_file_path for m in filtered_torrent_list]
+
             # Try to add torrents
-            execution = await torr_client_service.add_torrents(filtered_torrent_list, save_path, app=self.app)
+            execution = await torr_client_service.add_torrents(torrent_path_list, save_path, app=self.app)
+
             if execution:
                 await self.broadcast_messages(f"Added to {self.client}")
                 return True

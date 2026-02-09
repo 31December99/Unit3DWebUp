@@ -73,6 +73,7 @@ class QbittorrentClientService(TorrentClientServiceInterface):
                 is_skip_checking=True
             )
         except qbittorrentapi.exceptions.TorrentFileError as e:
+            logging.debug(f"Add torrents {e}")
             return False
 
         return True
