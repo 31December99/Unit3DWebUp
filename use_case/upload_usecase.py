@@ -54,7 +54,7 @@ class UploadUseCase:
             logger.debug(f"Start Uploaded Torrents {uploaded_torrents}")
 
             # Send a message to frontend for each uploaded media
-            await self.send_message(uploaded_torrents=uploaded_torrents)
+            await self.broadcast_messages(uploaded_torrents=uploaded_torrents)
 
             for torrent in uploaded_torrents:
                 await self.app.state.ws_manager.broadcast({
@@ -63,7 +63,7 @@ class UploadUseCase:
                     "message": f"{torrent['message']}"})
         return True
 
-    async def send_message(self, uploaded_torrents: tuple[Any]) -> None:
+    async def broadcast_messages(self, uploaded_torrents: tuple[Any]) -> None:
         """
         :param uploaded_torrents: results message from the uploaded torrents
         :return:
