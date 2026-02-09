@@ -12,6 +12,7 @@ __pycache__/
 
 *.note
 notes
+UI
 
 # Distribution / packaging
 .Python
