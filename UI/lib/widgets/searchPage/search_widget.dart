@@ -35,7 +35,14 @@ class _SearchState extends State<Search> {
   @override
   Widget build(BuildContext context) {
     final posterProvider = context.read<PosterProvider>();
-    final settingProvider = context.watch<SettingProvider>();
+    // final settingProvider = context.watch<SettingProvider>();
+    /// context.watch replaced with context.select
+    /// Rebuild the widget Settings only if selectedScanpath01 changes
+    /// thanks to context.select
+    final selectedScanPath = context.select<SettingProvider, String>(
+      (p) => p.selectedScanpath01,
+    );
+
     final logProvider = context.read<LogProvider>();
 
     return Container(
@@ -92,7 +99,7 @@ class _SearchState extends State<Search> {
           /// as textbox
           SearchTextField(
             controller: _controller,
-            onSubmitted: (value) {  /// <--- Enter a keyword
+            onSubmitted: (value) {   /// <--- Enter a keyword
               /// As above , get job_list_id, talk to console, run endpoint
               final jobListId = posterProvider.posterItems[0].jobListId;
 
@@ -125,17 +132,22 @@ class _SearchState extends State<Search> {
             // },
             onClickScan: () {
               /// Scan endpoint
-              /// Passes SelectedScanpath01 that is the field value from the
+              /// Passes SelectedScanpath01 that is the field from the
               /// setting Page
 
+              // final String notifyString =
+              //     "Reloading ${settingProvider.selectedScanpath01}' Please wait...";
               final String notifyString =
-                  "Reloading ${settingProvider.selectedScanpath01}' Please wait...";
+                  "Reloading $selectedScanPath' Please wait...";
+
               logProvider.add(notifyString, LogLevel.info);
               showAppSnackBar(context, notifyString);
-              posterProvider.scan(
-                settingProvider.selectedScanpath01,
-                _controller.text,
-              );
+              posterProvider.scan(selectedScanPath, _controller.text);
+
+              // posterProvider.scan(
+              //   settingProvider.selectedScanpath01,
+              //   _controller.text,
+              // );
             },
             onClickTracker: (value) {
               /// Tracker endpoint
