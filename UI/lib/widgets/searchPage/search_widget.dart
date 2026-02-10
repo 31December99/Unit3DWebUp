@@ -56,7 +56,7 @@ class _SearchState extends State<Search> {
               /// Event button
               onPressed: () {
                 /// Every poster has a job_id and a job_list_id
-                final jobListId = posterProvider.posterItems[0].jobListId;
+                final jobListId = posterProvider.posterItems.first.jobListId;
 
                 /// Preparare a message for the console log ( the job Page)
                 final String notifyString =
@@ -99,9 +99,15 @@ class _SearchState extends State<Search> {
           /// as textbox
           SearchTextField(
             controller: _controller,
-            onSubmitted: (value) {   /// <--- Enter a keyword
+            /// Enter a keyword
+            onSubmitted: (value) {
+              // check if the list is empty
+              if (posterProvider.posterItems.isEmpty) {
+                return;
+              }
+
               /// As above , get job_list_id, talk to console, run endpoint
-              final jobListId = posterProvider.posterItems[0].jobListId;
+              final jobListId = posterProvider.posterItems.first.jobListId;
 
               /// Console log ( the job Page)
               final String notifyString =
@@ -114,50 +120,29 @@ class _SearchState extends State<Search> {
               /// Tracker Search in the results
               posterProvider.searchPoster(value);
             },
-            // onPressed: () {  ///
-            //
-            //   /// ...prepare the console message
-            //   final String notifyString =
-            //       "'Starting scan' ${settingProvider.selectedScanpath01}' Please wait...";
-            //
-            //   /// Talks to the console
-            //   logProvider.add(notifyString, LogLevel.info);
-            //
-            //   /// Pop message
-            //   showAppSnackBar(context, notifyString);
-            //   posterProvider.scan(
-            //     settingProvider.selectedScanpath01,
-            //     _controller.text,
-            //   );
-            // },
+
+            /// SCAN
             onClickScan: () {
-              /// Scan endpoint
               /// Passes SelectedScanpath01 that is the field from the
               /// setting Page
-
-              // final String notifyString =
-              //     "Reloading ${settingProvider.selectedScanpath01}' Please wait...";
               final String notifyString =
                   "Reloading $selectedScanPath' Please wait...";
 
               logProvider.add(notifyString, LogLevel.info);
               showAppSnackBar(context, notifyString);
               posterProvider.scan(selectedScanPath, _controller.text);
-
-              // posterProvider.scan(
-              //   settingProvider.selectedScanpath01,
-              //   _controller.text,
-              // );
             },
-            onClickTracker: (value) {
-              /// Tracker endpoint
-              /// Passes search value
 
+            /// TRACKER
+            onClickTracker: (value) {
+              /// Passes search value
               final String notifyString = "Searching... '$value' in tracker";
               logProvider.add(notifyString, LogLevel.info);
               showAppSnackBar(context, notifyString);
               posterProvider.searchPoster(value);
             },
+
+            /// DELETE
             onClickClear: () {
               /// Request to backend to delete job_list_id (Page)
               ///
