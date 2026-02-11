@@ -1,0 +1,33 @@
+import 'package:flutter/material.dart';
+import 'package:UI/widgets/jobsPage/jobs_container.dart';
+
+/// Main class for the console Log Jobs Page
+class JobsPage extends StatelessWidget {
+  const JobsPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(padding: EdgeInsets.all(16.0)),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [const SizedBox(width: 8)],
+                ),
+                const SizedBox(height: 8),
+                Expanded(child: JobsContainer()),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
