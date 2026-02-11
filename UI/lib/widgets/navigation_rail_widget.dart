@@ -1,20 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:UI/providers/providers.dart';
 
 /// Separate widget uses NavigationRail to build a lateral menù
 /// The user can click on a specific icon to navigate to the selected page
-class NavigationSwitchText extends StatelessWidget {
-  const NavigationSwitchText({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final posterProvider = context.watch<PosterProvider>();
-    return Text(posterProvider.selectedSource);
-  }
-}
-
 class NavigationRailMenu extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onSelect;
