@@ -1,0 +1,18 @@
+FROM python:3.12-slim
+WORKDIR /app
+
+COPY requirements.txt /app/
+RUN pip install --no-cache-dir -r requirements.txt
+
+# /// Copy backend
+COPY *.py /app/
+COPY config/ /app/config/
+COPY external/ /app/external/
+COPY models/ /app/models/
+COPY repositories/ /app/repositories/
+COPY services/ /app/services/
+COPY use_case/ /app/use_case/
+
+
+EXPOSE 8000
+CMD ["uvicorn", "start:app", "--host", "0.0.0.0", "--port", "8000"]
