@@ -87,6 +87,7 @@ class LogProvider extends ChangeNotifier {
     );
   }
 
+  /// not used
   void _reconnect() async {
     await Future.delayed(const Duration(seconds: 5));
   }
