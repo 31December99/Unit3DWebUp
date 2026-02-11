@@ -32,14 +32,29 @@ from fastapi.responses import JSONResponse
 from fastapi import WebSocket
 from fastapi import FastAPI
 from fastapi import status
-from pydantic import BaseModel
+from pydantic import BaseModel, constr
 import aiohttp
 import uvicorn
 
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
-REDIS_URL = "redis://localhost:6379"
+# Environment variabile in the container backend
+redis_host = os.getenv("REDIS_HOST", "localhost")
+redis_port = int(os.getenv("REDIS_PORT", 6379))
+
+# Development
+DEV = False
+# TODO use environment variable
+if DEV:
+    data_path = "/home/parzival/itt/upload"
+    watcher_path = "/home/parzival/itt/watcher"
+else:
+    data_path = "/app/upload"
+    watcher_path = "/app/watcher"
+
+# Build redis url
+REDIS_URL = f"redis://{redis_host}:{redis_port}"
 
 
 class RedisEventHandler(FileSystemEventHandler):
@@ -80,10 +95,10 @@ async def redis_event_consumer(app: FastAPI):
         event = await queue.get()
         try:
             app.state.folder_event = event
-            # TODO:
             # For the moment the watcher folder is hardcoded
-            relative = Path(app.state.folder_event['path']).relative_to(Path("/home/parzival/ts watcher"))
-            new_path = os.path.join("/home/parzival/ts watcher", relative.parts[0])
+            # local
+            relative = Path(app.state.folder_event['path']).relative_to(Path(watcher_path))
+            new_path = os.path.join(watcher_path, relative.parts[0])
 
             # Send logs to the client
             await app.state.ws_manager.broadcast({
@@ -156,8 +171,9 @@ async def lifespan(app: FastAPI):
     # Start to watch
     # TODO:
     # For the moment the watcher folder is hardcoded
-    observer.schedule(handler, "/home/parzival/ts watcher", recursive=True)
+    observer.schedule(handler, watcher_path, recursive=True)
     observer.start()
+    # /home/parzival/itt/watcher
 
     # Create a consumer that works in the background
     consumer_task = asyncio.create_task(redis_event_consumer(app))
