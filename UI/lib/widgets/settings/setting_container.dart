@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:UI/providers/providers.dart';
 import 'package:UI/widgets/settings/setting_tab_views.dart';
 
-/// Main class for the SettingPage
+/// Container class for the SettingPage
 class Setting extends StatefulWidget {
   const Setting({super.key});
 

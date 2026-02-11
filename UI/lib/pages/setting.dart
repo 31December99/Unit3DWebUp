@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:UI/widgets/settings/setting_container.dart';
 
-/// Classe per leggere la configurazione dal backend (SettingPage)
-///
+/// Main class for the SettingPage
 class SettingPage extends StatelessWidget {
   const SettingPage({super.key});
 
