@@ -3,7 +3,7 @@
 import json
 import os
 import signal
-from config import logger
+from config.logger import get_logger
 from fastapi import FastAPI
 
 from repositories.interfaces import JobRepositoryInterface
@@ -28,6 +28,7 @@ class JobRedisRepo(JobRepositoryInterface):
         :param url: Redis server url
         """
         self.redis = redis.from_url(url, decode_responses=True)
+        self.logger = get_logger(self.__class__.__name__)
 
     async def connect(self, app: FastAPI) -> Redis | None:
         """
@@ -40,7 +41,7 @@ class JobRedisRepo(JobRepositoryInterface):
             if await self.redis.ping(): print("INfO:     DB connected to redis://localhost:6379")
             return self.redis
         except redis_exceptions.ConnectionError as e:
-            logger.debug("Database connection error")
+            self.logger.error("Database connection error")
             os.kill(os.getpid(), signal.SIGTERM)
             return None
 
