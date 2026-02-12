@@ -4,6 +4,7 @@ import aiohttp
 
 from repositories.interfaces import JobRepositoryInterface
 from config.constants import MediaStatus
+from config.logger import get_logger
 
 from services.video_service import VideoService, BuildService
 from services.media_service import MediaService, MediaService2
@@ -37,6 +38,7 @@ class ScanMediaUseCase:
         self.job_repo = job_repo
         self.session = session
         self.job_list = job_list
+        self.logger = get_logger(self.__class__.__name__)
 
     async def execute(self):
 
@@ -119,7 +121,7 @@ class ScanMediaUseCase:
     async def _handle_error(self, media, status, error):
         media.status = status
         media.error = str(error)
-        print(status, media.error)
+        self.logger.error(f"{status} {media.error}")
         await self._save(media)
 
     async def _save(self, media):
