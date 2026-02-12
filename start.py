@@ -8,9 +8,10 @@ import time
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from config.settings import Load, DEFAULT_JSON_PATH
+from config.settings import get_settings
 from config.constants import MediaStatus
 from config import logger
+
 from repositories.job_repos import JobRedisRepo
 from repositories.db_online import Tmdb, Tvdb
 
@@ -44,7 +45,7 @@ redis_host = os.getenv("REDIS_HOST", "localhost")
 redis_port = int(os.getenv("REDIS_PORT", 6379))
 
 # Development
-DEV = False
+DEV = True
 # TODO use environment variable
 if DEV:
     data_path = "/home/parzival/itt/upload"
@@ -142,7 +143,8 @@ async def lifespan(app: FastAPI):
     """
 
     # Load the configuration file
-    app.state.config = Load().load_config()
+    settings = get_settings()
+    app.state.settings = settings
 
     # Create a new state for the watcher queue
     app.state.redis_events = asyncio.Queue()
@@ -156,7 +158,7 @@ async def lifespan(app: FastAPI):
 
     # Create a new profile from user_preferences Job_id is '0'
     # Later will be recalled from the setting endpoint
-    await job.create_profile(dict(config.user_preferences))
+    await job.create_profile(dict(settings.prefs))
 
     # The WebSocket. Send to client progress bar value( Torrent creation) and short log message
     app.state.ws_manager = WebSocketManager()
@@ -173,8 +175,6 @@ async def lifespan(app: FastAPI):
     # For the moment the watcher folder is hardcoded
     observer.schedule(handler, watcher_path, recursive=True)
     observer.start()
-    # /home/parzival/itt/watcher
-
     # Create a consumer that works in the background
     consumer_task = asyncio.create_task(redis_event_consumer(app))
 
@@ -392,7 +392,7 @@ async def process_all(payload: HttpRequest):
     """
 
     use_case = ProcessAllUseCase(app=app, job_list_id=payload.job_list_id,
-                                 torrent_client_name=config.torrent_client_config.TORRENT_CLIENT)
+                                 torrent_client_name=app.state.settings.torrent.TORRENT_CLIENT)
     await use_case.execute()
 
 
@@ -427,7 +427,7 @@ async def seed(payload: HttpRequest):
     :param payload:  - job_id: Identifies each poster. Corresponds to Media.job_id
     :return: none
     """
-    use_case = SeedUseCase(app=app, client=config.torrent_client_config.TORRENT_CLIENT, job_id=payload.job_id)
+    use_case = SeedUseCase(app=app, client=app.state.settings.tracker.TORRENT_CLIENT, job_id=payload.job_id)
     await use_case.execute()
 
 
@@ -536,16 +536,13 @@ async def filter_search(payload: HttpRequest):
         )
 
 
-config = Load().load_config()
-
-
 def main():
+    settings = get_settings()
     logger.info("\nChecking Unit3D configuration file..\n")
-    logger.info(f"Configuration       -> '{DEFAULT_JSON_PATH}'")
-    logger.info(f"torrent Archive     -> '{config.user_preferences.TORRENT_ARCHIVE_PATH}'")
-    logger.info(f"Images,Tmdb cache   -> '{config.user_preferences.CACHE_PATH}'")
-    logger.info(f"Watcher Path        -> '{config.user_preferences.WATCHER_PATH}'")
-    logger.info(f"Watcher Dest. Path  -> '{config.user_preferences.WATCHER_DESTINATION_PATH}'\n")
+    logger.info(f"torrent Archive     -> '{settings.prefs.TORRENT_ARCHIVE_PATH}'")
+    logger.info(f"Images,Tmdb cache   -> '{settings.prefs.CACHE_PATH}'")
+    logger.info(f"Watcher Path        -> '{settings.prefs.WATCHER_PATH}'")
+    logger.info(f"Watcher Dest. Path  -> '{settings.prefs.WATCHER_DESTINATION_PATH}'\n")
 
     uvicorn.run("start:app", host="127.0.0.1", port=8000, reload=False)
 
