@@ -1,16 +1,19 @@
 import aiohttp
 
-from config import logger
+from config.logger import get_logger
+
 
 class AsyncHttpClient:
     """
      basic Async HTTP client
     """
+
     def __init__(self, session: aiohttp.ClientSession | None = None):
         """
         :param session: aiohttp.ClientSession | None
         """
         self.session = session or aiohttp.ClientSession()
+        self.logger = get_logger(self.__class__.__name__)
 
     async def __aenter__(self):
         self.session = aiohttp.ClientSession()
@@ -31,7 +34,7 @@ class AsyncHttpClient:
                     return await resp.json()
                 return None
         except Exception as e:
-            logger.debug(f"[HTTP ERROR] {e} | URL: {url}")
+            self.logger.error(f"[HTTP ERROR] {e} | URL: {url}")
             return None
 
     async def post(self, url: str, data: dict = None):
@@ -41,5 +44,5 @@ class AsyncHttpClient:
                     return await resp.json()
                 return None
         except Exception as e:
-            logger.debug(f"[HTTP ERROR] {e} | URL: {url}")
+            self.logger.error(f"[HTTP ERROR] {e} | URL: {url}")
             return None
