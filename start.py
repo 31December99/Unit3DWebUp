@@ -10,7 +10,7 @@ from pathlib import Path
 
 from config.settings import get_settings
 from config.constants import MediaStatus
-from config import logger
+from config.logger import get_logger
 
 from repositories.job_repos import JobRedisRepo
 from repositories.db_online import Tmdb, Tvdb
@@ -92,6 +92,9 @@ async def redis_event_consumer(app: FastAPI):
     # > The queue :|
     queue = app.state.redis_events
 
+    # Logger
+    logger = get_logger("settings_logger")
+
     while True:
         event = await queue.get()
         try:
@@ -120,6 +123,9 @@ async def update_poster(msg: str, job_id: str, field_id: str, new_id: str):
     # Update the Media status
     await app.state.job.update_job(job_id=job_id, new_data={'status': str(MediaStatus.DB_IDENTIFIED)})
 
+    # Logger
+    logger = get_logger("settings_logger")
+
     # Console message
     logger.info(f"-> Update {msg} JOB_ID: {job_id}\n")
 
@@ -141,10 +147,20 @@ async def lifespan(app: FastAPI):
     :param app: FastAPI
     :return: None
     """
+    # Logger
+    logger = get_logger("settings_logger")
 
     # Load the configuration file
     settings = get_settings()
     app.state.settings = settings
+
+    # Check configuration file (only once because get_settings() is cached)
+    for field_name, field in settings.tracker.model_fields.items():
+        # optional field (default=None)
+        if field.default is None:
+            value = getattr(settings.tracker, field_name)
+            if value is None:
+                logger.warning(f"{field_name} not set in .env – related feature may be disabled")
 
     # Create a new state for the watcher queue
     app.state.redis_events = asyncio.Queue()
@@ -254,6 +270,9 @@ async def clear_job_list_id(payload: HttpRequest):
     # Carica la joblist per ottenere il percorso e inviarlo a log. Mi sembra troppo per una stampa
     job_list = await app.state.job.get_job_list(job_id=payload.job_list_id)
     results = [json.loads(await app.state.job.get_job(job_id)) for job_id in job_list]
+
+    # Logger
+    logger = get_logger("settings_logger")
 
     # Delete the job List
     await app.state.job.delete_job_list(job_id=payload.job_list_id)
@@ -427,7 +446,7 @@ async def seed(payload: HttpRequest):
     :param payload:  - job_id: Identifies each poster. Corresponds to Media.job_id
     :return: none
     """
-    use_case = SeedUseCase(app=app, client=app.state.settings.tracker.TORRENT_CLIENT, job_id=payload.job_id)
+    use_case = SeedUseCase(app=app, client=app.state.settings.torrent.TORRENT_CLIENT, job_id=payload.job_id)
     await use_case.execute()
 
 
@@ -538,6 +557,8 @@ async def filter_search(payload: HttpRequest):
 
 def main():
     settings = get_settings()
+    # Logger
+    logger = get_logger("settings_logger")
     logger.info("\nChecking Unit3D configuration file..\n")
     logger.info(f"torrent Archive     -> '{settings.prefs.TORRENT_ARCHIVE_PATH}'")
     logger.info(f"Images,Tmdb cache   -> '{settings.prefs.CACHE_PATH}'")
