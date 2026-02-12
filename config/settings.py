@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
-
+import os
 from functools import lru_cache
 from enum import Enum
 from pathlib import Path
 
+from config.logger import get_logger
+
 from pydantic import BaseModel, field_validator, model_validator, HttpUrl, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
 
 
 # /// Class to help avoid typos...
@@ -14,7 +15,6 @@ class TorrentClient(str, Enum):
     qbittorrent = "qbittorrent"
     transmission = "transmission"
     rtorrent = "rtorrent"
-
 
 
 # /// Check for missing value
@@ -26,7 +26,6 @@ class BaseConfigModel(BaseModel):
         if v == "":
             return None
         return v
-
 
 
 # /// TRACKER CONFIG
@@ -65,7 +64,6 @@ class TrackerConfig(BaseConfigModel):
             if v is not None and len(v) < 5:
                 raise ValueError(f"{info.field_name} too short")
         return v
-
 
 
 # /// TORRENT CLIENT CONFIG
@@ -125,7 +123,6 @@ class TorrentClientConfig(BaseConfigModel):
             if not self.RTORR_HOST:
                 raise ValueError("rtorrent selected but no host has been configured")
         return self
-
 
 
 # /// USER PREFERENCES
@@ -208,4 +205,18 @@ def get_settings() -> Settings:
     """
     :return: settings cached
     """
-    return Settings()
+    settings = Settings()
+
+    # Check the user folders
+    prefs = settings.prefs
+    tracker = settings.tracker
+
+    logger = get_logger(__name__)
+
+    for tracker_name in tracker.MULTI_TRACKER:
+        path = Path(prefs.TORRENT_ARCHIVE_PATH) / tracker_name.upper()
+        if not path.exists():
+            logger.warning(f"Create default torrent archive path: {prefs.TORRENT_ARCHIVE_PATH}")
+            os.makedirs(path, exist_ok=True)
+
+    return settings
