@@ -5,7 +5,7 @@ import json
 from repositories.media_info_factory import MediaFileFactory
 from services.utility import ManageTitles
 from config.constants import MediaStatus
-from config import logger
+from config.logger import get_logger
 from models.media import Media
 
 from fastapi import FastAPI
@@ -30,6 +30,7 @@ class AsyncMediaManager:
         self.is_dir = os.path.isdir(self.path)
         self.media_list: list[Media] = []
         self.sem = asyncio.Semaphore(60)
+        self.logger = get_logger(self.__class__.__name__)
 
     @staticmethod
     def scan_folder(path: str):
@@ -66,7 +67,7 @@ class AsyncMediaManager:
             list[str]: a list of media objects
         """
         if not self.is_dir:
-            logger.debug(f"We can't scan a file {self.path}")
+            self.logger.warning(f"We can't scan a file {self.path}")
             return []
 
         entries = await asyncio.to_thread(os.listdir, self.path)
@@ -132,7 +133,7 @@ class AsyncMediaManager:
         elif os.path.isfile(path):
             success = await self.process_file(media)
         else:
-            logger.debug("Process Media return None")
+            self.logger.warning("Process Media return None")
             return None
 
         # Add a Mediainfo object
