@@ -44,16 +44,6 @@ from watchdog.events import FileSystemEventHandler
 redis_host = os.getenv("REDIS_HOST", "localhost")
 redis_port = int(os.getenv("REDIS_PORT", 6379))
 
-# Development
-DEV = True
-# TODO use environment variable
-if DEV:
-    data_path = "/home/parzival/itt/upload"
-    watcher_path = "/home/parzival/itt/watcher"
-else:
-    data_path = "/app/upload"
-    watcher_path = "/app/watcher"
-
 # Build redis url
 REDIS_URL = f"redis://{redis_host}:{redis_port}"
 
@@ -95,14 +85,15 @@ async def redis_event_consumer(app: FastAPI):
     # Logger
     logger = get_logger("settings_logger")
 
+    # Select Dev or Docker
+    watcher_path = app.state.settings.prefs.WATCHER_PATH if os.getenv("RUNNING_IN_DOCKER") == "1" else "/app/watcher"
+
     while True:
         event = await queue.get()
         try:
             app.state.folder_event = event
-            # For the moment the watcher folder is hardcoded
-            # local
             relative = Path(app.state.folder_event['path']).relative_to(Path(watcher_path))
-            new_path = os.path.join(watcher_path, relative.parts[0])
+            new_path = os.path.join(app.state.settings.prefs.WATCHER_PATH, relative.parts[0])
 
             # Send logs to the client
             await app.state.ws_manager.broadcast({
@@ -179,6 +170,9 @@ async def lifespan(app: FastAPI):
     # The WebSocket. Send to client progress bar value( Torrent creation) and short log message
     app.state.ws_manager = WebSocketManager()
 
+    # Select Dev or Docker
+    watcher_path = app.state.settings.prefs.WATCHER_PATH if os.getenv("RUNNING_IN_DOCKER") == "1" else "/app/watcher"
+
     # Watcher zone
     # Shared event
     app.state.folder_event = None
@@ -187,12 +181,19 @@ async def lifespan(app: FastAPI):
     # Callback
     handler = RedisEventHandler(app)
     # Start to watch
-    # TODO:
-    # For the moment the watcher folder is hardcoded
     observer.schedule(handler, watcher_path, recursive=True)
     observer.start()
     # Create a consumer that works in the background
     consumer_task = asyncio.create_task(redis_event_consumer(app))
+
+    # Main folder
+    logger = get_logger("settings_logger")
+    logger.info("\nChecking Unit3D configuration file..\n")
+    logger.info(f"Scan Path            -> '{settings.prefs.SCAN_PATH}'\n")
+    logger.info(f"Torrent Archive Path -> '{settings.prefs.TORRENT_ARCHIVE_PATH}'")
+    logger.info(f"Cache Path           -> '{settings.prefs.CACHE_PATH}'")
+    logger.info(f"Watcher Path         -> '{settings.prefs.WATCHER_PATH}'")
+    logger.info(f"Watcher Dest. Path   -> '{settings.prefs.WATCHER_DESTINATION_PATH}'\n")
 
     # Goes..
     yield
@@ -464,6 +465,7 @@ async def configuration(payload: HttpRequest):
 
     # Get data
     user_prefs = json.loads(job_data)
+
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content={"userPreferences": user_prefs}
@@ -556,15 +558,6 @@ async def filter_search(payload: HttpRequest):
 
 
 def main():
-    settings = get_settings()
-    # Logger
-    logger = get_logger("settings_logger")
-    logger.info("\nChecking Unit3D configuration file..\n")
-    logger.info(f"torrent Archive     -> '{settings.prefs.TORRENT_ARCHIVE_PATH}'")
-    logger.info(f"Images,Tmdb cache   -> '{settings.prefs.CACHE_PATH}'")
-    logger.info(f"Watcher Path        -> '{settings.prefs.WATCHER_PATH}'")
-    logger.info(f"Watcher Dest. Path  -> '{settings.prefs.WATCHER_DESTINATION_PATH}'\n")
-
     uvicorn.run("start:app", host="127.0.0.1", port=8000, reload=False)
 
 
