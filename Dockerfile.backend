@@ -1,6 +1,9 @@
 FROM python:3.12-slim
 WORKDIR /app
 
+# Exists when running inside Docker
+ENV RUNNING_DOCKER=1
+
 # /// FFMPEG / Poppler (PDF)
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
