@@ -33,9 +33,9 @@ class Myhttp:
         self.api_token = api_data["api_key"]
 
         # Endpoints
-        self.upload_url = urljoin(self.base_url, "api/torrents/upload")
-        self.filter_url = urljoin(self.base_url, "api/torrents/filter")
-        self.fetch_url = urljoin(self.base_url, "api/torrents/")
+        self.upload_url = urljoin(str(self.base_url), "api/torrents/upload")
+        self.filter_url = urljoin(str(self.base_url), "api/torrents/filter")
+        self.fetch_url = urljoin(str(self.base_url), "api/torrents/")
 
         self.headers = {
             "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
@@ -70,7 +70,6 @@ class Myhttp:
 
     async def close(self):
         await self.session.close()
-
 
 
 class Tracker(Myhttp):
@@ -140,7 +139,6 @@ class Tracker(Myhttp):
         ) as resp:
             resp.raise_for_status()
             return await resp.json()
-
 
     # Main endpoints fetch by id
     async def _fetch_id(self, torrent_id: int):
@@ -260,7 +258,6 @@ class filterAPI(Tracker):
         })
 
 
-
 class Torrents(Tracker):
     """
       TORRENTS
@@ -314,11 +311,11 @@ class Uploader(Tracker):
         return io.BytesIO(b"Error: Unable to decode NFO file")
 
 
-
 class Unit3D(filterAPI, Torrents, Uploader):
     """
     UNIT3D - calls
     """
+
     async def get_tmdb(self, tmdb_id: int, perPage: int = None):
         return await self.tmdb(tmdb_id=tmdb_id, perPage=perPage)
 
