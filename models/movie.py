@@ -6,7 +6,7 @@ import json
 from dataclasses import dataclass, field
 from typing import Any
 
-from config import logger
+from config.logger import get_logger
 from models.interfaces import MediaRepoInterface
 
 
@@ -261,6 +261,7 @@ class MovieReleaseInfo:
 
         iso_3166_1 = data.get("iso_3166_1")
         release_dates = data.get("release_dates", {})
+        logger = get_logger(cls.__name__)
 
         # Validate country code
         if iso_3166_1 is not None:
