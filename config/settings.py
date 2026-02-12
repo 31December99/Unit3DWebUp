@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
-import os
 from functools import lru_cache
 from enum import Enum
 from pathlib import Path
-
-from config.logger import get_logger
 
 from pydantic import BaseModel, field_validator, model_validator, HttpUrl, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -147,6 +144,7 @@ class UserPreferences(BaseConfigModel):
     WATCHER_PATH: str | None = None
     WATCHER_DESTINATION_PATH: str | None = None
     TORRENT_ARCHIVE_PATH: str | None = None
+    SCAN_PATH: str | None = None
     CACHE_PATH: str | None = None
     COMPRESS_SCSHOT: int = 4
     RESIZE_SCSHOT: bool = False
@@ -164,6 +162,7 @@ class UserPreferences(BaseConfigModel):
         "WATCHER_DESTINATION_PATH",
         "TORRENT_ARCHIVE_PATH",
         "CACHE_PATH",
+        "SCAN_PATH",
         mode="before"
     )
     @classmethod
@@ -205,18 +204,4 @@ def get_settings() -> Settings:
     """
     :return: settings cached
     """
-    settings = Settings()
-
-    # Check the user folders
-    prefs = settings.prefs
-    tracker = settings.tracker
-
-    logger = get_logger(__name__)
-
-    for tracker_name in tracker.MULTI_TRACKER:
-        path = Path(prefs.TORRENT_ARCHIVE_PATH) / tracker_name.upper()
-        if not path.exists():
-            logger.warning(f"Create default torrent archive path: {prefs.TORRENT_ARCHIVE_PATH}")
-            os.makedirs(path, exist_ok=True)
-
-    return settings
+    return Settings()
