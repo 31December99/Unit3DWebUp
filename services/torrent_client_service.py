@@ -8,6 +8,7 @@ logging.getLogger("urllib3.connectionpool").setLevel(logging.DEBUG)
 
 from services.interfaces import TorrentClientServiceInterface
 from config.settings import get_settings
+from config.logger import get_logger
 
 import qbittorrentapi
 from qbittorrentapi import APIConnectionError
@@ -23,6 +24,7 @@ class QbittorrentClientService(TorrentClientServiceInterface):
     def __init__(self):
         self.qbt_client = None
         self._logged = False
+        self.logger = get_logger(self.__class__.__name__)
 
     async def login(self) -> bool:
         """
@@ -43,14 +45,14 @@ class QbittorrentClientService(TorrentClientServiceInterface):
         try:
             await asyncio.to_thread(self.qbt_client.auth_log_in)
             self._logged = True
-            print("Login successfully")
+            self.logger.info("Login successfully")
             return True
 
         except qbittorrentapi.LoginFailed:
-            print("Login failed")
+            self.logger.error("Login failed")
             return False
         except APIConnectionError:
-            print("Qbittorrent not respond")
+            self.logger.error("Qbittorrent not respond")
             return False
 
     async def add_torrents(self, torrent_paths: list[str], save_path: str, app: FastAPI) -> bool:
@@ -73,7 +75,7 @@ class QbittorrentClientService(TorrentClientServiceInterface):
                 is_skip_checking=True
             )
         except qbittorrentapi.exceptions.TorrentFileError as e:
-            logging.debug(f"Add torrents {e}")
+            logging.info(f"Add torrents {e}")
             return False
 
         return True
