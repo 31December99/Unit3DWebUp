@@ -317,7 +317,10 @@ async def scan(payload: HttpRequest) -> JSONResponse:
     start_time = time.perf_counter()
 
     # Get the id for the current path
-    job_list_id = hashlib.sha256(payload.path.encode()).hexdigest()
+    job_list_id = hashlib.sha256(app.state.settings.prefs.SCAN_PATH.encode()).hexdigest()
+
+    # Select Dev or Docker
+    scan_path = app.state.settings.prefs.SCAN_PATH if os.getenv("RUNNING_IN_DOCKER") == "1" else "/app/scan"
 
     # Load the jobs list using the previous id
     job_list = await app.state.job.get_job_list(job_id=job_list_id)
@@ -332,7 +335,7 @@ async def scan(payload: HttpRequest) -> JSONResponse:
     async with aiohttp.ClientSession() as session:
 
         manager = AsyncMediaManager(
-            path=payload.path,
+            path=scan_path,
             app=app,
             job_id_list=job_list_id
         )
