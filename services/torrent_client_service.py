@@ -7,12 +7,12 @@ from fastapi import FastAPI
 logging.getLogger("urllib3.connectionpool").setLevel(logging.DEBUG)
 
 from services.interfaces import TorrentClientServiceInterface
-from config.settings import Load
+from config.settings import get_settings
 
 import qbittorrentapi
 from qbittorrentapi import APIConnectionError
 
-config_settings = Load().load_config()
+settings = get_settings()
 
 
 class QbittorrentClientService(TorrentClientServiceInterface):
@@ -32,10 +32,10 @@ class QbittorrentClientService(TorrentClientServiceInterface):
             return True
 
         conn_info = dict(
-            host=config_settings.torrent_client_config.QBIT_HOST,
-            port=config_settings.torrent_client_config.QBIT_PORT,
-            username=config_settings.torrent_client_config.QBIT_USER,
-            password=config_settings.torrent_client_config.QBIT_PASS,
+            host=settings.torrent.QBIT_HOST,
+            port=settings.torrent.QBIT_PORT,
+            username=settings.torrent.QBIT_USER,
+            password=settings.torrent.QBIT_PASS,
         )
 
         self.qbt_client = qbittorrentapi.Client(**conn_info)

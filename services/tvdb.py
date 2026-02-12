@@ -5,11 +5,11 @@ from models.tvdb_search import TvdbSearchResult
 from models.interfaces import MediaRepoInterface
 
 from external.async_http_client_service import AsyncHttpClient
-from config.settings import Load
+from config.settings import get_settings
 
 import aiohttp
 
-config_settings = Load().load_config()
+settings = get_settings()
 T = TypeVar('T')
 
 
@@ -19,7 +19,7 @@ class TvdbAsyncAPI:
         :param session: an active aiohttp session
         """
         # Use the apikey received from the website (apikey for project)
-        self.api_key = config_settings.tracker_config.TVDB_APIKEY
+        self.api_key = settings.tracker.TVDB_APIKEY
         # get a new session
         self.session = session or aiohttp.ClientSession()
         # an http async client instance

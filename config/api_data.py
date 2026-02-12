@@ -1,27 +1,27 @@
 # -*- coding: utf-8 -*-
 
 # Same as the old code 08.21
-from config.settings import Load
+from config.settings import get_settings
 
-config_settings = Load.load_config()
+settings = get_settings()
 
 # Get data based on tracker name. For example itt e sis
 trackers_api_data = {
     'ITT':
         {
-            "url": config_settings.tracker_config.ITT_URL,
-            "api_key": config_settings.tracker_config.ITT_APIKEY,
-            "pass_key": config_settings.tracker_config.ITT_PID,
-            "announce": f"{config_settings.tracker_config.ITT_URL}/announce/{config_settings.tracker_config.ITT_PID}",
+            "url": settings.tracker.ITT_URL,
+            "api_key": settings.tracker.ITT_APIKEY,
+            "pass_key": settings.tracker.ITT_PID,
+            "announce": f"{settings.tracker.ITT_URL}/announce/{settings.tracker.ITT_PID}",
             "source": "ItaTorrents",
         }
     ,
     'SIS':
         {
-            "url": config_settings.tracker_config.SIS_URL,
-            "api_key": config_settings.tracker_config.SIS_APIKEY,
-            "pass_key": config_settings.tracker_config.SIS_PID,
-            "announce": f"{config_settings.tracker_config.SIS_URL}/announce/{config_settings.tracker_config.SIS_PID}",
+            "url": settings.tracker.SIS_URL,
+            "api_key": settings.tracker.SIS_APIKEY,
+            "pass_key": settings.tracker.SIS_PID,
+            "announce": f"{settings.tracker.SIS_URL}/announce/{settings.tracker.SIS_PID}",
             "source": "ShareIsland",
         }
 

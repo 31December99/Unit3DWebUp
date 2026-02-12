@@ -8,10 +8,10 @@ from config.tags import crew_patterns, platform_patterns
 from services.utility import ManageTitles, System
 from models.media_info import MediaFile
 from config.constants import MediaStatus
-from config.settings import Load
+from config.settings import get_settings
 from services import utility
 
-config_settings = Load().load_config()
+settings = get_settings()
 
 
 class Media:
@@ -31,7 +31,7 @@ class Media:
         self.subfolder: str = subfolder
         self.title: str = os.path.basename(os.path.join(self.folder, self.subfolder))
         self.torrent_file_path: str = os.path.join(
-            config_settings.user_preferences.TORRENT_ARCHIVE_PATH,
+            settings.prefs.TORRENT_ARCHIVE_PATH,
             'ITT',
             f"{self.title}.torrent"
         )

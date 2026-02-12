@@ -6,13 +6,13 @@ from pathlib import Path
 from services.interfaces import TorrentServiceInterface
 from config.api_data import trackers_api_data
 from config.constants import MediaStatus
-from config.settings import Load
+from config.settings import get_settings
 from models.media import Media
 
 from fastapi import FastAPI
 import torf
 
-config_settings = Load().load_config()
+settings = get_settings()
 
 
 def worker(args) -> dict:
@@ -27,7 +27,7 @@ def worker(args) -> dict:
     ]
 
     mytorr = torf.Torrent(path=torrent_path, trackers=announces)
-    mytorr.comment = config_settings.user_preferences.TORRENT_COMMENT
+    mytorr.comment = settings.prefs.TORRENT_COMMENT
     mytorr.name = torrent_name
     mytorr.created_by = ""
     mytorr.private = True
@@ -70,7 +70,7 @@ class MyTorrentService(TorrentServiceInterface):
     def _create_batch(self, media_list: list[Media], trackers: list[str] = None, workers: int = None,
                       progress_queue=None):
         workers = workers or cpu_count()
-        archive_path = config_settings.user_preferences.TORRENT_ARCHIVE_PATH or '.'
+        archive_path = settings.prefs.TORRENT_ARCHIVE_PATH or '.'
 
         with Manager() as manager:
             if progress_queue is None:

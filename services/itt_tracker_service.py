@@ -4,7 +4,7 @@ from pathlib import Path
 
 from config.constants import MediaStatus
 from config.trackers import TRACKData
-from config.settings import Load
+from config.settings import get_settings
 
 from services.interfaces import TrackerServiceInterface
 from services.itt_tracker_helper import Unit3D
@@ -14,7 +14,7 @@ from models.media import Media
 from fastapi import FastAPI
 import aiohttp
 
-config = Load().load_config()
+config = get_settings()
 
 
 class ITTtrackerService(TrackerServiceInterface):
@@ -47,7 +47,7 @@ class ITTtrackerService(TrackerServiceInterface):
             "tvdb": media.tvdb_id if media.tvdb_id and media.category == 'series' else None,
             "keywords": media.keyword,
             "category_id": self.tracker_data.category.get(media.category),
-            "anonymous": int(config.user_preferences.ANON),
+            "anonymous": int(config.prefs.ANON),
             "resolution_id": self.tracker_data.resolution.get(media.resolution),
             "mediainfo": media.media_to_string,
             "description": media.description,
@@ -55,7 +55,7 @@ class ITTtrackerService(TrackerServiceInterface):
             "type_id": self.tracker_data.filter_type(media.file_name),
             "season_number": media.guess_season or "",
             "episode_number": media.guess_episode or "",
-            "personal_release": int(config.user_preferences.PERSONAL_RELEASE)
+            "personal_release": int(config.prefs.PERSONAL_RELEASE)
         }
 
     async def upload(self, media: Media) -> dict:
@@ -67,7 +67,7 @@ class ITTtrackerService(TrackerServiceInterface):
         payload = await self.prepare_payload(media)
 
         # Build the torrent file path
-        archive = os.path.join(config.user_preferences.TORRENT_ARCHIVE_PATH, self.tracker_name)
+        archive = os.path.join(config.prefs.TORRENT_ARCHIVE_PATH, self.tracker_name)
         torrent_filepath: Path = (Path(archive) / f"{media.torrent_name}.torrent")
 
         # Load the file and send to the tracker

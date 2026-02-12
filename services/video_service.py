@@ -11,7 +11,7 @@ from services.interfaces import VideoServiceInterface, DescriptionBuilderInterfa
 from config.host_data import upload_hosts, priority_map, master_uploaders
 from external.async_http_client_service import AsyncHttpClient
 from config.constants import MediaStatus
-from config.settings import Load
+from config.settings import get_settings
 from models.media import Media
 
 from pymediainfo import MediaInfo
@@ -19,7 +19,7 @@ from aiohttp import FormData
 import numpy as np
 import asyncio
 
-config_settings = Load().load_config()
+settings = get_settings()
 
 
 # Based on the old code unit3dup 0.8.21
@@ -209,16 +209,16 @@ class VideoService(VideoServiceInterface):
         self.display_name: str = media.display_name
         self.webp_filepath: str | None = None
 
-        if config_settings.user_preferences.WEBP_ENABLED:
-            self.webp_filepath = os.path.join(config_settings.user_preferences.CACHE_PATH, f"{media.display_name}.webp")
+        if settings.prefs.WEBP_ENABLED:
+            self.webp_filepath = os.path.join(settings.prefs.CACHE_PATH, f"{media.display_name}.webp")
 
         # Load the video frames
         # if web_enabled is off set the number of screenshots to an even number
-        if not config_settings.user_preferences.WEBP_ENABLED:
-            if config_settings.user_preferences.NUMBER_OF_SCREENSHOTS % 2 != 0:
-                config_settings.user_preferences.NUMBER_OF_SCREENSHOTS += 1
+        if not settings.prefs.WEBP_ENABLED:
+            if settings.prefs.NUMBER_OF_SCREENSHOTS % 2 != 0:
+                settings.prefs.NUMBER_OF_SCREENSHOTS += 1
 
-        samples_n = max(2, min(config_settings.user_preferences.NUMBER_OF_SCREENSHOTS, 10))
+        samples_n = max(2, min(settings.prefs.NUMBER_OF_SCREENSHOTS, 10))
         self.video_frames: VideoFrame = VideoFrame(video_path=self.file_name,
                                                    num_screenshots=samples_n, webp_filepath=self.webp_filepath)
 

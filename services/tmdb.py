@@ -11,11 +11,11 @@ from models.keywords import Keyword
 
 from external.async_http_client_service import AsyncHttpClient
 
-from config.settings import Load
+from config.settings import get_settings
 
-config_settings = Load().load_config()
+settings = get_settings()
 BASE_URL = "https://api.themoviedb.org/3"
-TMDB_APIKEY = config_settings.tracker_config.TMDB_APIKEY
+TMDB_APIKEY = settings.tracker.TMDB_APIKEY
 T = TypeVar('T')
 
 
