@@ -8,8 +8,9 @@ from models.media import Media
 
 import asyncio
 import aiohttp
+
+from config.logger import get_logger
 from fastapi import FastAPI
-from config import logger
 
 
 class UploadUseCase:
@@ -23,6 +24,7 @@ class UploadUseCase:
         self.media_list: list[Media] | None = None
         self.app = app
         self.job_id = job_id
+        self.logger = get_logger(self.__class__.__name__)
 
     async def execute(self, media_list: list[Media] | None = None) -> bool:
         """
@@ -51,7 +53,7 @@ class UploadUseCase:
 
             # Concurrent execution
             uploaded_torrents = await asyncio.gather(*tasks)
-            logger.debug(f"Start Uploaded Torrents {uploaded_torrents}")
+            self.logger.debug(f"Start Uploaded Torrents {uploaded_torrents}")
 
             # Send a message to frontend for each uploaded media
             await self.broadcast_messages(uploaded_torrents=uploaded_torrents)
