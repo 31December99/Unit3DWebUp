@@ -19,6 +19,7 @@ services:
       - ${PREFS__SCAN_PATH}:/app/scan
       - ${PREFS__WATCHER_PATH}:/app/watcher
       - ${PREFS__TORRENT_ARCHIVE_PATH}:/app/torrent_archive
+      - ${ENV_PATH}:/app/.env
 
   frontend:
     build:
