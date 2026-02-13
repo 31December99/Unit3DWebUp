@@ -49,7 +49,7 @@ redis_port = int(os.getenv("REDIS_PORT", 6379))
 REDIS_URL = f"redis://{redis_host}:{redis_port}"
 
 # Env file mount: used to edit and save requests from the frontend
-ENV_FILE = Path("/app/.env") if os.getenv("RUNNING_IN_DOCKER") == "1" else Path(".env")
+ENV_FILE = Path(os.getenv("ENV_PATH")) if os.getenv("RUNNING_IN_DOCKER") == "1" else Path(".env")
 
 
 class RedisEventHandler(FileSystemEventHandler):
@@ -193,7 +193,8 @@ async def lifespan(app: FastAPI):
     # Main folder
     logger = get_logger("settings_logger")
     logger.info("\nChecking Unit3D configuration file..\n")
-    logger.info(f"Scan Path            -> '{settings.prefs.SCAN_PATH}'\n")
+    logger.info(f"Scan Path            -> '{settings.prefs.SCAN_PATH}'")
+    logger.info(f"Env Path            ->  '{ENV_FILE}'\n")
     logger.info(f"Torrent Archive Path -> '{settings.prefs.TORRENT_ARCHIVE_PATH}'")
     logger.info(f"Cache Path           -> '{settings.prefs.CACHE_PATH}'")
     logger.info(f"Watcher Path         -> '{settings.prefs.WATCHER_PATH}'")
