@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 class SettingText extends StatefulWidget {
   final String label;
   final String value;
-  final ValueChanged<String> onChanged;
+  final ValueChanged<String> onSubmitted;
   final String? hint;
 
   const SettingText({
     super.key,
     required this.label,
     required this.value,
-    required this.onChanged,
+    required this.onSubmitted,
     this.hint,
   });
 
@@ -66,7 +66,7 @@ class _SettingTextState extends State<SettingText> {
                   vertical: 4,
                 ),
               ),
-              onChanged: widget.onChanged,
+              onSubmitted: widget.onSubmitted,
             ),
           ),
         ],
