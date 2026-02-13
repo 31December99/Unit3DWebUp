@@ -34,6 +34,7 @@ from fastapi import WebSocket
 from fastapi import FastAPI
 from fastapi import status
 from pydantic import BaseModel, constr
+from dotenv import load_dotenv, set_key
 import aiohttp
 import uvicorn
 
@@ -46,6 +47,9 @@ redis_port = int(os.getenv("REDIS_PORT", 6379))
 
 # Build redis url
 REDIS_URL = f"redis://{redis_host}:{redis_port}"
+
+# Env file mount: used to edit and save requests from the frontend
+ENV_FILE = Path("/app/.env") if os.getenv("RUNNING_IN_DOCKER") == "1" else Path(".env")
 
 
 class RedisEventHandler(FileSystemEventHandler):
@@ -235,9 +239,11 @@ class HttpRequest(BaseModel):
     title: str | None = None
     path: str | None = None
     job_id: str | None = None
+    job_list_id: str | None = None
     field_id: str | None = None
     new_id: str | None = None
-    job_list_id: str | None = None
+    key: str | None = None
+    value: str | None = None
 
 
 @app.websocket("/ws")
@@ -454,27 +460,6 @@ async def seed(payload: HttpRequest):
     await use_case.execute()
 
 
-@app.post("/setting")
-async def configuration(payload: HttpRequest):
-    """
-    load setting from the local configuration file
-
-    :param payload: - Job_id is fixed to zero
-    :return: none
-    """
-
-    # Load json settings and return it to the client
-    job_data = await app.state.job.get_job(job_id='0')
-
-    # Get data
-    user_prefs = json.loads(job_data)
-
-    return JSONResponse(
-        status_code=status.HTTP_200_OK,
-        content={"userPreferences": user_prefs}
-    )
-
-
 @app.post("/settmdbid")
 async def set_poster_id(payload: HttpRequest):
     """
@@ -535,6 +520,57 @@ async def set_poster_dname(payload: HttpRequest):
 
     await update_poster(msg="Update DisplayName", job_id=payload.job_id, field_id=payload.field_id,
                         new_id=payload.new_id)
+
+
+@app.post("/setting")
+async def configuration(payload: HttpRequest):
+    """
+    load setting from the local configuration file
+
+    :param payload: - Job_id is fixed to zero
+    :return: none
+    """
+
+    # Load json settings and return it to the client
+    job_data = await app.state.job.get_job(job_id='0')
+
+    # Get data
+    user_prefs = json.loads(job_data)
+
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={"userPreferences": user_prefs}
+    )
+
+@app.post("/setenv")
+async def set_env(payload: HttpRequest):
+    load_dotenv(dotenv_path=ENV_FILE, override=True)
+
+    # Edit file env
+    set_key(str(ENV_FILE), payload.key, payload.value)
+    # Refresh memory
+    os.environ[payload.key] = payload.value
+    # Clear cache and reload
+    get_settings.cache_clear()
+    # Refresh the lru cache
+    settings = get_settings()
+    # Update the fast api app state
+    app.state.settings = settings
+    # Ricreate profile (overwrite -> it uses hset command)
+    await app.state.job.create_profile(dict(settings.prefs))
+
+    # Logger
+    logger = get_logger("settings_logger")
+
+    # Console message
+    logger.info(f"-> Update {payload.key} value -> {payload.value}\n")
+
+    # Send log to the client
+    await app.state.ws_manager.broadcast({
+        "type": "log",
+        "level": "success",
+        "message": f"-> Update {payload.key} value -> {payload.value}\n",
+    })
 
 
 @app.post("/filter")
