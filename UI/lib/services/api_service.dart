@@ -293,6 +293,20 @@ class ApiService {
     }
   }
 
+  /// Edit env variables PREFS__
+  static Future<void> setEnv(String key, String value) async {
+    final response = await http.post(
+      Uri.parse('http://127.0.0.1:8000/setenv'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'value': value, 'key': key}),
+    );
+
+    if (response.statusCode == 200) {
+    } else {
+      print('Errore: ${response.statusCode}');
+    }
+  }
+
   /// Fetch Filtered Item
   static Future<List<PosterItem>> clearJobListId(String? jobListId) async {
     if (jobListId != null) {
