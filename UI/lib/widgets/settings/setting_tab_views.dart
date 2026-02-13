@@ -1,7 +1,7 @@
+import 'package:UI/widgets/settings/settings.dart';
+import 'package:UI/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:UI/providers/providers.dart';
-import 'package:UI/widgets/settings/settings.dart';
 
 /// Custom widget to represent TABS in SettingPage
 class SettingTabViews extends StatelessWidget {
@@ -25,70 +25,52 @@ class SettingTabViews extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-
               SettingText(
-                label: "YOUTUBE_FAV_CHANNEL_ID",
-                value:
-                    prefs?['YOUTUBE_FAV_CHANNEL_ID']?.toString() ??
-                    provider.selectedYouTubeFavChannelId,
-                onChanged: (value) => provider.youTubeFavChannelId(value),
-                hint: "id è parte dell'url del canale",
+                label: "PREFS__YOUTUBE_FAV_CHANNEL_ID",
+                value: provider.getValue('YOUTUBE_FAV_CHANNEL_ID'),
+                onSubmitted: (value) =>
+                    provider.setEnv('PREFS__YOUTUBE_FAV_CHANNEL_ID', value),
               ),
 
               SettingText(
-                label: "WATCHER_INTERVAL",
-                value:
-                    prefs?['WATCHER_INTERVAL']?.toString() ??
-                    provider.selectedWatcherInterval,
-                onChanged: (value) => provider.watcherInterval(value),
+                label: "PREFS__WATCHER_INTERVAL",
+                value: provider.getValue('WATCHER_INTERVAL'),
+                onSubmitted: (value) =>
+                    provider.setEnv('PREFS__WATCHER_INTERVAL', value),
               ),
 
               SettingText(
-                label: "WATCHER_PATH",
-                value:
-                    prefs?['WATCHER_PATH']?.toString() ??
-                    provider.selectedWatcherPath,
-                onChanged: (value) => provider.watcherPath(value),
+                label: "PREFS__WATCHER_PATH",
+                value: provider.getValue('WATCHER_PATH'),
+                onSubmitted: (value) =>
+                    provider.setEnv('PREFS__WATCHER_PATH', value),
               ),
 
               SettingText(
-                label: "WATCHER_DESTINATION_PATH",
-                value:
-                    prefs?['WATCHER_DESTINATION_PATH']?.toString() ??
-                    provider.selectedWatcherDestinationPath,
-                onChanged: (value) => provider.watcherDestinationPath(value),
+                label: "PREFS__WATCHER_DESTINATION_PATH",
+                value: provider.getValue('WATCHER_DESTINATION_PATH'),
+                onSubmitted: (value) =>
+                    provider.setEnv('PREFS__WATCHER_DESTINATION_PATH', value),
               ),
 
               SettingText(
-                label: "TORRENT_ARCHIVE_PATH",
-                value:
-                    prefs?['TORRENT_ARCHIVE_PATH']?.toString() ??
-                    provider.selectedTorrentArchivePath,
-                onChanged: (value) => provider.torrentArchivePath(value),
+                label: "PREFS__TORRENT_ARCHIVE_PATH",
+                value: provider.getValue('TORRENT_ARCHIVE_PATH'),
+                onSubmitted: (value) =>
+                    provider.setEnv('PREFS__TORRENT_ARCHIVE_PATH', value),
               ),
 
               SettingText(
-                label: "CACHE_PATH",
-                value:
-                    prefs?['CACHE_PATH']?.toString() ??
-                    provider.selectedCachePath,
-                onChanged: (value) => provider.cachePath(value),
+                label: "PREFS__CACHE_PATH",
+                value: provider.getValue('CACHE_PATH'),
+                onSubmitted: (value) =>
+                    provider.setEnv('PREFS__CACHE_PATH', value),
               ),
-
               SettingText(
-                label: "TORRENT_COMMENT",
-                value:
-                    prefs?['TORRENT_COMMENT']?.toString() ??
-                    provider.selectedTorrentComment,
-                onChanged: (value) => provider.torrentComment(value),
-              ),
-
-              SettingText(
-                label: "PATH SCAN n° 1",
-                value:
-                    prefs?['PATH_SCAN_01']?.toString() ??
-                    provider.selectedScanpath01,
-                onChanged: (value) => provider.pathScan01(value),
+                label: "PREFS__TORRENT_COMMENT",
+                value: provider.getValue('TORRENT_COMMENT'),
+                onSubmitted: (value) =>
+                    provider.setEnv('PREFS__TORRENT_COMMENT', value),
               ),
             ],
           ),
@@ -112,9 +94,10 @@ class SettingTabViews extends StatelessWidget {
               ),
 
               SettingText(
-                label: "SIZE_TH",
-                value: prefs?['SIZE_TH']?.toString() ?? provider.selectedSizeTh,
-                onChanged: (value) => provider.sizeTh(value),
+                label: "PREFS__SIZE_TH",
+                value: provider.getValue('SIZE_TH'),
+                onSubmitted: (value) =>
+                    provider.setEnv('PREFS__SIZE_TH', value),
                 hint: "es. 100",
               ),
 
@@ -174,91 +157,66 @@ class SettingTabViews extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              SettingDropdown(
+              SettingText(
                 label: "Imposta il numero di screenshot desiderato",
-                items: provider.priorityHostOption,
-                selected:
-                    prefs?['SCR_SHOT']?.toString() ?? provider.selectedScrShot,
-                onChanged: (value) =>
-                    value != null ? provider.numScsShot(value) : null,
+                value: provider.getValue('NUMBER_OF_SCREENSHOTS'),
+                onSubmitted: (value) =>
+                    provider.setEnv('PREFS__NUMBER_OF_SCREENSHOTS', value),
               ),
 
               SettingText(
-                label: "COMPRESS_SCSHOT",
-                value:
-                    prefs?['NUM_COMPRESS_SCSHOT']?.toString() ??
-                    provider.selectedNumCompressShot,
-                onChanged: (value) => provider.numCompressScsShot(value),
+                label: "PREFS__PASSIMA_PRIORITY",
+                value: provider.getValue('PASSIMA_PRIORITY'),
+                onSubmitted: (value) =>
+                    provider.setEnv('PREFS__PASSIMA_PRIORITY', value),
               ),
 
-              SettingDropdown(
-                label: "PASSIMA_PRIORITY",
-                items: provider.priorityHostOption,
-                selected:
-                    prefs?['PASSIMA_PRIORITY']?.toString() ??
-                    provider.selectedPriorityPassima,
-                onChanged: (value) =>
-                    value != null ? provider.Passima(value) : null,
+              SettingText(
+                label: "PREFS__COMPRESS_SCSHOT",
+                value: provider.getValue('COMPRESS_SCSHOT'),
+                onSubmitted: (value) =>
+                    provider.setEnv('PREFS__COMPRESS_SCSHOT', value),
               ),
 
-              SettingDropdown(
-                label: "PTSCREENS_PRIORITY",
-                items: provider.priorityHostOption,
-                selected:
-                    prefs?['PTSCREENS_PRIORITY']?.toString() ??
-                    provider.selectedPriorityPtScreens,
-                onChanged: (value) =>
-                    value != null ? provider.PtScreens(value) : null,
+              SettingText(
+                label: "PREFS__PTSCREENS_PRIORITY",
+                value: provider.getValue('PTSCREENS_PRIORITY'),
+                onSubmitted: (value) =>
+                    provider.setEnv('PREFS__PTSCREENS_PRIORITY', value),
               ),
 
-              SettingDropdown(
-                label: "LENSDUMP_PRIORITY",
-                items: provider.priorityHostOption,
-                selected:
-                    prefs?['LENSDUMP_PRIORITY']?.toString() ??
-                    provider.selectedPriorityLensDump,
-                onChanged: (value) =>
-                    value != null ? provider.lensDump(value) : null,
+              SettingText(
+                label: "PREFS__LENSDUMP_PRIORITY",
+                value: provider.getValue('LENSDUMP_PRIORITY'),
+                    onSubmitted: (value) =>
+                    provider.setEnv('PREFS__LENSDUMP_PRIORITY', value),
               ),
 
-              SettingDropdown(
-                label: "FREE_IMAGE_PRIORITY",
-                items: provider.priorityHostOption,
-                selected:
-                    prefs?['FREE_IMAGE_PRIORITY']?.toString() ??
-                    provider.selectedPriorityFreeImage,
-                onChanged: (value) =>
-                    value != null ? provider.freeImage(value) : null,
+              SettingText(
+                label: "PREFS__FREE_IMAGE_PRIORITY",
+                value: provider.getValue('FREE_IMAGE_PRIORITY'),
+                onSubmitted: (value) =>
+                    provider.setEnv('PREFS__FREE_IMAGE_PRIORITY', value),
               ),
 
-              SettingDropdown(
-                label: "IMGBB_PRIORITY",
-                items: provider.priorityHostOption,
-                selected:
-                    prefs?['IMGBB_PRIORITY']?.toString() ??
-                    provider.selectedPriorityImgBB,
-                onChanged: (value) =>
-                    value != null ? provider.imgBB(value) : null,
+              SettingText(
+                label: "PREFS__IMGBB_PRIORITY",
+                value: provider.getValue('IMGBB_PRIORITY'),
+                onSubmitted: (value) =>
+                    provider.setEnv('PREFS__IMGBB_PRIORITY', value),
               ),
 
-              SettingDropdown(
-                label: "IMGFI_PRIORITY",
-                items: provider.priorityHostOption,
-                selected:
-                    prefs?['IMGFI_PRIORITY']?.toString() ??
-                    provider.selectedPriorityImgfi,
-                onChanged: (value) =>
-                    value != null ? provider.imgFi(value) : null,
+              SettingText(
+                label: "PREFS__IMGFI_PRIORITY",
+                value: provider.getValue('IMGFI_PRIORITY'),
+                onSubmitted: (value) =>
+                    provider.setEnv('PREFS__IMGFI_PRIORITY', value),
               ),
-
-              SettingDropdown(
-                label: "IMARIDE_PRIORITY",
-                items: provider.priorityHostOption,
-                selected:
-                    prefs?['IMARIDE_PRIORITY']?.toString() ??
-                    provider.selectedPriorityImaride,
-                onChanged: (value) =>
-                    value != null ? provider.imaRide(value) : null,
+              SettingText(
+                label: "PREFS__IMARIDE_PRIORITY",
+                value: provider.getValue('IMARIDE_PRIORITY'),
+                onSubmitted: (value) =>
+                    provider.setEnv('PREFS__IMARIDE_PRIORITY', value),
               ),
             ],
           ),
