@@ -171,8 +171,14 @@ async def lifespan(app: FastAPI):
     # Switch path between dev and Docker
     app.state.watcher_path = "/app/watcher" if os.getenv("DOCKER") == "true" else app.state.settings.prefs.WATCHER_PATH
     app.state.scan_path = "/app/scan" if os.getenv("DOCKER") == "true" else app.state.settings.prefs.SCAN_PATH
-    # Env file mount: used to edit and save requests from the frontend
-    app.state.env_file = Path(os.getenv("ENV_PATH","")) if os.getenv("DOCKER") == "true" else Path(".env")
+    app.state.torrent_archive_path = "/app/torrent_archive" if os.getenv(
+        "DOCKER") == "true" else app.state.settings.prefs.TORRENT_ARCHIVE_PATH
+    app.state.watcher_destination_path = "/app/watcher_destination_path" if os.getenv(
+        "DOCKER") == "true" else app.state.settings.prefs.WATCHER_DESTINATION_PATH
+    app.state.cache_path = "/app/." if os.getenv("DOCKER") == "true" else app.state.settings.prefs.CACHE_PATH
+
+    # Env file mount: used to edit Env file from the frontend
+    app.state.env_file = Path(os.getenv("ENV_PATH", "")) if os.getenv("DOCKER") == "true" else Path(".env")
 
     # Watcher zone
     # Shared event
@@ -193,10 +199,10 @@ async def lifespan(app: FastAPI):
     logger.info(f"Docker mode          -> '{os.getenv("DOCKER")}'")
     logger.info(f"Scan Path            -> '{app.state.scan_path}'")
     logger.info(f"Env Path             -> '{app.state.env_file}'\n")
-    logger.info(f"Torrent Archive Path -> '{settings.prefs.TORRENT_ARCHIVE_PATH}'")
-    logger.info(f"Cache Path           -> '{settings.prefs.CACHE_PATH}'")
-    logger.info(f"Watcher Path         -> '{settings.prefs.WATCHER_PATH}'")
-    logger.info(f"Watcher Dest. Path   -> '{settings.prefs.WATCHER_DESTINATION_PATH}'\n")
+    logger.info(f"Torrent Archive Path -> '{app.state.torrent_archive_path}'")
+    logger.info(f"Cache Path           -> '{app.state.cache_path}'")
+    logger.info(f"Watcher Path         -> '{app.state.watcher_path}'")
+    logger.info(f"Watcher Dest. Path   -> '{app.state.watcher_destination_path}'\n")
 
     # Goes..
     yield
