@@ -71,6 +71,9 @@ class AsyncMediaManager:
             return []
 
         entries = await asyncio.to_thread(os.listdir, self.path)
+        if not entries:
+            self.logger.warning(f"Folder {self.path} is empty")
+
         files = [os.path.join(self.path, e) for e in entries if
                  os.path.isfile(os.path.join(self.path, e)) and ManageTitles.filter_ext(e)]
         subfolders = [os.path.join(self.path, e) for e in entries if os.path.isdir(os.path.join(self.path, e))]
@@ -172,8 +175,7 @@ class AsyncMediaManager:
         media.metainfo = json.dumps([{"length": media.size, "path": [media.file_name]}], indent=4)
         return True
 
-
-    async def process_folder(self,media: Media) -> bool:
+    async def process_folder(self, media: Media) -> bool:
         """
         process media object folder
 
@@ -181,7 +183,7 @@ class AsyncMediaManager:
         :return: success or failure
         """
         # Read the folder and create a list of files
-        #TODO forse ha poco senso asyncio.to_thread qui
+        # TODO forse ha poco senso asyncio.to_thread qui
         entries = await asyncio.to_thread(os.listdir, media.torrent_path)
         files = [my_file for my_file in entries if ManageTitles.filter_ext(my_file)]
 
