@@ -41,8 +41,7 @@ class MakeTorrentUseCase:
         # FILTER: filter for existing torrent. Ensures that only new torrents are created
         filtered_torrent_list = []
         for media in self.media_list:
-            torrent_file_path = os.path.join(self.app.state.torrent_archive_path, 'ITT', f"{media.title}.torrent")
-            if Path.exists(Path(torrent_file_path)):
+            if Path.exists(media.torrent_file_path):
                 # notify the frontend
                 await self.send_message(media=media, message=f"Torrent file exists")
             else:
