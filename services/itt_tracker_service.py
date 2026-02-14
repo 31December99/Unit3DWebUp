@@ -66,29 +66,25 @@ class ITTtrackerService(TrackerServiceInterface):
         # Payload ready
         payload = await self.prepare_payload(media)
 
-        # Build the torrent file path
-        archive = os.path.join(config.prefs.TORRENT_ARCHIVE_PATH, self.tracker_name)
-        torrent_filepath: Path = (Path(archive) / f"{media.torrent_name}.torrent")
-
         # Load the file and send to the tracker
-        response = await self.tracker.upload_t(data=payload, torrent_path=torrent_filepath)
+        response = await self.tracker.upload_t(data=payload, torrent_path=media.torrent_file_path)
 
         # Wait for response
         if not response:
             media.status = MediaStatus.TRACKER_NOT_UPLOADED
-            return {'status': '404', 'message': 'Torrent file not found !', 'file': torrent_filepath,
+            return {'status': '404', 'message': 'Torrent file not found !', 'file': media.torrent_file_path,
                     'job_id': media.job_id}
 
         if response.get('success', None):
             media.status = MediaStatus.TRACKER_UPLOADED
             await self.app.state.job.update_job(job_id=media.job_id, new_data=media.to_dict())
-            return {'status': '200', 'message': 'Torrent uploaded', 'file': torrent_filepath,
+            return {'status': '200', 'message': 'Torrent uploaded', 'file': media.torrent_file_path,
                     'job_id': media.job_id}
         else:
             media.status = MediaStatus.TRACKER_NOT_UPLOADED
             await self.app.state.job.update_job(job_id=media.job_id, new_data=media.to_dict())
             return {'status': '409', 'message': response.get('data', None),
-                    'file': torrent_filepath, 'job_id': media.job_id}
+                    'file': media.torrent_file_path, 'job_id': media.job_id}
 
     async def search(self, query: str) -> dict:
         return await self.tracker.name(query)
