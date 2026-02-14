@@ -84,15 +84,21 @@ class SettingTabViews extends StatelessWidget {
               SettingSwitch(
                 label: "Inserisce un trailer YouTube ( solo se esiste) ",
                 value: provider.youtubeChannelEnable,
-                onChanged: (_) => provider.youtube(),
+                onChanged: (value) {
+                  String setValue = (value == false) ? 'false' : 'true';
+                  provider.setEnv('PREFS__YOUTUBE_CHANNEL_ENABLE', setValue);
+                  provider.youtube();
+                },
               ),
-
               SettingSwitch(
-                label: "Duplicate",
+                label: "Confronto il tuo torrent con uno presente nel tracker",
                 value: provider.duplicateOn,
-                onChanged: (_) => provider.duplicate(),
+                onChanged: (value) {
+                  String setValue = (value == false) ? 'false' : 'true';
+                  provider.setEnv('PREFS__DUPLICATE_ON', setValue);
+                  provider.searchDuplicate();
+                },
               ),
-
               SettingText(
                 label: "PREFS__SIZE_TH",
                 value: provider.getValue('SIZE_TH'),
@@ -100,53 +106,78 @@ class SettingTabViews extends StatelessWidget {
                     provider.setEnv('PREFS__SIZE_TH', value),
                 hint: "es. 100",
               ),
-
               SettingSwitch(
                 label: "Skippa ogni duplicato senza chiedere conferma",
-                value: provider.skipDuplicate,
-                onChanged: (_) => provider.dpSkip(),
+                value: provider.duplicate,
+                onChanged: (value) {
+                  String setValue = (value == false) ? 'false' : 'true';
+                  provider.setEnv('PREFS__SKIP_DUPLICATE', setValue);
+                  provider.skipDuplicate();
+                },
               ),
 
               SettingSwitch(
                 label: "Skippa in caso di Tmdb_id non trovato ( verificare..)",
-                value: provider.skipTmdb,
-                onChanged: (_) => provider.tmdbSkip(),
+                value: provider.tmdb,
+                onChanged: (value) {
+                  String setValue = (value == false) ? 'false' : 'true';
+                  provider.setEnv('PREFS__SKIP_TMDB', setValue);
+                  provider.skipTmdb();
+                },
               ),
-
               SettingSwitch(
                 label: "Ridimensiona automaticamente ogni screenshot",
                 value: provider.resizeScshot,
-                onChanged: (_) => provider.rszScshot(),
+                onChanged: (value) {
+                  String setValue = (value == false) ? 'false' : 'true';
+                  provider.setEnv('PREFS__RESIZE_SCSHOT', setValue);
+                  provider.rszScshot();
+                },
               ),
-
               SettingSwitch(
                 label: "Rende 'anonimo' l'utente durante l'upload",
                 value: provider.anon,
-                onChanged: (_) => provider.anonUser(),
+                onChanged: (value) {
+                  String setValue = (value == false) ? 'false' : 'true';
+                  provider.setEnv('PREFS__ANON', setValue);
+                  provider.anonUser();
+                },
               ),
-
               SettingSwitch(
                 label: "Salva nella cache locale l'url di ogni screenshot",
                 value: provider.cacheScshot,
-                onChanged: (_) => provider.cacheScreenshot(),
+                onChanged: (value) {
+                  String setValue = (value == false) ? 'false' : 'true';
+                  provider.setEnv('PREFS__CACHE_SCR', setValue);
+                  provider.cacheScreenshot();
+                },
               ),
-
               SettingSwitch(
                 label: "Salva nella cache locale TMDB ID e titolo",
                 value: provider.cacheDbonline,
-                onChanged: (_) => provider.cacheTmdb(),
+                onChanged: (value) {
+                  String setValue = (value == false) ? 'false' : 'true';
+                  provider.setEnv('PREFS__CACHE_DBONLINE', setValue);
+                  provider.cacheTmdb();
+                },
               ),
-
               SettingSwitch(
                 label: "Ogni torrent è una personal release",
                 value: provider.personalRel,
-                onChanged: (_) => provider.personalRelease(),
+                onChanged: (value) {
+                  String setValue = (value == false) ? 'false' : 'true';
+                  provider.setEnv('PREFS__PERSONAL_RELEASE', setValue);
+                  provider.personalRelease();
+                },
               ),
-
               SettingSwitch(
                 label: "Aggiungi un gif webp agli screenshot",
                 value: provider.webp,
-                onChanged: (_) => provider.webpScshot(),
+                onChanged: (value) {
+                  String setValue = (value == false) ? 'false' : 'true';
+                  provider.setEnv('PREFS__WEBP_ENABLED', setValue);
+                  provider.webpScshot();
+                },
               ),
             ],
           ),
@@ -188,7 +219,7 @@ class SettingTabViews extends StatelessWidget {
               SettingText(
                 label: "PREFS__LENSDUMP_PRIORITY",
                 value: provider.getValue('LENSDUMP_PRIORITY'),
-                    onSubmitted: (value) =>
+                onSubmitted: (value) =>
                     provider.setEnv('PREFS__LENSDUMP_PRIORITY', value),
               ),
 

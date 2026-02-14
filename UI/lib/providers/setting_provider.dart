@@ -8,7 +8,7 @@ class SettingProvider extends ChangeNotifier {
 
   /// Default scan path #1
   /// TODO for the moment hardcoded
-  String selectedScanpath01 = "/home/parzival/ts";
+  String selectedScanpath01 = "/home/parzival/itt/scan";
 
   /// Enable YouTube trailer
   bool youtubeChannelEnable = false;
@@ -17,10 +17,10 @@ class SettingProvider extends ChangeNotifier {
   bool duplicateOn = false;
 
   /// Enable skip duplicates
-  bool skipDuplicate = false;
+  bool duplicate = false;
 
   /// Enable skip TMDB
-  bool skipTmdb = false;
+  bool tmdb = false;
 
   /// Enable screenshot resize
   bool resizeScshot = false;
@@ -69,20 +69,20 @@ class SettingProvider extends ChangeNotifier {
   }
 
   /// Toggle duplicate search
-  void duplicate() {
+  void searchDuplicate() {
     duplicateOn = !duplicateOn;
     notifyListeners();
   }
 
   /// Toggle skip duplicates
-  void dpSkip() {
-    skipDuplicate = !skipDuplicate;
+  void skipDuplicate() {
+    duplicate = !duplicate;
     notifyListeners();
   }
 
   /// Toggle skip TMDB
-  void tmdbSkip() {
-    skipTmdb = !skipTmdb;
+  void skipTmdb() {
+    tmdb = !tmdb;
     notifyListeners();
   }
 
