@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:UI/providers/providers.dart';
 import 'package:UI/widgets/searchPage/search.dart';
-import 'package:UI/widgets/snack.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:UI/widgets/widgets.dart';
 import 'package:UI/models/models.dart';
