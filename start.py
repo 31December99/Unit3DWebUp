@@ -178,7 +178,7 @@ async def lifespan(app: FastAPI):
     app.state.cache_path = "/app/." if os.getenv("DOCKER") == "true" else app.state.settings.prefs.CACHE_PATH
 
     # Env file mount: used to edit Env file from the frontend
-    app.state.env_file = Path(os.getenv("ENV_PATH", "")) if os.getenv("DOCKER") == "true" else Path(".env")
+    app.state.env_file = Path(".env") if os.getenv("DOCKER") == "true" else Path(os.getenv("ENV_PATH", ""))
 
     # Watcher zone
     # Shared event
@@ -547,8 +547,9 @@ async def configuration(payload: HttpRequest):
 
 @app.post("/setenv")
 async def set_env(payload: HttpRequest):
-    load_dotenv(dotenv_path=app.state.env_file, override=True)
 
+    # Load env file
+    load_dotenv(dotenv_path=app.state.env_file, override=True)
     # Edit file env
     set_key(str(app.state.env_file), payload.key, payload.value)
     # Refresh memory
