@@ -69,20 +69,20 @@ class MyTorrentService(TorrentServiceInterface):
 
     def _create_batch(self, media_list: list[Media], trackers: list[str] = None, workers: int = None,
                       progress_queue=None):
-        workers = workers or cpu_count()
-        archive_path = settings.prefs.TORRENT_ARCHIVE_PATH or '.'
 
         with Manager() as manager:
             if progress_queue is None:
                 progress_queue = manager.Queue()
 
             # Create a list of task only for Media with description and video status positive
+            archive_path = self.app.state.torrent_archive_path or '.'
             jobs = [
                 (m.torrent_path, m.torrent_name, archive_path, trackers, progress_queue, m.job_id)
                 for m in media_list if m.status not in (MediaStatus.DESCRIPTION_ERROR, MediaStatus.VIDEO_ERROR)
             ]
 
             # Go
+            workers = workers or cpu_count()
             with Pool(workers) as pool:
                 results = pool.map(worker, jobs)
 
