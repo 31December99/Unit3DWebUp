@@ -22,7 +22,7 @@ class Media:
     it is gradually built until it is used to create the payload for the tracker
     """
 
-    def __init__(self, folder: str, subfolder: str):
+    def __init__(self, folder: str, subfolder: str) -> None:
         """
         :param folder: the main path
         :param subfolder: file path or subfolder path
@@ -30,12 +30,6 @@ class Media:
         self.folder: str = folder
         self.subfolder: str = subfolder
         self.title: str = os.path.basename(os.path.join(self.folder, self.subfolder))
-        self.torrent_file_path: str = os.path.join(
-            settings.prefs.TORRENT_ARCHIVE_PATH,
-            'ITT',
-            f"{self.title}.torrent"
-        )
-
         # // Assign a job id
         self.job_id: str = hashlib.sha256(os.path.join(self.folder, self.subfolder).encode()).hexdigest()
         # // Media
