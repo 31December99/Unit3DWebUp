@@ -119,7 +119,8 @@ class AsyncMediaManager:
         """
 
         return [
-            Media(folder=self.path, subfolder=os.path.basename(_path))
+            Media(folder=self.path, subfolder=os.path.basename(_path),
+                  torrent_archive_path=self.app.state.torrent_archive_path)
             for _path in paths
             if _path is not None
         ]

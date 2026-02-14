@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # based on the old code unit3dup 08.21
+from pathlib import Path
 import hashlib
 import os
 import re
@@ -22,7 +23,7 @@ class Media:
     it is gradually built until it is used to create the payload for the tracker
     """
 
-    def __init__(self, folder: str, subfolder: str) -> None:
+    def __init__(self, folder: str, subfolder: str, torrent_archive_path: str) -> None:
         """
         :param folder: the main path
         :param subfolder: file path or subfolder path
@@ -30,6 +31,8 @@ class Media:
         self.folder: str = folder
         self.subfolder: str = subfolder
         self.title: str = os.path.basename(os.path.join(self.folder, self.subfolder))
+        self._torrent_file_path = Path(torrent_archive_path) / "ITT" / f"{self.title}.torrent"
+
         # // Assign a job id
         self.job_id: str = hashlib.sha256(os.path.join(self.folder, self.subfolder).encode()).hexdigest()
         # // Media
@@ -315,6 +318,10 @@ class Media:
         return self._subtitle
 
     @property
+    def torrent_file_path(self) -> Path:
+        return self._torrent_file_path
+
+    @property
     def torrent_path(self) -> str:
         if not self._torrent_path:
             if os.path.isfile(self.folder):
@@ -495,6 +502,8 @@ class Media:
 
     # Serialize
     def to_dict(self) -> dict:
+
+        # /// Path objects must be converted to strings to be serializable
         return {
             "folder": self.folder,
             "subfolder": self.subfolder,
@@ -519,6 +528,7 @@ class Media:
             "display_name": self.display_name,
             "torrent_name": self.torrent_name,
             "torrent_path": self.torrent_path,
+            "torrent_file_path": str(self.torrent_file_path),
             "torrent_pack": self.torrent_pack,
             "size": self.size,
             "resolution": self.resolution,
@@ -537,7 +547,12 @@ class Media:
     @classmethod
     # json to Media()
     def from_dict(cls, data: dict) -> "Media":
-        m = cls(folder=data["folder"], subfolder=data["subfolder"])
+        torrent_archive_path = (
+            Path("/app/torrent_archive") if os.getenv("DOCKER") == "true"
+            else Path(settings.prefs.TORRENT_ARCHIVE_PATH)
+        )
+
+        m = cls(folder=data["folder"], subfolder=data["subfolder"], torrent_archive_path=str(torrent_archive_path))
         m.file_name = data.get("file_name")
         m.display_name = data.get("display_name")
         m.torrent_name = data.get("torrent_name")
