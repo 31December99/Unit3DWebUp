@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import os
 from pathlib import Path
 
 from services.interfaces import TorrentClientServiceInterface
@@ -43,7 +44,8 @@ class SeedUseCase:
         # Verify if the *.torrent files still exist
         filtered_torrent_list = []
         for media in self.media_list:
-            if not Path.exists(Path(media.torrent_file_path)):
+            torrent_file_path = os.path.join(self.app.state.torrent_archive_path, 'ITT', f"{media.title}.torrent")
+            if not Path.exists(Path(torrent_file_path)):
                 # notify the frontend
                 await self.send_message(media=media, message=f"Torrent file not found !")
             else:
