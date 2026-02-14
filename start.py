@@ -41,16 +41,6 @@ import uvicorn
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
-# Environment variabile in the container backend
-redis_host = os.getenv("REDIS_HOST", "localhost")
-redis_port = int(os.getenv("REDIS_PORT", 6379))
-
-# Build redis url
-REDIS_URL = f"redis://{redis_host}:{redis_port}"
-
-# Env file mount: used to edit and save requests from the frontend
-ENV_FILE = Path(os.getenv("ENV_PATH")) if os.getenv("RUNNING_IN_DOCKER") == "1" else Path(".env")
-
 
 class RedisEventHandler(FileSystemEventHandler):
     """
@@ -89,14 +79,11 @@ async def redis_event_consumer(app: FastAPI):
     # Logger
     logger = get_logger("settings_logger")
 
-    # Select Dev or Docker
-    watcher_path = app.state.settings.prefs.WATCHER_PATH if os.getenv("RUNNING_IN_DOCKER") == "1" else "/app/watcher"
-
     while True:
         event = await queue.get()
         try:
             app.state.folder_event = event
-            relative = Path(app.state.folder_event['path']).relative_to(Path(watcher_path))
+            relative = Path(app.state.folder_event['path']).relative_to(Path(app.state.watcher_path))
             new_path = os.path.join(app.state.settings.prefs.WATCHER_PATH, relative.parts[0])
 
             # Send logs to the client
@@ -160,6 +147,13 @@ async def lifespan(app: FastAPI):
     # Create a new state for the watcher queue
     app.state.redis_events = asyncio.Queue()
 
+    # Environment variabile in the container backend
+    redis_host = os.getenv("REDIS_HOST", "localhost")
+    redis_port = int(os.getenv("REDIS_PORT", 6379))
+
+    # Build redis url
+    REDIS_URL = f"redis://{redis_host}:{redis_port}"
+
     # Connect to redis
     job = JobRedisRepo(url=REDIS_URL)
     await job.connect(app=app)
@@ -174,8 +168,11 @@ async def lifespan(app: FastAPI):
     # The WebSocket. Send to client progress bar value( Torrent creation) and short log message
     app.state.ws_manager = WebSocketManager()
 
-    # Select Dev or Docker
-    watcher_path = app.state.settings.prefs.WATCHER_PATH if os.getenv("RUNNING_IN_DOCKER") == "1" else "/app/watcher"
+    # Switch path between dev and Docker
+    app.state.watcher_path = "/app/watcher" if os.getenv("DOCKER") == "true" else app.state.settings.prefs.WATCHER_PATH
+    app.state.scan_path = "/app/scan" if os.getenv("DOCKER") == "true" else app.state.settings.prefs.SCAN_PATH
+    # Env file mount: used to edit and save requests from the frontend
+    app.state.env_file = Path(os.getenv("ENV_PATH","")) if os.getenv("DOCKER") == "true" else Path(".env")
 
     # Watcher zone
     # Shared event
@@ -185,7 +182,7 @@ async def lifespan(app: FastAPI):
     # Callback
     handler = RedisEventHandler(app)
     # Start to watch
-    observer.schedule(handler, watcher_path, recursive=True)
+    observer.schedule(handler, app.state.watcher_path, recursive=True)
     observer.start()
     # Create a consumer that works in the background
     consumer_task = asyncio.create_task(redis_event_consumer(app))
@@ -193,8 +190,9 @@ async def lifespan(app: FastAPI):
     # Main folder
     logger = get_logger("settings_logger")
     logger.info("\nChecking Unit3D configuration file..\n")
-    logger.info(f"Scan Path            -> '{settings.prefs.SCAN_PATH}'")
-    logger.info(f"Env Path            ->  '{ENV_FILE}'\n")
+    logger.info(f"Docker mode          -> '{os.getenv("DOCKER")}'")
+    logger.info(f"Scan Path            -> '{app.state.scan_path}'")
+    logger.info(f"Env Path             -> '{app.state.env_file}'\n")
     logger.info(f"Torrent Archive Path -> '{settings.prefs.TORRENT_ARCHIVE_PATH}'")
     logger.info(f"Cache Path           -> '{settings.prefs.CACHE_PATH}'")
     logger.info(f"Watcher Path         -> '{settings.prefs.WATCHER_PATH}'")
@@ -326,9 +324,6 @@ async def scan(payload: HttpRequest) -> JSONResponse:
     # Get the id for the current path
     job_list_id = hashlib.sha256(app.state.settings.prefs.SCAN_PATH.encode()).hexdigest()
 
-    # Select Dev or Docker
-    scan_path = app.state.settings.prefs.SCAN_PATH if os.getenv("RUNNING_IN_DOCKER") == "1" else "/app/scan"
-
     # Load the jobs list using the previous id
     job_list = await app.state.job.get_job_list(job_id=job_list_id)
 
@@ -342,7 +337,7 @@ async def scan(payload: HttpRequest) -> JSONResponse:
     async with aiohttp.ClientSession() as session:
 
         manager = AsyncMediaManager(
-            path=scan_path,
+            path=app.state.scan_path,
             app=app,
             job_id_list=job_list_id
         )
@@ -543,12 +538,13 @@ async def configuration(payload: HttpRequest):
         content={"userPreferences": user_prefs}
     )
 
+
 @app.post("/setenv")
 async def set_env(payload: HttpRequest):
-    load_dotenv(dotenv_path=ENV_FILE, override=True)
+    load_dotenv(dotenv_path=app.state.env_file, override=True)
 
     # Edit file env
-    set_key(str(ENV_FILE), payload.key, payload.value)
+    set_key(str(app.state.env_file), payload.key, payload.value)
     # Refresh memory
     os.environ[payload.key] = payload.value
     # Clear cache and reload
