@@ -3,13 +3,16 @@ import 'package:flutter/material.dart';
 /// Shows a popup message at the bottom of the screen
 void showAppSnackBar(
   BuildContext context,
-  String message, {
-  Duration duration = const Duration(milliseconds: 700),
-}) {
+  String message,
+  {Duration duration = const Duration(milliseconds: 700),
+  Color backgroundColor = const Color(0xFFBEBF91),
+  })
+
+{
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       duration: duration,
-      backgroundColor: const Color(0xFFBEBF91),
+      backgroundColor: backgroundColor,
       content: Text(
         message,
         style: const TextStyle(

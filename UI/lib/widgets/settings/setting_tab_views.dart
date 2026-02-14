@@ -2,10 +2,22 @@ import 'package:UI/widgets/settings/settings.dart';
 import 'package:UI/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:UI/widgets/widgets.dart';
 
 /// Custom widget to represent TABS in SettingPage
 class SettingTabViews extends StatelessWidget {
   const SettingTabViews({super.key});
+
+
+  /// Notify the user: Docker needs to be restarted because the paths are mounted
+  void dockerRestart(BuildContext context) {
+    showAppSnackBar(
+      context,
+      "Please Restart docker or run docker-compose restart",
+      duration: Duration(seconds: 2),
+      backgroundColor: Colors.redAccent,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,30 +52,48 @@ class SettingTabViews extends StatelessWidget {
               SettingText(
                 label: "PREFS__WATCHER_PATH",
                 value: provider.getValue('WATCHER_PATH'),
-                onSubmitted: (value) =>
-                    provider.setEnv('PREFS__WATCHER_PATH', value),
+                onSubmitted: (value) {
+                  provider.setEnv('PREFS__WATCHER_PATH', value);
+                  dockerRestart(context);
+                },
               ),
 
               SettingText(
                 label: "PREFS__WATCHER_DESTINATION_PATH",
                 value: provider.getValue('WATCHER_DESTINATION_PATH'),
-                onSubmitted: (value) =>
-                    provider.setEnv('PREFS__WATCHER_DESTINATION_PATH', value),
+                onSubmitted: (value) {
+                  provider.setEnv('PREFS__WATCHER_DESTINATION_PATH', value);
+                  dockerRestart(context);
+                },
               ),
 
               SettingText(
                 label: "PREFS__TORRENT_ARCHIVE_PATH",
                 value: provider.getValue('TORRENT_ARCHIVE_PATH'),
-                onSubmitted: (value) =>
-                    provider.setEnv('PREFS__TORRENT_ARCHIVE_PATH', value),
+                onSubmitted: (value) {
+                  provider.setEnv('PREFS__TORRENT_ARCHIVE_PATH', value);
+                  dockerRestart(context);
+                },
               ),
 
               SettingText(
                 label: "PREFS__CACHE_PATH",
                 value: provider.getValue('CACHE_PATH'),
-                onSubmitted: (value) =>
-                    provider.setEnv('PREFS__CACHE_PATH', value),
+                onSubmitted: (value) {
+                  provider.setEnv('PREFS__CACHE_PATH', value);
+                  dockerRestart(context);
+                },
               ),
+
+              SettingText(
+                label: "PREFS__SCAN_PATH",
+                value: provider.getValue('SCAN_PATH'),
+                onSubmitted: (value) {
+                  provider.setEnv('PREFS__SCAN_PATH', value);
+                  dockerRestart(context);
+                },
+              ),
+
               SettingText(
                 label: "PREFS__TORRENT_COMMENT",
                 value: provider.getValue('TORRENT_COMMENT'),
