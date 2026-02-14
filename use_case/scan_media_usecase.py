@@ -121,7 +121,7 @@ class ScanMediaUseCase:
     async def _handle_error(self, media, status, error):
         media.status = status
         media.error = str(error)
-        self.logger.error(f"{status} {media.error}")
+        self.logger.error(f"{status} {media.file_name} {media.error}")
         await self._save(media)
 
     async def _save(self, media):
