@@ -171,11 +171,13 @@ async def lifespan(app: FastAPI):
     # Switch path between dev and Docker
     app.state.watcher_path = "/app/watcher" if os.getenv("DOCKER") == "true" else app.state.settings.prefs.WATCHER_PATH
     app.state.scan_path = "/app/scan" if os.getenv("DOCKER") == "true" else app.state.settings.prefs.SCAN_PATH
-    app.state.torrent_archive_path = "/app/torrent_archive" if os.getenv(
-        "DOCKER") == "true" else app.state.settings.prefs.TORRENT_ARCHIVE_PATH
     app.state.watcher_destination_path = "/app/watcher_destination_path" if os.getenv(
         "DOCKER") == "true" else app.state.settings.prefs.WATCHER_DESTINATION_PATH
     app.state.cache_path = "/app/." if os.getenv("DOCKER") == "true" else app.state.settings.prefs.CACHE_PATH
+
+    torrent_archive_path = Path("/app/torrent_archive") if os.getenv("DOCKER") == "true" else Path(
+        settings.prefs.TORRENT_ARCHIVE_PATH)
+    app.state.torrent_archive_path = torrent_archive_path.expanduser().resolve()
 
     # Env file mount: used to edit Env file from the frontend
     app.state.env_file = Path(".env") if os.getenv("DOCKER") == "true" else Path(os.getenv("ENV_PATH", ""))
