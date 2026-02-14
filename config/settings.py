@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 from functools import lru_cache
 from enum import Enum
 from pathlib import Path
@@ -204,4 +205,13 @@ def get_settings() -> Settings:
     """
     :return: settings cached
     """
-    return Settings()
+
+    settings = Settings()
+
+    # Create a folder for each tracker name in the MULTI_TRACKER environment variable
+    torrent_archive_path = "/app/torrent_archive" if os.getenv("DOCKER") == "true" else settings.prefs.TORRENT_ARCHIVE_PATH
+    for tracker_name in settings.tracker.MULTI_TRACKER:
+        torrent_archive_tracker_path = os.path.join(torrent_archive_path, tracker_name.upper())
+        os.makedirs(torrent_archive_tracker_path, exist_ok=True)
+
+    return settings
