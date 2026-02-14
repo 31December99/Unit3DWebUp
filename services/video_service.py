@@ -26,7 +26,7 @@ settings = get_settings()
 class VideoFrame:
     def __init__(self, video_path: str, num_screenshots: int, webp_filepath=None):
         self.video_path = Path(video_path)
-        self.webp_filepath = Path(webp_filepath)
+        self.webp_filepath = Path(webp_filepath) if webp_filepath else None
         self.num_screenshots = num_screenshots
 
     async def create(self):
@@ -219,6 +219,7 @@ class VideoService(VideoServiceInterface):
                 settings.prefs.NUMBER_OF_SCREENSHOTS += 1
 
         samples_n = max(2, min(settings.prefs.NUMBER_OF_SCREENSHOTS, 10))
+
         self.video_frames: VideoFrame = VideoFrame(video_path=self.file_name,
                                                    num_screenshots=samples_n, webp_filepath=self.webp_filepath)
 
