@@ -66,6 +66,10 @@ class AsyncMediaManager:
         :returns:
             list[str]: a list of media objects
         """
+        if not os.path.exists(self.path):
+            self.logger.warning(f"Path not found {self.path}")
+            return []
+
         if not self.is_dir:
             self.logger.warning(f"We can't scan a file {self.path}")
             return []
