@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   backend:
     build:
@@ -19,6 +17,7 @@ services:
     volumes:
       - ${PREFS__SCAN_PATH}:/app/scan
       - ${PREFS__WATCHER_PATH}:/app/watcher
+      - ${PREFS__WATCHER_DESTINATION_PATH}:/app/watcher_destination_path
       - ${PREFS__TORRENT_ARCHIVE_PATH}:/app/torrent_archive
       - ${ENV_PATH}:/app/.env
 
