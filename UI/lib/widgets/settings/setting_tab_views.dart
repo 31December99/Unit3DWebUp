@@ -16,8 +16,6 @@ class SettingTabViews extends StatelessWidget {
       return const Center(child: Text("Nessuna configurazione caricata"));
     }
 
-    Map<String, dynamic>? prefs = setting.userPreferences;
-
     return TabBarView(
       /// I° TAB Paths
       children: [
