@@ -12,6 +12,7 @@ from config.host_data import upload_hosts, priority_map, master_uploaders
 from external.async_http_client_service import AsyncHttpClient
 from config.constants import MediaStatus
 from config.settings import get_settings
+from config.logger import get_logger
 from models.media import Media
 
 from pymediainfo import MediaInfo
@@ -21,13 +22,13 @@ import asyncio
 
 
 
-
 # Based on the old code unit3dup 0.8.21
 class VideoFrame:
     def __init__(self, video_path: str, num_screenshots: int, webp_filepath=None):
         self.video_path = Path(video_path)
         self.webp_filepath = Path(webp_filepath) if webp_filepath else None
         self.num_screenshots = num_screenshots
+        self.logger = get_logger(self.__class__.__name__)
 
     async def create(self):
         """
@@ -36,7 +37,6 @@ class VideoFrame:
         frames = await self._extract()
         frames_in_bytes = []
         is_hd = 0
-        settings = get_settings()
 
         for frame in frames:
             img_bytes = self.image_to_bytes(frame)
@@ -148,8 +148,8 @@ class VideoFrame:
 
         return frames
 
-    @staticmethod
-    async def create_webp_from_video(video_path, output_path):
+
+    async def create_webp_from_video(self, video_path, output_path):
         """
         - "-y",                                            overwrite output if it exists
         - "-ss", '70',                                     start time at 70 seconds
@@ -187,7 +187,7 @@ class VideoFrame:
         await proc.communicate()
 
         if not os.path.isfile(output_path):
-            print(f"file {output_path} doesn't exist!")
+            self.logger.error(f"file {output_path} doesn't exist!")
             return None
 
         # todo: vorrei non dover scrivere su file ma in memoria ram
@@ -250,6 +250,7 @@ class BuildService(DescriptionBuilderInterface):
         self.http = AsyncHttpClient(self.session)
         self.media_list = media_list
         self.screenshots = []
+        self.logger = get_logger(self.__class__.__name__)
 
     async def description(self):
 
@@ -287,12 +288,12 @@ class BuildService(DescriptionBuilderInterface):
                     img_url = result["data"]["image"]["url"]
                 else:
                     img_url = result["image"]["url"]
-                print(f"[OK] Uploaded {img_url}")
+                self.logger.info(f"[OK] Uploaded {img_url}")
                 self.screenshots.append(img_url)
                 media.status = MediaStatus.DESCRIPTION_READY
                 return f"[url={img_url}][img=650]{img_url}[/img][/url]"
             except Exception as e:
-                print(f"[ERROR] Upload frame {image_name}: {e}")
+                self.logger.error(f"[ERROR] Upload frame {image_name}: {e}")
                 media.status = MediaStatus.DESCRIPTION_ERROR
                 return ""
 
@@ -322,8 +323,7 @@ class BuildService(DescriptionBuilderInterface):
             if media.status == MediaStatus.DESCRIPTION_READY:
                 media.description = desc
             else:
-                print("[ERROR] Description error")
-                print(media.status)
+                self.logger.warning("Description error")
         return None
 
     async def close(self) -> None:
