@@ -56,9 +56,12 @@ class JobRedisRepo(JobRepositoryInterface):
 
         Every Media object contains a job_id (hash)
         """
-        await self.redis.hset(job_id, mapping={
-            "data": json.dumps(data),
-        })
+        try:
+            await self.redis.hset(job_id, mapping={
+                "data": json.dumps(data),
+            })
+        except Exception as e:
+           self.logger.error(e)
         return job_id
 
     async def create_job_list(self, job_id: str, job_list: list):
@@ -105,7 +108,6 @@ class JobRedisRepo(JobRepositoryInterface):
         :param job_id: Job id is the file or folder path hashed stored in the Media class object
         :return: a dict that stores data about Media object
         """
-
         return await self.redis.hget(job_id, 'data')
 
     async def update_job(self, job_id: str, new_data: dict):
