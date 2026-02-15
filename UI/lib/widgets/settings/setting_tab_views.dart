@@ -8,7 +8,6 @@ import 'package:UI/widgets/widgets.dart';
 class SettingTabViews extends StatelessWidget {
   const SettingTabViews({super.key});
 
-
   /// Notify the user: Docker needs to be restarted because the paths are mounted
   void dockerRestart(BuildContext context) {
     showAppSnackBar(
@@ -111,16 +110,14 @@ class SettingTabViews extends StatelessWidget {
           child: Column(
             children: [
               SettingText(
-                label: "Inserisce un trailer YouTube ( solo se esiste) ",
-                value: provider.getValue('YOUTUBE_CHANNEL_ENABLE'),
-                onSubmitted: (value) async => await provider.setEnv(
-                  'PREFS__YOUTUBE_CHANNEL_ENABLE',
-                  value,
-                ),
+                label: "PREFS__SKIP_YOUTUBE",
+                value: provider.getValue('SKIP_YOUTUBE'),
+                onSubmitted: (value) async =>
+                    await provider.setEnv('PREFS__SKIP_YOUTUBE', value),
               ),
 
               SettingText(
-                label: "Confronto il tuo torrent con uno presente nel tracker",
+                label: "PREFS__DUPLICATE_ON",
                 value: provider.getValue('DUPLICATE_ON'),
                 onSubmitted: (value) async =>
                     await provider.setEnv('PREFS__DUPLICATE_ON', value),
@@ -135,67 +132,31 @@ class SettingTabViews extends StatelessWidget {
               ),
 
               SettingText(
-                label: "Skippa ogni duplicato senza chiedere conferma",
+                label: "PREFS__SKIP_DUPLICATE",
                 value: provider.getValue('SKIP_DUPLICATE'),
                 onSubmitted: (value) async =>
                     await provider.setEnv('PREFS__SKIP_DUPLICATE', value),
               ),
 
               SettingText(
-                label: "Skippa in caso di Tmdb_id non trovato ( verificare..)",
-                value: provider.getValue('SKIP_TMDB'),
-                onSubmitted: (value) async =>
-                    await provider.setEnv('PREFS__SKIP_TMDB', value),
-              ),
-
-              SettingText(
-                label: "Ridimensiona automaticamente ogni screenshot",
-                value: provider.getValue('SKIP_TMDB'),
-                onSubmitted: (value) async =>
-                    await provider.setEnv('PREFS__RESIZE_SCSHOT', value),
-              ),
-
-              SettingText(
-                label: "Rende 'anonimo' l'utente durante l'upload",
+                label: "PREFS__ANON",
                 value: provider.getValue('ANON'),
                 onSubmitted: (value) async =>
                     await provider.setEnv('PREFS__ANON', value),
               ),
 
               SettingText(
-                label: "Salva nella cache locale l'url di ogni screenshot",
-                value: provider.getValue('CACHE_SCR'),
-                onSubmitted: (value) async =>
-                    await provider.setEnv('PREFS__CACHE_SCR', value),
-              ),
-
-              SettingText(
-                label: "Salva nella cache locale TMDB ID e titolo",
-                value: provider.getValue('CACHE_DBONLINE'),
-                onSubmitted: (value) async =>
-                    await provider.setEnv('PREFS__CACHE_DBONLINE', value),
-              ),
-
-              SettingText(
-                label: "Ogni torrent è una personal release",
+                label: "PREFS__PERSONAL_RELEASE",
                 value: provider.getValue('PERSONAL_RELEASE'),
                 onSubmitted: (value) async =>
                     await provider.setEnv('PREFS__PERSONAL_RELEASE', value),
               ),
 
               SettingText(
-                label: "Aggiungi un gif webp agli screenshot",
+                label: "PREFS__WEBP_ENABLED",
                 value: provider.getValue('WEBP_ENABLED'),
                 onSubmitted: (value) async =>
                     await provider.setEnv('PREFS__WEBP_ENABLED', value),
-              ),
-              SettingText(
-                label: "PREFS__YOUTUBE_FAV_CHANNEL_ID",
-                value: provider.getValue('YOUTUBE_FAV_CHANNEL_ID'),
-                onSubmitted: (value) async => await provider.setEnv(
-                  'PREFS__YOUTUBE_FAV_CHANNEL_ID',
-                  value,
-                ),
               ),
             ],
           ),
@@ -207,7 +168,7 @@ class SettingTabViews extends StatelessWidget {
           child: Column(
             children: [
               SettingText(
-                label: "Imposta il numero di screenshot desiderato",
+                label: "PREFS__NUMBER_OF_SCREENSHOTS",
                 value: provider.getValue('NUMBER_OF_SCREENSHOTS'),
                 onSubmitted: (value) async => await provider.setEnv(
                   'PREFS__NUMBER_OF_SCREENSHOTS',

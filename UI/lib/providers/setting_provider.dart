@@ -10,29 +10,14 @@ class SettingProvider extends ChangeNotifier {
   /// TODO for the moment hardcoded
   String selectedScanpath01 = "/home/parzival/itt/scan";
 
-  /// Enable YouTube trailer
-  bool youtubeChannelEnable = false;
-
   /// Enable duplicate search
   bool duplicateOn = false;
 
   /// Enable skip duplicates
   bool duplicate = false;
 
-  /// Enable skip TMDB
-  bool tmdb = false;
-
-  /// Enable screenshot resize
-  bool resizeScshot = false;
-
   /// Enable anonymous uploader
   bool anon = false;
-
-  /// Enable screenshot cache
-  bool cacheScshot = false;
-
-  /// Enable TMDB cache
-  bool cacheDbonline = false;
 
   /// Enable personal release torrent
   bool personalRel = false;
@@ -62,12 +47,6 @@ class SettingProvider extends ChangeNotifier {
     return value.toString();
   }
 
-  /// Toggle YouTube trailer
-  void youtube() {
-    youtubeChannelEnable = !youtubeChannelEnable;
-    notifyListeners();
-  }
-
   /// Toggle duplicate search
   void searchDuplicate() {
     duplicateOn = !duplicateOn;
@@ -80,33 +59,9 @@ class SettingProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Toggle skip TMDB
-  void skipTmdb() {
-    tmdb = !tmdb;
-    notifyListeners();
-  }
-
-  /// Toggle screenshot resize
-  void rszScshot() {
-    resizeScshot = !resizeScshot;
-    notifyListeners();
-  }
-
   /// Toggle anonymous uploader
   void anonUser() {
     anon = !anon;
-    notifyListeners();
-  }
-
-  /// Toggle screenshot cache
-  void cacheScreenshot() {
-    cacheScshot = !cacheScshot;
-    notifyListeners();
-  }
-
-  /// Toggle TMDB cache
-  void cacheTmdb() {
-    cacheDbonline = !cacheDbonline;
     notifyListeners();
   }
 
