@@ -75,16 +75,6 @@ class SettingTabViews extends StatelessWidget {
               ),
 
               SettingText(
-                label: "PREFS__CACHE_PATH",
-                value: provider.getValue('CACHE_PATH'),
-                onSubmitted: (value) async {
-                  await provider.setEnv('PREFS__CACHE_PATH', value);
-                  if (!context.mounted) return;
-                  dockerRestart(context);
-                },
-              ),
-
-              SettingText(
                 label: "PREFS__SCAN_PATH",
                 value: provider.getValue('SCAN_PATH'),
                 onSubmitted: (value) async {
