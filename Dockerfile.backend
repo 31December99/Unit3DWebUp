@@ -1,5 +1,7 @@
 FROM python:3.12-slim
-WORKDIR /app
+
+RUN useradd -ms /bin/bash app
+WORKDIR /home/app
 
 # Exists when running inside Docker
 ENV RUNNING_DOCKER=1
@@ -13,18 +15,19 @@ RUN apt-get update && \
 
 
 # /// Requirements
-COPY requirements.txt /app/
+COPY requirements.txt /home/app/
 RUN pip install --no-cache-dir -r requirements.txt
 
 # /// Copy backend
-COPY *.py /app/
-COPY config/ /app/config/
-COPY external/ /app/external/
-COPY models/ /app/models/
-COPY repositories/ /app/repositories/
-COPY services/ /app/services/
-COPY use_case/ /app/use_case/
+COPY *.py /home/app/
+COPY config/ /home/app/config/
+COPY external/ /home/app/external/
+COPY models/ /home/app/models/
+COPY repositories/ /home/app/repositories/
+COPY services/ /home/app/services/
+COPY use_case/ /home/app/use_case/
 
+USER app
 
 EXPOSE 8000
 CMD ["uvicorn", "start:app", "--host", "0.0.0.0", "--port", "8000"]
