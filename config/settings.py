@@ -134,11 +134,9 @@ class UserPreferences(BaseConfigModel):
     IMARIDE_PRIORITY: int = 6
 
     NUMBER_OF_SCREENSHOTS: int = 4
-    YOUTUBE_FAV_CHANNEL_ID: str | None = None # No longer used
     YOUTUBE_CHANNEL_ENABLE: bool = False
     DUPLICATE_ON: bool = False # Todo Not yet implemented
     SKIP_DUPLICATE: bool = False #
-    SKIP_TMDB: bool = False # no longer used You can edit it via the web interface
     SKIP_YOUTUBE: bool = False
     SIZE_TH: int = 50
     WATCHER_INTERVAL: int = 60
@@ -148,13 +146,10 @@ class UserPreferences(BaseConfigModel):
     SCAN_PATH: str | None = None
     CACHE_PATH: str | None = None
     COMPRESS_SCSHOT: int = 4
-    RESIZE_SCSHOT: bool = False # no longer used
     TORRENT_COMMENT: str | None = "no_comment"
     PREFERRED_LANG: str | None = "all"
     ANON: bool = False
     WEBP_ENABLED: bool = False
-    CACHE_SCR: bool = False # no longer used
-    CACHE_DBONLINE: bool = False # no longer used
     PERSONAL_RELEASE: bool = False
     FAST_LOAD: int = 0
 
