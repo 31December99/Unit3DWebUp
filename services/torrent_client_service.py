@@ -48,17 +48,19 @@ class QbittorrentClientService(TorrentClientServiceInterface):
             self.logger.info("Login successfully")
             return True
 
-        except qbittorrentapi.LoginFailed:
-            self.logger.error("Login failed")
+        except qbittorrentapi.LoginFailed as e:
+            self.logger.error(e)
             return False
-        except APIConnectionError:
-            self.logger.error("Qbittorrent not respond")
+        except APIConnectionError as e:
+            self.logger.error(e)
             return False
 
     async def add_torrents(self, torrent_paths: list[str], save_path: str, app: FastAPI) -> bool:
         """
-        :param torrent_paths: The files .torrent path
-        :param save_path: The folder with data file
+        Add torrents to torrent client
+
+        :param torrent_paths: If Docker = true, torrent_path must refer the docker mounted path
+        :param save_path: The folder with data file, host path
         :param app: app.state
         :return: success or fail
         """
@@ -67,12 +69,12 @@ class QbittorrentClientService(TorrentClientServiceInterface):
 
         try:
             await asyncio.to_thread(
-                self.qbt_client.torrents_add,
-                torrent_files=torrent_paths,
-                save_path=save_path,
-                autoTMM=False,
-                paused=False,
-                is_skip_checking=True
+            self.qbt_client.torrents_add,
+            torrent_files=torrent_paths, # Docker
+            save_path=save_path, # Host
+            autoTMM=False,
+            paused=False,
+            is_skip_checking=True
             )
         except qbittorrentapi.exceptions.TorrentFileError as e:
             logging.info(f"Add torrents {e}")

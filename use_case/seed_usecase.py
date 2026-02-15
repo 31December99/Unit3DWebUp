@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import json
-import os
 from pathlib import Path
 
 from services.interfaces import TorrentClientServiceInterface
@@ -41,18 +40,14 @@ class SeedUseCase:
             # Receive a list
             self.media_list = media_list
 
-        # Verify if the *.torrent files still exist
+        # Verify whether the *.torrent files still exist and notify the frontend
         filtered_torrent_list = []
         for media in self.media_list:
             if not Path.exists(media.torrent_file_path):
-                # notify the frontend
                 await self.send_message(media=media, message=f"Torrent file not found !")
             else:
                 # discard the invalid torrent file
                 filtered_torrent_list.append(media)
-
-        # Get the data path ( scan path)
-        save_path = self.media_list[0].folder
 
         # Add torrents to the client
         if filtered_torrent_list:
@@ -65,11 +60,14 @@ class SeedUseCase:
                 await self.broadcast_messages(f"{self.client} Login failed")
                 return False
 
-            # Create a list of torrent paths
             torrent_path_list = [m.torrent_file_path for m in filtered_torrent_list]
+            save_path = self.app.state.settings.prefs.SCAN_PATH
 
             # Try to add torrents
-            execution = await torr_client_service.add_torrents(torrent_path_list, save_path, app=self.app)
+            execution = await torr_client_service.add_torrents(
+                torrent_paths=torrent_path_list,  # Docker path
+                save_path=save_path,  # Host path
+                app=self.app)
 
             if execution:
                 await self.broadcast_messages(f"Added to {self.client}")
