@@ -1,20 +1,14 @@
 # -*- coding: utf-8 -*-
-import os
-from pathlib import Path
-
 from config.constants import MediaStatus
 from config.trackers import TRACKData
 from config.settings import get_settings
 
 from services.interfaces import TrackerServiceInterface
 from services.itt_tracker_helper import Unit3D
-
 from models.media import Media
 
 from fastapi import FastAPI
 import aiohttp
-
-config = get_settings()
 
 
 class ITTtrackerService(TrackerServiceInterface):
@@ -40,14 +34,15 @@ class ITTtrackerService(TrackerServiceInterface):
 
         The Media object processed helps to build the payload for the tracker
         """
+        settings = get_settings()
         return {
             "name": media.display_name,
-            "tmdb": media.tmdb_id,
+            "tmdb": media.tmdb_id or 0,
             "imdb": media.imdb_id_from_tvdb or 0,
             "tvdb": media.tvdb_id if media.tvdb_id and media.category == 'series' else None,
             "keywords": media.keyword,
             "category_id": self.tracker_data.category.get(media.category),
-            "anonymous": int(config.prefs.ANON),
+            "anonymous": int(settings.prefs.ANON),
             "resolution_id": self.tracker_data.resolution.get(media.resolution),
             "mediainfo": media.media_to_string,
             "description": media.description,
@@ -55,7 +50,7 @@ class ITTtrackerService(TrackerServiceInterface):
             "type_id": self.tracker_data.filter_type(media.file_name),
             "season_number": media.guess_season or "",
             "episode_number": media.guess_episode or "",
-            "personal_release": int(config.prefs.PERSONAL_RELEASE)
+            "personal_release": int(settings.prefs.PERSONAL_RELEASE)
         }
 
     async def upload(self, media: Media) -> dict:
