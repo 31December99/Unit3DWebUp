@@ -169,13 +169,13 @@ async def lifespan(app: FastAPI):
     app.state.ws_manager = WebSocketManager()
 
     # Switch path between dev and Docker
-    app.state.watcher_path = "/app/watcher" if os.getenv("DOCKER") == "true" else app.state.settings.prefs.WATCHER_PATH
-    app.state.scan_path = "/app/scan" if os.getenv("DOCKER") == "true" else app.state.settings.prefs.SCAN_PATH
-    app.state.watcher_destination_path = "/app/watcher_destination_path" if os.getenv(
+    app.state.watcher_path = "/home/app/watcher" if os.getenv("DOCKER") == "true" else app.state.settings.prefs.WATCHER_PATH
+    app.state.scan_path = "/home/app/scan" if os.getenv("DOCKER") == "true" else app.state.settings.prefs.SCAN_PATH
+    app.state.watcher_destination_path = "/home/app/watcher_destination_path" if os.getenv(
         "DOCKER") == "true" else app.state.settings.prefs.WATCHER_DESTINATION_PATH
-    app.state.cache_path = "/app/." if os.getenv("DOCKER") == "true" else app.state.settings.prefs.CACHE_PATH
+    app.state.cache_path = "/home/app/." if os.getenv("DOCKER") == "true" else app.state.settings.prefs.CACHE_PATH
 
-    torrent_archive_path = Path("/app/torrent_archive") if os.getenv("DOCKER") == "true" else Path(
+    torrent_archive_path = Path("/home/app/torrent_archive") if os.getenv("DOCKER") == "true" else Path(
         settings.prefs.TORRENT_ARCHIVE_PATH)
     app.state.torrent_archive_path = torrent_archive_path.expanduser().resolve()
 
