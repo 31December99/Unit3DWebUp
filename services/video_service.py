@@ -310,9 +310,11 @@ class BuildService(DescriptionBuilderInterface):
             media.screen_shots = self.screenshots
             if media.status == MediaStatus.DESCRIPTION_READY:
                 description = "[center]\n" + "".join(uploaded_frames)
-                description += (
-                    f"\n[/center][b][spoiler=Spoiler: PLAY TRAILER][center][youtube]{media.trailer}[/youtube]"
-                    f"[/center][/spoiler][/b]")
+                if media.trailer:
+                    description += (
+                        f"\n[/center][b][spoiler=Spoiler:"
+                        f" PLAY TRAILER][center][youtube]{media.trailer}[/youtube]"
+                        f"[/center][/spoiler][/b]")
                 return description
             return None
 
