@@ -19,6 +19,7 @@ from services.media_service import MediaService, MediaService2
 from services.itt_tracker_service import ITTtrackerService
 from services.auto_async_service import AsyncMediaManager
 from services.interfaces import TrackerServiceInterface
+from services.lifespan_service import update_mounted_paths, checking_env_file
 
 from use_case.scan_media_usecase import ScanMediaUseCase
 from use_case.process_all_usecase import ProcessAllUseCase
@@ -84,7 +85,7 @@ async def redis_event_consumer(app: FastAPI):
         try:
             app.state.folder_event = event
             relative = Path(app.state.folder_event['path']).relative_to(Path(app.state.watcher_path))
-            new_path = os.path.join(app.state.settings.prefs.WATCHER_PATH, relative.parts[0])
+            new_path = Path(app.state.settings.prefs.WATCHER_PATH) / relative.parts[0]
 
             # Send logs to the client
             await app.state.ws_manager.broadcast({
@@ -129,20 +130,12 @@ async def lifespan(app: FastAPI):
     :param app: FastAPI
     :return: None
     """
-    # Logger
-    logger = get_logger("settings_logger")
-
     # Load the configuration file
     settings = get_settings()
     app.state.settings = settings
 
-    # Check configuration file (only once because get_settings() is cached)
-    for field_name, field in settings.tracker.model_fields.items():
-        # optional field (default=None)
-        if field.default is None:
-            value = getattr(settings.tracker, field_name)
-            if value is None:
-                logger.warning(f"{field_name} not set in .env – related feature may be disabled")
+    # Check configuration file
+    await checking_env_file(app=app)
 
     # Create a new state for the watcher queue
     app.state.redis_events = asyncio.Queue()
@@ -168,41 +161,25 @@ async def lifespan(app: FastAPI):
     # The WebSocket. Send to client progress bar value( Torrent creation) and short log message
     app.state.ws_manager = WebSocketManager()
 
-    # Switch path between dev and Docker
-    app.state.watcher_path = "/home/app/watcher" if os.getenv("DOCKER") == "true" else app.state.settings.prefs.WATCHER_PATH
-    app.state.scan_path = "/home/app/scan" if os.getenv("DOCKER") == "true" else app.state.settings.prefs.SCAN_PATH
-    app.state.watcher_destination_path = "/home/app/watcher_destination_path" if os.getenv(
-        "DOCKER") == "true" else app.state.settings.prefs.WATCHER_DESTINATION_PATH
-
-    torrent_archive_path = Path("/home/app/torrent_archive") if os.getenv("DOCKER") == "true" else Path(
-        settings.prefs.TORRENT_ARCHIVE_PATH)
-    app.state.torrent_archive_path = torrent_archive_path.expanduser().resolve()
-
-    # Env file mount: used to edit Env file from the frontend
-    app.state.env_file = Path(".env") if os.getenv("DOCKER") == "true" else Path(os.getenv("ENV_PATH", ""))
+    # Update mounted paths
+    await update_mounted_paths(app=app)
 
     # Watcher zone
     # Shared event
     app.state.folder_event = None
+
     # back to watcher
     observer = Observer()
+
     # Callback
     handler = RedisEventHandler(app)
+
     # Start to watch
     observer.schedule(handler, app.state.watcher_path, recursive=True)
     observer.start()
+
     # Create a consumer that works in the background
     consumer_task = asyncio.create_task(redis_event_consumer(app))
-
-    # Main folder
-    logger = get_logger("settings_logger")
-    logger.info("\nChecking Unit3D configuration file..\n")
-    logger.info(f"Docker mode          -> '{os.getenv("DOCKER")}'")
-    logger.info(f"Scan Path            -> '{app.state.scan_path}'")
-    logger.info(f"Env Path             -> '{app.state.env_file}'\n")
-    logger.info(f"Torrent Archive Path -> '{app.state.torrent_archive_path}'")
-    logger.info(f"Watcher Path         -> '{app.state.watcher_path}'")
-    logger.info(f"Watcher Dest. Path   -> '{app.state.watcher_destination_path}'\n")
 
     # Goes..
     yield
