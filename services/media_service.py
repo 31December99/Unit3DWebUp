@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
+from models.movie import AltTitle
+from models.tv import Alternative, DataResponse
 from repositories.interfaces import MovieRepositoryInterface
 from services.utility import ManageTitles
 
@@ -46,17 +48,21 @@ class MediaService:
                 media.backdrop_path = show.get_poster_path()
                 return True
 
+        alt_list = []
         for show in results:
-            # # Search for alternative title
+            # Search for alternative title TODO: rework dataclass
             alternative = await self.repo.alternative(movie_id=show.get_id(), category=media.category)
-            if alternative:
-                for alt in alternative.titles:
-                    if ManageTitles.fuzzyit(str1=media.guess_title, str2=alt.title) > 95:
-                        media.tmdb_id = show.get_id()
-                        media.keyword = await get_keyword()
-                        media.trailer = await get_trailer()
-                        media.backdrop_path = show.get_poster_path()
-                        return True
+            if isinstance(alternative, DataResponse):
+                alt_list = [alt.title for alt in alternative.results]
+            if isinstance(alternative, AltTitle):
+                alt_list = [alt.title for alt in alternative.titles]
+            for title in alt_list:
+                if ManageTitles.fuzzyit(str1=media.guess_title, str2=ManageTitles.clean_text(title)) > 95:
+                    media.tmdb_id = show.get_id()
+                    media.keyword = await get_keyword()
+                    media.trailer = await get_trailer()
+                    media.backdrop_path = show.get_poster_path()
+                    return True
         return False
 
 
