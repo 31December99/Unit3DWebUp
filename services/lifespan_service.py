@@ -8,6 +8,12 @@ from config.logger import get_logger
 
 
 async def update_mounted_paths(app: FastAPI):
+    """
+     Updates to mounted path strings are valid only when the backend is running on the host
+     When using docker ,docker must also be restarted
+    :param app: the FastAPI app
+    :return:
+    """
     settings = Settings()
     logger = get_logger(__name__)
 
