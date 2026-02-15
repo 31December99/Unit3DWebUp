@@ -5,12 +5,14 @@ from models.movie import AltTitle
 from models.tv import Alternative, DataResponse
 from repositories.interfaces import MovieRepositoryInterface
 from services.utility import ManageTitles
+from config.settings import get_settings
 
 
 # based on old code unit3dup 0.8.21
 class MediaService:
     def __init__(self, repository: MovieRepositoryInterface):
         self.repo = repository
+        self.settings = get_settings()
 
     async def fetch(self, media):
         async def get_keyword() -> str | None:
@@ -18,6 +20,8 @@ class MediaService:
             return " ".join([key.name for key in keywords]) if keywords else None
 
         async def get_trailer() -> str | None:
+            if self.settings.prefs.SKIP_YOUTUBE:
+                return None
             trailers = await self.repo.videos(movie_id=show.get_id(), category=media.category)
             if trailers:
                 trailer = next((video.key for video in trailers.results if video.type.lower() == 'trailer'  # .results
