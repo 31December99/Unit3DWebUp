@@ -36,15 +36,6 @@ class SettingTabViews extends StatelessWidget {
           child: Column(
             children: [
               SettingText(
-                label: "PREFS__YOUTUBE_FAV_CHANNEL_ID",
-                value: provider.getValue('YOUTUBE_FAV_CHANNEL_ID'),
-                onSubmitted: (value) async => await provider.setEnv(
-                  'PREFS__YOUTUBE_FAV_CHANNEL_ID',
-                  value,
-                ),
-              ),
-
-              SettingText(
                 label: "PREFS__WATCHER_INTERVAL",
                 value: provider.getValue('WATCHER_INTERVAL'),
                 onSubmitted: (value) async =>
@@ -119,27 +110,22 @@ class SettingTabViews extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              SettingSwitch(
+              SettingText(
                 label: "Inserisce un trailer YouTube ( solo se esiste) ",
-                value: provider.youtubeChannelEnable,
-                onChanged: (value) async {
-                  String setValue = (value == false) ? 'false' : 'true';
-                  await provider.setEnv(
-                    'PREFS__YOUTUBE_CHANNEL_ENABLE',
-                    setValue,
-                  );
-                  provider.youtube();
-                },
+                value: provider.getValue('YOUTUBE_CHANNEL_ENABLE'),
+                onSubmitted: (value) async => await provider.setEnv(
+                  'PREFS__YOUTUBE_CHANNEL_ENABLE',
+                  value,
+                ),
               ),
-              SettingSwitch(
+
+              SettingText(
                 label: "Confronto il tuo torrent con uno presente nel tracker",
-                value: provider.duplicateOn,
-                onChanged: (value) async {
-                  String setValue = (value == false) ? 'false' : 'true';
-                  await provider.setEnv('PREFS__DUPLICATE_ON', setValue);
-                  provider.searchDuplicate();
-                },
+                value: provider.getValue('DUPLICATE_ON'),
+                onSubmitted: (value) async =>
+                    await provider.setEnv('PREFS__DUPLICATE_ON', value),
               ),
+
               SettingText(
                 label: "PREFS__SIZE_TH",
                 value: provider.getValue('SIZE_TH'),
@@ -147,78 +133,69 @@ class SettingTabViews extends StatelessWidget {
                     await provider.setEnv('PREFS__SIZE_TH', value),
                 hint: "es. 100",
               ),
-              SettingSwitch(
+
+              SettingText(
                 label: "Skippa ogni duplicato senza chiedere conferma",
-                value: provider.duplicate,
-                onChanged: (value) async {
-                  String setValue = (value == false) ? 'false' : 'true';
-                  await provider.setEnv('PREFS__SKIP_DUPLICATE', setValue);
-                  provider.skipDuplicate();
-                },
+                value: provider.getValue('SKIP_DUPLICATE'),
+                onSubmitted: (value) async =>
+                    await provider.setEnv('PREFS__SKIP_DUPLICATE', value),
               ),
 
-              SettingSwitch(
+              SettingText(
                 label: "Skippa in caso di Tmdb_id non trovato ( verificare..)",
-                value: provider.tmdb,
-                onChanged: (value) async {
-                  String setValue = (value == false) ? 'false' : 'true';
-                  await provider.setEnv('PREFS__SKIP_TMDB', setValue);
-                  provider.skipTmdb();
-                },
+                value: provider.getValue('SKIP_TMDB'),
+                onSubmitted: (value) async =>
+                    await provider.setEnv('PREFS__SKIP_TMDB', value),
               ),
-              SettingSwitch(
+
+              SettingText(
                 label: "Ridimensiona automaticamente ogni screenshot",
-                value: provider.resizeScshot,
-                onChanged: (value) async {
-                  String setValue = (value == false) ? 'false' : 'true';
-                  await provider.setEnv('PREFS__RESIZE_SCSHOT', setValue);
-                  provider.rszScshot();
-                },
+                value: provider.getValue('SKIP_TMDB'),
+                onSubmitted: (value) async =>
+                    await provider.setEnv('PREFS__RESIZE_SCSHOT', value),
               ),
-              SettingSwitch(
+
+              SettingText(
                 label: "Rende 'anonimo' l'utente durante l'upload",
-                value: provider.anon,
-                onChanged: (value) async {
-                  String setValue = (value == false) ? 'false' : 'true';
-                  await provider.setEnv('PREFS__ANON', setValue);
-                  provider.anonUser();
-                },
+                value: provider.getValue('ANON'),
+                onSubmitted: (value) async =>
+                    await provider.setEnv('PREFS__ANON', value),
               ),
-              SettingSwitch(
+
+              SettingText(
                 label: "Salva nella cache locale l'url di ogni screenshot",
-                value: provider.cacheScshot,
-                onChanged: (value) async {
-                  String setValue = (value == false) ? 'false' : 'true';
-                  await provider.setEnv('PREFS__CACHE_SCR', setValue);
-                  provider.cacheScreenshot();
-                },
+                value: provider.getValue('CACHE_SCR'),
+                onSubmitted: (value) async =>
+                    await provider.setEnv('PREFS__CACHE_SCR', value),
               ),
-              SettingSwitch(
+
+              SettingText(
                 label: "Salva nella cache locale TMDB ID e titolo",
-                value: provider.cacheDbonline,
-                onChanged: (value) async {
-                  String setValue = (value == false) ? 'false' : 'true';
-                  await provider.setEnv('PREFS__CACHE_DBONLINE', setValue);
-                  provider.cacheTmdb();
-                },
+                value: provider.getValue('CACHE_DBONLINE'),
+                onSubmitted: (value) async =>
+                    await provider.setEnv('PREFS__CACHE_DBONLINE', value),
               ),
-              SettingSwitch(
+
+              SettingText(
                 label: "Ogni torrent è una personal release",
-                value: provider.personalRel,
-                onChanged: (value) async {
-                  String setValue = (value == false) ? 'false' : 'true';
-                  await provider.setEnv('PREFS__PERSONAL_RELEASE', setValue);
-                  provider.personalRelease();
-                },
+                value: provider.getValue('PERSONAL_RELEASE'),
+                onSubmitted: (value) async =>
+                    await provider.setEnv('PREFS__PERSONAL_RELEASE', value),
               ),
-              SettingSwitch(
+
+              SettingText(
                 label: "Aggiungi un gif webp agli screenshot",
-                value: provider.webp,
-                onChanged: (value) async {
-                  String setValue = (value == false) ? 'false' : 'true';
-                  await provider.setEnv('PREFS__WEBP_ENABLED', setValue);
-                  provider.webpScshot();
-                },
+                value: provider.getValue('WEBP_ENABLED'),
+                onSubmitted: (value) async =>
+                    await provider.setEnv('PREFS__WEBP_ENABLED', value),
+              ),
+              SettingText(
+                label: "PREFS__YOUTUBE_FAV_CHANNEL_ID",
+                value: provider.getValue('YOUTUBE_FAV_CHANNEL_ID'),
+                onSubmitted: (value) async => await provider.setEnv(
+                  'PREFS__YOUTUBE_FAV_CHANNEL_ID',
+                  value,
+                ),
               ),
             ],
           ),
