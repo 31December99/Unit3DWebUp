@@ -1,6 +1,9 @@
+# -*- coding: utf-8 -*-
+
 import os
 import asyncio
 import json
+from pathlib import Path
 
 from repositories.media_info_factory import MediaFileFactory
 from services.utility import ManageTitles
@@ -33,7 +36,7 @@ class AsyncMediaManager:
         self.logger = get_logger(self.__class__.__name__)
 
     @staticmethod
-    def scan_folder(path: str):
+    def scan_folder(path: Path):
         with os.scandir(path) as it:
             for entry in it:
                 if entry.is_file() and ManageTitles.filter_ext(entry.name):
@@ -78,9 +81,9 @@ class AsyncMediaManager:
         if not entries:
             self.logger.warning(f"Folder {self.path} is empty")
 
-        files = [os.path.join(self.path, e) for e in entries if
-                 os.path.isfile(os.path.join(self.path, e)) and ManageTitles.filter_ext(e)]
-        subfolders = [os.path.join(self.path, e) for e in entries if os.path.isdir(os.path.join(self.path, e))]
+        files = [Path(self.path) / e for e in entries if
+                 os.path.isfile(Path(self.path) / e) and ManageTitles.filter_ext(e)]
+        subfolders = [Path(self.path) / e for e in entries if os.path.isdir(Path(self.path) / e)]
 
         async def safe_create(path):
             async with self.sem:
@@ -101,7 +104,8 @@ class AsyncMediaManager:
 
         if self.is_dir:
             files = await asyncio.to_thread(os.listdir, self.path)
-            video_files = [os.path.join(self.path, f) for f in files if ManageTitles.filter_ext(f)]
+            video_files = [Path(self.path) / f for f in files if ManageTitles.filter_ext(f)]
+
             if self.mode == "man":
                 return await self._create_media_list(video_files)
             if self.mode == "folder":
@@ -176,8 +180,8 @@ class AsyncMediaManager:
         async with self.sem:
             media.size = await asyncio.to_thread(lambda: os.stat(media.file_name).st_size)
 
-        # Build metainfo
-        media.metainfo = json.dumps([{"length": media.size, "path": [media.file_name]}], indent=4)
+        # Convert PosixPath to str and build info
+        media.metainfo = json.dumps([{"length": media.size, "path": [str(media.file_name)]}], indent=4)
         return True
 
     async def process_folder(self, media: Media) -> bool:
@@ -198,9 +202,9 @@ class AsyncMediaManager:
         files.sort()
         media.status = MediaStatus.INDEXED
         media.job_id_list = self.job_id_list
-        media.file_name = os.path.join(media.torrent_path, files[0])
-        media.display_name = ManageTitles.clean_text(os.path.basename(media.torrent_path))
-        media.torrent_name = os.path.basename(media.torrent_path)
+        media.file_name = Path(media.torrent_path) / files[0]
+        media.display_name = ManageTitles.clean_text(Path(media.torrent_path).name)
+        media.torrent_name = Path(media.torrent_path).name
         media.doc_description = "\n".join(files)
 
         entries = await asyncio.to_thread(lambda: list(self.scan_folder(media.torrent_path)))

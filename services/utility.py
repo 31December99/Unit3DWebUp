@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # Same as old code unit3dup 0.8.21
 from datetime import datetime
+from pathlib import Path
+
 import unicodedata
 import os
 import re
@@ -264,7 +266,7 @@ class System:
             total_size = 0
             for dir_path, _, filenames in os.walk(folder_path):
                 for file in filenames:
-                    file_path = os.path.join(dir_path, file)
+                    file_path = Path(dir_path) / file
                     if not os.path.islink(file_path):
                         total_size += os.path.getsize(file_path)
 

@@ -202,9 +202,9 @@ def get_settings() -> Settings:
     settings = Settings()
 
     # Create a folder for each tracker name in the MULTI_TRACKER environment variable
-    torrent_archive_path = "/home/app/torrent_archive" if os.getenv("DOCKER") == "true" else settings.prefs.TORRENT_ARCHIVE_PATH
+    torrent_archive_path = Path("/home/app/torrent_archive") if os.getenv("DOCKER") == "true" else Path(settings.prefs.TORRENT_ARCHIVE_PATH)
     for tracker_name in settings.tracker.MULTI_TRACKER:
-        torrent_archive_tracker_path = os.path.join(torrent_archive_path, tracker_name.upper())
+        torrent_archive_tracker_path = Path(torrent_archive_path) / tracker_name.upper()
         os.makedirs(torrent_archive_tracker_path, exist_ok=True)
 
     return settings

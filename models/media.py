@@ -28,13 +28,14 @@ class Media:
         :param folder: the main path
         :param subfolder: file path or subfolder path
         """
-        self.folder: str = folder
+        self.folder: Path = Path(folder)
         self.subfolder: str = subfolder
-        self.title: str = os.path.basename(os.path.join(self.folder, self.subfolder))
+        self.title: str = (Path(self.folder) /  self.subfolder).name
         self._torrent_file_path = Path(torrent_archive_path) / "ITT" / f"{self.title}.torrent"
 
         # // Assign a job id
-        self.job_id: str = hashlib.sha256(os.path.join(self.folder, self.subfolder).encode()).hexdigest()
+        path = Path(self.folder) / self.subfolder
+        self.job_id: str = hashlib.sha256(str(path).encode()).hexdigest()
         # // Media
         self.cached: bool = False  # non utilizzato
         self._crew_list: list[str] | None = None
@@ -49,7 +50,7 @@ class Media:
         self._screen_size: str | None = None
         self._audio_codec: str | None = None
         self._subtitle: str | None = None
-        self._torrent_path: str | None = None
+        self._torrent_path: Path | None = None
         self._media_to_string: str | None = None
 
         # // Contents
@@ -322,12 +323,12 @@ class Media:
         return self._torrent_file_path
 
     @property
-    def torrent_path(self) -> str:
+    def torrent_path(self) -> Path:
         if not self._torrent_path:
             if os.path.isfile(self.folder):
                 self._torrent_path = self.folder
             if os.path.isdir(self.folder):
-                self._torrent_path = os.path.join(self.folder, self.subfolder)
+                self._torrent_path = Path(self.folder) / self.subfolder
         return self._torrent_path
 
     @property
@@ -503,9 +504,9 @@ class Media:
     # Serialize
     def to_dict(self) -> dict:
 
-        # /// Path objects must be converted to strings to be serializable
+        # /// PosixPath objects must be converted to strings to be serializable
         return {
-            "folder": self.folder,
+            "folder": str(self.folder),
             "subfolder": self.subfolder,
             "title": self.title,
             "job_id": self.job_id,
@@ -527,7 +528,7 @@ class Media:
             "file_name": self.file_name,
             "display_name": self.display_name,
             "torrent_name": self.torrent_name,
-            "torrent_path": self.torrent_path,
+            "torrent_path": str(self.torrent_path),
             "torrent_file_path": str(self.torrent_file_path),
             "torrent_pack": self.torrent_pack,
             "size": self.size,
