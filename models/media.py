@@ -548,7 +548,7 @@ class Media:
     # json to Media()
     def from_dict(cls, data: dict) -> "Media":
         torrent_archive_path = (
-            Path("/app/torrent_archive") if os.getenv("DOCKER") == "true"
+            Path("/home/app/torrent_archive") if os.getenv("DOCKER") == "true"
             else Path(settings.prefs.TORRENT_ARCHIVE_PATH)
         )
 
