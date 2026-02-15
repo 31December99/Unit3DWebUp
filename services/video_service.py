@@ -19,7 +19,7 @@ from aiohttp import FormData
 import numpy as np
 import asyncio
 
-settings = get_settings()
+
 
 
 # Based on the old code unit3dup 0.8.21
@@ -36,6 +36,7 @@ class VideoFrame:
         frames = await self._extract()
         frames_in_bytes = []
         is_hd = 0
+        settings = get_settings()
 
         for frame in frames:
             img_bytes = self.image_to_bytes(frame)
@@ -208,6 +209,7 @@ class VideoService(VideoServiceInterface):
         self.file_name: str = media.file_name
         self.display_name: str = media.display_name
         self.webp_filepath: str | None = None
+        settings = get_settings()
 
         if settings.prefs.WEBP_ENABLED:
             self.webp_filepath = os.path.join(settings.prefs.CACHE_PATH, f"{media.display_name}.webp")
