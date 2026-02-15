@@ -212,7 +212,7 @@ class VideoService(VideoServiceInterface):
         settings = get_settings()
 
         if settings.prefs.WEBP_ENABLED:
-            self.webp_filepath = os.path.join(settings.prefs.CACHE_PATH, f"{media.display_name}.webp")
+            self.webp_filepath = f"{media.display_name}.webp"
 
         # Load the video frames
         # if web_enabled is off set the number of screenshots to an even number

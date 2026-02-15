@@ -173,7 +173,6 @@ async def lifespan(app: FastAPI):
     app.state.scan_path = "/home/app/scan" if os.getenv("DOCKER") == "true" else app.state.settings.prefs.SCAN_PATH
     app.state.watcher_destination_path = "/home/app/watcher_destination_path" if os.getenv(
         "DOCKER") == "true" else app.state.settings.prefs.WATCHER_DESTINATION_PATH
-    app.state.cache_path = "/home/app/." if os.getenv("DOCKER") == "true" else app.state.settings.prefs.CACHE_PATH
 
     torrent_archive_path = Path("/home/app/torrent_archive") if os.getenv("DOCKER") == "true" else Path(
         settings.prefs.TORRENT_ARCHIVE_PATH)
@@ -202,7 +201,6 @@ async def lifespan(app: FastAPI):
     logger.info(f"Scan Path            -> '{app.state.scan_path}'")
     logger.info(f"Env Path             -> '{app.state.env_file}'\n")
     logger.info(f"Torrent Archive Path -> '{app.state.torrent_archive_path}'")
-    logger.info(f"Cache Path           -> '{app.state.cache_path}'")
     logger.info(f"Watcher Path         -> '{app.state.watcher_path}'")
     logger.info(f"Watcher Dest. Path   -> '{app.state.watcher_destination_path}'\n")
 

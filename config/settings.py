@@ -144,7 +144,6 @@ class UserPreferences(BaseConfigModel):
     WATCHER_DESTINATION_PATH: str | None = None
     TORRENT_ARCHIVE_PATH: str | None = None
     SCAN_PATH: str | None = None
-    CACHE_PATH: str | None = None
     COMPRESS_SCSHOT: int = 4
     TORRENT_COMMENT: str | None = "no_comment"
     PREFERRED_LANG: str | None = "all"
@@ -157,7 +156,6 @@ class UserPreferences(BaseConfigModel):
         "WATCHER_PATH",
         "WATCHER_DESTINATION_PATH",
         "TORRENT_ARCHIVE_PATH",
-        "CACHE_PATH",
         "SCAN_PATH",
         mode="before"
     )
