@@ -266,7 +266,8 @@ async def clear_job_list_id(payload: HttpRequest):
     frame = inspect.currentframe()
     logger = get_logger(frame.f_code.co_name)
 
-    # Delete the job List
+    # Delete the job list
+    # TODO: delete all job ids
     await app.state.job.delete_job_list(job_id=payload.job_list_id)
 
     if results:
@@ -316,13 +317,13 @@ async def scan(payload: HttpRequest) -> JSONResponse:
 
     # Load the jobs list using the previous id
     job_list = await app.state.job.get_job_list(job_id=job_list_id)
-    logger.info(f"Current joblist {job_list}")
 
     # Load Media for each job id from the job_list
-    job_list_results = [
-        json.loads(await app.state.job.get_job(job_id))
-        for job_id in job_list if job_id
-    ]
+    job_list_results = []
+    for job_id in job_list:
+        job = await app.state.job.get_job(job_id)
+        if job:
+            job_list_results.append(json.loads(job))
 
     # New session
     async with aiohttp.ClientSession() as session:
@@ -532,7 +533,6 @@ async def configuration(payload: HttpRequest):
 
 @app.post("/setenv")
 async def set_env(payload: HttpRequest):
-
     # Load env file
     load_dotenv(dotenv_path=app.state.env_file, override=True)
     # Edit file env
