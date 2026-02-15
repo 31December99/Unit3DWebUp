@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import asyncio
 import hashlib
+import inspect
 import json
 import os
 import time
@@ -107,7 +108,8 @@ async def update_poster(msg: str, job_id: str, field_id: str, new_id: str):
     await app.state.job.update_job(job_id=job_id, new_data={'status': str(MediaStatus.DB_IDENTIFIED)})
 
     # Logger
-    logger = get_logger("settings_logger")
+    frame = inspect.currentframe()
+    logger = get_logger(frame.f_code.co_name)
 
     # Console message
     logger.info(f"-> Update {msg} JOB_ID: {job_id}\n")
@@ -161,7 +163,7 @@ async def lifespan(app: FastAPI):
     # The WebSocket. Send to client progress bar value( Torrent creation) and short log message
     app.state.ws_manager = WebSocketManager()
 
-    # Update mounted paths
+    # Update mounted paths string
     await update_mounted_paths(app=app)
 
     # Watcher zone
@@ -261,7 +263,8 @@ async def clear_job_list_id(payload: HttpRequest):
     results = [json.loads(await app.state.job.get_job(job_id)) for job_id in job_list]
 
     # Logger
-    logger = get_logger("settings_logger")
+    frame = inspect.currentframe()
+    logger = get_logger(frame.f_code.co_name)
 
     # Delete the job List
     await app.state.job.delete_job_list(job_id=payload.job_list_id)
@@ -302,18 +305,23 @@ async def scan(payload: HttpRequest) -> JSONResponse:
             - message: what the frontend should write in the console window
     """
 
+    frame = inspect.currentframe()
+    logger = get_logger(frame.f_code.co_name)
+
     start_time = time.perf_counter()
 
     # Get the id for the current path
     job_list_id = hashlib.sha256(app.state.settings.prefs.SCAN_PATH.encode()).hexdigest()
+    logger.info(f"Current joblist_id {job_list_id}")
 
     # Load the jobs list using the previous id
     job_list = await app.state.job.get_job_list(job_id=job_list_id)
+    logger.info(f"Current joblist {job_list}")
 
     # Load Media for each job id from the job_list
     job_list_results = [
         json.loads(await app.state.job.get_job(job_id))
-        for job_id in job_list
+        for job_id in job_list if job_id
     ]
 
     # New session
@@ -537,11 +545,16 @@ async def set_env(payload: HttpRequest):
     settings = get_settings()
     # Update the fast api app state
     app.state.settings = settings
+
+    # Update mounted path strings. Changes paths require restarting docker when DOCKER == 1
+    await update_mounted_paths(app=app)
+
     # Ricreate profile (overwrite -> it uses hset command)
     await app.state.job.create_profile(dict(settings.prefs))
 
     # Logger
-    logger = get_logger("settings_logger")
+    frame = inspect.currentframe()
+    logger = get_logger(frame.f_code.co_name)
 
     # Console message
     logger.info(f"-> Update {payload.key} value -> {payload.value}\n")
