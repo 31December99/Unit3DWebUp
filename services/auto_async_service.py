@@ -170,7 +170,8 @@ class AsyncMediaManager:
         """
         media.status = MediaStatus.INDEXED
         media.job_id_list = self.job_id_list
-        media.file_name = media.torrent_path
+        # Convert PosixPath to str
+        media.file_name = str(media.torrent_path)
         media.display_name, _ = os.path.splitext(os.path.basename(media.file_name))
         media.display_name = ManageTitles.clean_text(media.display_name)
         media.torrent_name = os.path.basename(media.file_name)
@@ -181,7 +182,7 @@ class AsyncMediaManager:
             media.size = await asyncio.to_thread(lambda: os.stat(media.file_name).st_size)
 
         # Convert PosixPath to str and build info
-        media.metainfo = json.dumps([{"length": media.size, "path": [str(media.file_name)]}], indent=4)
+        media.metainfo = json.dumps([{"length": media.size, "path": [media.file_name]}], indent=4)
         return True
 
     async def process_folder(self, media: Media) -> bool:
