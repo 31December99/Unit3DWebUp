@@ -525,7 +525,7 @@ class Media:
             "tvdb_id": self.tvdb_id,
             "igdb_id": self.igdb_id,
             "imdb_id_from_tvdb": self.imdb_id_from_tvdb,
-            "file_name": self.file_name,
+            "file_name": str(self.file_name),
             "display_name": self.display_name,
             "torrent_name": self.torrent_name,
             "torrent_path": str(self.torrent_path),

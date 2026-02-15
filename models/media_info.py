@@ -117,8 +117,9 @@ class MediaFile:
         return f"{guess_title}.web-dl.{video_format}.{resolution}.{audio_format}{ext}".lower()
 
     def to_dict(self) -> Dict:
+        # Converto PosixPath to str
         return {
-            "file_path": self.file_path,
+            "file_path": str(self.file_path),
             "media_to_string": self.media_to_string,
             "video_tracks": self.video_tracks,
             "audio_tracks": self.audio_tracks,
