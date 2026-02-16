@@ -24,10 +24,11 @@ class SettingProvider extends ChangeNotifier {
   Map<String, dynamic> envValues = {};
 
   /// update single env
-  Future<void> setEnv(String key, String value) async {
+  Future<PosterItem> setEnv(String key, String value) async {
     envValues[key] = value;
-    await ApiService.setEnv(key, value);
+    final response = await ApiService.setEnv(key, value);
     notifyListeners();
+    return response;
   }
 
   /// Load settings from backend

@@ -548,14 +548,19 @@ async def configuration(payload: HttpRequest):
 async def set_env(payload: HttpRequest):
     # Load env file
     load_dotenv(dotenv_path=app.state.env_file, override=True)
+
     # Edit file env
     set_key(str(app.state.env_file), payload.key, payload.value)
+
     # Refresh memory
     os.environ[payload.key] = payload.value
+
     # Clear cache and reload
     get_settings.cache_clear()
+
     # Refresh the lru cache
     settings = get_settings()
+
     # Update the fast api app state
     app.state.settings = settings
 
@@ -584,6 +589,14 @@ async def set_env(payload: HttpRequest):
         "message": f"-> Update {payload.key} value -> {payload.value}\n",
     })
 
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "source": "local",
+            "docker": "1",
+            "message": f"Saved {payload.key}",
+        }
+    )
 
 @app.post("/filter")
 async def filter_search(payload: HttpRequest):

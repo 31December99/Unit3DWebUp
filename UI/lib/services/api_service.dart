@@ -71,7 +71,7 @@ class ApiService {
       Uri.parse('http://127.0.0.1:8000/scan'),
       headers: {'Content-Type': 'application/json'},
       //Todo later
-      body: jsonEncode({'scan': "nothing" }),
+      body: jsonEncode({'scan': "nothing"}),
     );
 
     if (response.statusCode == 200) {
@@ -80,10 +80,10 @@ class ApiService {
 
     if (response.statusCode == 403) {
       final result = jsonDecode(response.body);
-      return [PosterItem(error: result['message'])];
+      return [PosterItem(snackBarError: result['message'])];
     }
 
-    return [PosterItem(error: response.statusCode.toString())];
+    return [PosterItem(snackBarError: response.statusCode.toString())];
   }
 
   /// Create torrents
@@ -300,7 +300,7 @@ class ApiService {
   }
 
   /// Edit env variables PREFS__
-  static Future<void> setEnv(String key, String value) async {
+  static Future<PosterItem> setEnv(String key, String value) async {
     final response = await http.post(
       Uri.parse('http://127.0.0.1:8000/setenv'),
       headers: {'Content-Type': 'application/json'},
@@ -308,9 +308,14 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-    } else {
-      print('Errore: ${response.statusCode}');
+      final result = jsonDecode(response.body);
+
+      return PosterItem(
+        dockerStatus: result['docker'],
+        snackBarStatus: result['message'],
+      );
     }
+    return PosterItem(snackBarError: response.statusCode.toString());
   }
 
   /// Fetch Filtered Item

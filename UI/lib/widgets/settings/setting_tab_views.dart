@@ -18,6 +18,17 @@ class SettingTabViews extends StatelessWidget {
     );
   }
 
+  /// Notify the user: Docker needs to be restarted because the paths are mounted
+  void snackBarStatus(BuildContext context, String? message) {
+    showAppSnackBar(
+      context,
+      message ?? '',
+      duration: Duration(seconds: 2),
+      backgroundColor: Colors.greenAccent
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<SettingProvider>();
@@ -78,9 +89,23 @@ class SettingTabViews extends StatelessWidget {
                 label: "PREFS__SCAN_PATH",
                 value: provider.getValue('SCAN_PATH'),
                 onSubmitted: (value) async {
-                  await provider.setEnv('PREFS__SCAN_PATH', value);
+                  final response = await provider.setEnv(
+                    'PREFS__SCAN_PATH',
+                    value,
+                  );
+
+                  /// If the user is no longer on the page return
                   if (!context.mounted) return;
-                  dockerRestart(context);
+                  /// otherwise if the backend runs on the docker
+                  if (response.dockerStatus == '1') {
+                    /// notify the user to restart the backend
+                    dockerRestart(context);
+                  }
+                  else {
+                    snackBarStatus(context, response.snackBarStatus);
+                  }
+
+
                 },
               ),
 

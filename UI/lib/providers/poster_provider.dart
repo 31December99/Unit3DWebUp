@@ -31,16 +31,17 @@ class PosterProvider extends ChangeNotifier {
   Future<String?> scan(String query) async {
     posterItems = await ApiService.scan();
 
-    /// Check for possible errors
     /// When there is only one item and the error attribute is not null
+    /// Check for possible errors
     if (posterItems.isNotEmpty) {
-      if (posterItems[0].error != null) {
-        return posterItems[0].error;
+      if (posterItems[0].snackBarError != null) {
+        return posterItems[0].snackBarError;
       }
     }
 
     isLoading = true;
     notifyListeners();
+
     /// Filter results based on the query string
     final filteredList = posterItems
         .where(
@@ -170,8 +171,7 @@ class PosterProvider extends ChangeNotifier {
     }
     isLoading = false;
     notifyListeners();
-  } /// End poster popup functions
-
+  }  /// End poster popup functions
 
   /// Request backend to search for torrents in the tracker
   Future<void> searchPoster(String title) async {

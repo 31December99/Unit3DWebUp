@@ -15,13 +15,13 @@ class PosterItem {
   /// IMDb identifier from the remote list
   String? imdbId;
 
-  /// Current job or poster status
+  /// Show Current job or poster status on the Poster when the mouse hovers
   String? status;
 
   /// Current torrent creation progress (percentage)
   String? progress;
 
-  /// Result of a process
+  /// Show result of a process on the Poster
   String? process;
 
   /// Source origin: remote (tracker) or local (backend)
@@ -39,9 +39,14 @@ class PosterItem {
   /// List of video screenshot urls returned by the host (for example imgBB)
   List<dynamic>? screenshots;
 
-  /// an Error message
-  final String? error;
+  /// Show an error message on the page using the snackBar
+  final String? snackBarError;
 
+  /// Show a status message on the page using the snackBar
+  final String? snackBarStatus;
+
+  /// The backend runs in the container if dockerStatus is true
+  final String? dockerStatus;
 
   PosterItem({
     this.posterUrl,
@@ -57,7 +62,9 @@ class PosterItem {
     this.screenshots,
     this.progress,
     this.process,
-    this.error
+    this.snackBarError,
+    this.snackBarStatus,
+    this.dockerStatus,
   });
 
   @override
@@ -73,6 +80,11 @@ class PosterItem {
         'jobListId: $jobListId,'
         'status: $status,'
         'screenshots: $screenshots,'
+        'progress: $progress,'
+        'process: $process,'
+        'SnackBarError: $snackBarError,'
+        'SnackBarStatus: $snackBarStatus,'
+        'DockerStatus: $dockerStatus'
         ')';
   }
 }
