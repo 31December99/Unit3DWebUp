@@ -97,8 +97,9 @@ class SettingTabViews extends StatelessWidget {
                   /// If the user is no longer on the page return
                   if (!context.mounted) return;
                   /// otherwise if the backend runs on the docker
-                  if (response.dockerStatus == '1') {
+                  if (response.dockerStatus == 'true') {
                     /// notify the user to restart the backend
+                    snackBarStatus(context, response.snackBarStatus);
                     dockerRestart(context);
                   }
                   else {
