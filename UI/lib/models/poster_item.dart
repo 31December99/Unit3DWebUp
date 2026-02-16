@@ -39,6 +39,10 @@ class PosterItem {
   /// List of video screenshot urls returned by the host (for example imgBB)
   List<dynamic>? screenshots;
 
+  /// an Error message
+  final String? error;
+
+
   PosterItem({
     this.posterUrl,
     this.displayName,
@@ -53,6 +57,7 @@ class PosterItem {
     this.screenshots,
     this.progress,
     this.process,
+    this.error
   });
 
   @override

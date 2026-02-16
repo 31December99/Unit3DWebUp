@@ -31,12 +31,20 @@ class PosterProvider extends ChangeNotifier {
   /// Request to scan the user path
   /// TODO same as -scan flag in unit3dup
   /// TODO Add creation torrent for -f and -u flag
-  Future<bool> scan(String remotePath, String query) async {
+  Future<String?> scan(String remotePath, String query) async {
+    posterItems = await ApiService.scan(remotePath);
+
+    /// Check for possible errors
+    /// When there is only one item and the error attribute is not null
+    if (posterItems.isNotEmpty) {
+      if (posterItems[0].error != null) {
+        return posterItems[0].error;
+      }
+    }
+
     isLoading = true;
     notifyListeners();
-
-    posterItems = await ApiService.scan(remotePath);
-    // Filter results based on the query string
+    /// Filter results based on the query string
     final filteredList = posterItems
         .where(
           (c) =>
@@ -47,7 +55,7 @@ class PosterProvider extends ChangeNotifier {
     posterItems = filteredList;
     isLoading = false;
     notifyListeners();
-    return true;
+    return null;
   }
 
   /// Create torrents

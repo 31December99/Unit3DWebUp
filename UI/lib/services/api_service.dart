@@ -75,10 +75,14 @@ class ApiService {
 
     if (response.statusCode == 200) {
       return getScanUrls(jsonDecode(response.body));
-    } else {
-      print('Errore: ${response.statusCode}');
-      return [];
     }
+
+    if (response.statusCode == 403) {
+      final result = jsonDecode(response.body);
+      return [PosterItem(error: result['message'])];
+    }
+
+    return [PosterItem(error: response.statusCode.toString())];
   }
 
   /// Create torrents
@@ -114,6 +118,7 @@ class ApiService {
       } else {
         print('Errore: ${response.statusCode}');
         print(jsonDecode(response.body));
+
         return [];
       }
     }

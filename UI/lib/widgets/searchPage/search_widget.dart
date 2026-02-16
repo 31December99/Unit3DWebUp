@@ -31,6 +31,16 @@ class _SearchState extends State<Search> {
     super.dispose();
   }
 
+  /// Notify the user: TODO: one or more errors
+  void notifyTheUser(BuildContext context, errorMessage) {
+    showAppSnackBar(
+      context,
+      errorMessage,
+      duration: Duration(seconds: 2),
+      backgroundColor: Colors.redAccent,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final posterProvider = context.read<PosterProvider>();
@@ -98,6 +108,7 @@ class _SearchState extends State<Search> {
           /// as textbox
           SearchTextField(
             controller: _controller,
+
             /// Enter a keyword
             onSubmitted: (value) {
               // check if the list is empty
@@ -121,7 +132,7 @@ class _SearchState extends State<Search> {
             },
 
             /// SCAN
-            onClickScan: () {
+            onClickScan: () async {
               /// Passes SelectedScanpath01 that is the field from the
               /// setting Page
               final String notifyString =
@@ -129,7 +140,19 @@ class _SearchState extends State<Search> {
 
               logProvider.add(notifyString, LogLevel.info);
               showAppSnackBar(context, notifyString);
-              posterProvider.scan(selectedScanPath, _controller.text);
+
+              /// https://dart.dev/tools/diagnostics/use_build_context_synchronously?utm_source=dartdev&utm_medium=redir&utm_id=diagcode&utm_content=use_build_context_synchronously
+              final String? error = await posterProvider.scan(
+                selectedScanPath,
+                _controller.text,
+              );
+              if (error != null) {
+                if (error.isNotEmpty) {
+                  if (context.mounted) {
+                    notifyTheUser(context, error);
+                  }
+                }
+              }
             },
 
             /// TRACKER
