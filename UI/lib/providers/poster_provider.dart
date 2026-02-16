@@ -8,9 +8,6 @@ class PosterProvider extends ChangeNotifier {
   /// PosterItem list received from api endpoints
   List<PosterItem> posterItems = [];
 
-  /// Il nuovo poster che deve sostituire il vecchio nella lista PosterItem
-  // PosterItem newPosterItems = PosterItem();
-
   /// Use different name for PosterItem list for poster Popup
   List<PosterItem> posterPopUpItems = [];
 
@@ -31,8 +28,8 @@ class PosterProvider extends ChangeNotifier {
   /// Request to scan the user path
   /// TODO same as -scan flag in unit3dup
   /// TODO Add creation torrent for -f and -u flag
-  Future<String?> scan(String remotePath, String query) async {
-    posterItems = await ApiService.scan(remotePath);
+  Future<String?> scan(String query) async {
+    posterItems = await ApiService.scan();
 
     /// Check for possible errors
     /// When there is only one item and the error attribute is not null
@@ -185,20 +182,6 @@ class PosterProvider extends ChangeNotifier {
     isLoading = false;
     notifyListeners();
   }
-
-  // /// Azzera il poster selezionato
-  // Future<void> clearSelectedPoster() async {
-  //   selectedPosterUrl = null;
-  //   notifyListeners();
-  // }
-
-  /// Aggiorna la stringa per NavigationRail 'remote' or 'local'
-  /// non utilizzata
-  // Future<void> switchSourcePoster() async {
-  //   isLocal = !isLocal;
-  //   selectedSource = isLocal ? 'Local' : 'Remote';
-  //   notifyListeners();
-  // }
 
   /// Request backend to delete the job list
   /// The SearchPage will be cleared

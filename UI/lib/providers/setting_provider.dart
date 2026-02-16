@@ -6,10 +6,6 @@ class SettingProvider extends ChangeNotifier {
   /// Holds current setting values
   SettingItem? currentSetting;
 
-  /// Default scan path #1
-  /// TODO for the moment hardcoded
-  String selectedScanpath01 = "/home/parzival/itt/scan";
-
   /// Enable duplicate search
   bool duplicateOn = false;
 

@@ -44,12 +44,9 @@ class _SearchState extends State<Search> {
   @override
   Widget build(BuildContext context) {
     final posterProvider = context.read<PosterProvider>();
-    // final settingProvider = context.watch<SettingProvider>();
-    /// context.watch replaced with context.select
-    /// Rebuild the widget Settings only if selectedScanpath01 changes
-    /// thanks to context.select
-    final selectedScanPath = context.select<SettingProvider, String>(
-      (p) => p.selectedScanpath01,
+
+    final scanPath = context.select<SettingProvider, String>(
+          (p) => p.getValue('SCAN_PATH')
     );
 
     final logProvider = context.read<LogProvider>();
@@ -122,6 +119,7 @@ class _SearchState extends State<Search> {
               /// Console log ( the job Page)
               final String notifyString =
                   "Searching text... in jobList $jobListId";
+
               logProvider.add(notifyString, LogLevel.info);
 
               /// Pop pop
@@ -133,17 +131,17 @@ class _SearchState extends State<Search> {
 
             /// SCAN
             onClickScan: () async {
-              /// Passes SelectedScanpath01 that is the field from the
               /// setting Page
-              final String notifyString =
-                  "Reloading $selectedScanPath' Please wait...";
+              final String notifyString = "Reloading $scanPath ";
 
+              ///Add notify to console
               logProvider.add(notifyString, LogLevel.info);
+
+              /// popup message
               showAppSnackBar(context, notifyString);
 
               /// https://dart.dev/tools/diagnostics/use_build_context_synchronously?utm_source=dartdev&utm_medium=redir&utm_id=diagcode&utm_content=use_build_context_synchronously
               final String? error = await posterProvider.scan(
-                selectedScanPath,
                 _controller.text,
               );
               if (error != null) {

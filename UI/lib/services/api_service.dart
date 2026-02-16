@@ -66,11 +66,12 @@ class ApiService {
   }
 
   /// Scan remote path
-  static Future<List<PosterItem>> scan(String remotePath) async {
+  static Future<List<PosterItem>> scan() async {
     final response = await http.post(
       Uri.parse('http://127.0.0.1:8000/scan'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'path': remotePath}),
+      //Todo later
+      body: jsonEncode({'scan': "nothing" }),
     );
 
     if (response.statusCode == 200) {
