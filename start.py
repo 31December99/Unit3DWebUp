@@ -593,7 +593,7 @@ async def set_env(payload: HttpRequest):
         status_code=status.HTTP_200_OK,
         content={
             "source": "local",
-            "docker": "1",
+            "docker": os.getenv("DOCKER"),
             "message": f"Saved {payload.key}",
         }
     )
