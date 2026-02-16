@@ -156,6 +156,10 @@ async def lifespan(app: FastAPI):
     # Store the job reference to app.state
     app.state.job = job
 
+    # RestartDocker notify
+    # Set flag to true when setEnv is called from the frontend
+    app.state.restart_docker = False
+
     # Create a new profile from user_preferences Job_id is '0'
     # Later will be recalled from the setting endpoint
     await job.create_profile(dict(settings.prefs))
@@ -308,6 +312,15 @@ async def scan(payload: HttpRequest) -> JSONResponse:
 
     frame = inspect.currentframe()
     logger = get_logger(frame.f_code.co_name)
+
+    if app.state.restart_docker:
+        return JSONResponse(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            content={
+                "source": "local",
+                "message": "Please restart the Docker container",
+            }
+        )
 
     start_time = time.perf_counter()
 
@@ -545,6 +558,11 @@ async def set_env(payload: HttpRequest):
     settings = get_settings()
     # Update the fast api app state
     app.state.settings = settings
+
+    # This key requires a Docker restart
+    if payload.key.upper() in ["PREFS__WATCHER_DESTINATION_PATH", "PREFS__WATCHER_PATH", "PREFS__TORRENT_ARCHIVE_PATH",
+                               "PREFS__SCAN_PATH"] and os.getenv("DOCKER") == "true":
+        app.state.restart_docker = True
 
     # Update mounted path strings. Changes paths require restarting docker when DOCKER == 1
     await update_mounted_paths(app=app)
