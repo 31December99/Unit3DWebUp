@@ -315,7 +315,7 @@ async def scan(payload: HttpRequest) -> JSONResponse:
 
     if app.state.restart_docker:
         return JSONResponse(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_403_FORBIDDEN,
             content={
                 "source": "local",
                 "message": "Please restart the Docker container",
