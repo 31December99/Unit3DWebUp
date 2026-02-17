@@ -45,13 +45,3 @@ upload_hosts = {
         "fieldname": "source"
     }
 }
-
-priority_map = {
-    'ImgBB': settings.prefs.IMGBB_PRIORITY,
-    'PtScreens': settings.prefs.PTSCREENS_PRIORITY,
-    'LensDump': settings.prefs.LENSDUMP_PRIORITY,
-    'ImgFi': settings.prefs.IMGFI_PRIORITY,
-    'PassIMA': settings.prefs.PASSIMA_PRIORITY,
-    'ImaRide': settings.prefs.IMARIDE_PRIORITY,
-    'Freeimage': settings.prefs.FREE_IMAGE_PRIORITY,
-}

@@ -8,7 +8,7 @@ from pathlib import Path
 from PIL import Image
 
 from services.interfaces import VideoServiceInterface, DescriptionBuilderInterface
-from config.host_data import upload_hosts, priority_map, master_uploaders
+from config.host_data import upload_hosts, master_uploaders
 from external.async_http_client_service import AsyncHttpClient
 from config.constants import MediaStatus
 from config.settings import get_settings
@@ -254,7 +254,17 @@ class BuildService(DescriptionBuilderInterface):
 
     async def description(self):
 
-        # As in the old code 0.8.21 the host is chosen based on the priority setting
+        settings = get_settings()
+        priority_map = {
+            'ImgBB': settings.prefs.IMGBB_PRIORITY,
+            'PtScreens': settings.prefs.PTSCREENS_PRIORITY,
+            'LensDump': settings.prefs.LENSDUMP_PRIORITY,
+            'ImgFi': settings.prefs.IMGFI_PRIORITY,
+            'PassIMA': settings.prefs.PASSIMA_PRIORITY,
+            'ImaRide': settings.prefs.IMARIDE_PRIORITY,
+            'Freeimage': settings.prefs.FREE_IMAGE_PRIORITY,
+        }
+
         user_order = sorted(master_uploaders, key=lambda uploader: priority_map[uploader])
 
         async def upload_frame(media: Media, index: int, image_bytes: bytes) -> str:
