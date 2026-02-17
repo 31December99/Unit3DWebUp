@@ -1,17 +1,19 @@
+import 'package:UI/models/models.dart';
+import 'package:UI/providers/providers.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:UI/widgets/widgets.dart';
 
 /// Custom widget for a TextField in the SettingsPage
 class SettingText extends StatefulWidget {
   final String label;
   final String value;
-  final ValueChanged<String> onSubmitted;
   final String? hint;
 
   const SettingText({
     super.key,
     required this.label,
     required this.value,
-    required this.onSubmitted,
     this.hint,
   });
 
@@ -31,7 +33,7 @@ class _SettingTextState extends State<SettingText> {
   @override
   void didUpdateWidget(covariant SettingText oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Check the previous state !
+
     if (widget.value != oldWidget.value) {
       _controller.text = widget.value;
       _controller.selection = TextSelection.fromPosition(
@@ -46,8 +48,42 @@ class _SettingTextState extends State<SettingText> {
     super.dispose();
   }
 
+  /// Notify the user: Docker needs to be restarted
+  void dockerRestart(BuildContext context) {
+    showAppSnackBar(
+      context,
+      "Please restart the container or run docker-compose restart",
+      duration: const Duration(seconds: 2),
+      backgroundColor: Colors.redAccent,
+    );
+  }
+
+  /// Generic success snackbar
+  void snackBarStatus(BuildContext context, String? message) {
+    showAppSnackBar(
+      context,
+      message ?? '',
+      duration: const Duration(seconds: 2),
+      backgroundColor: Colors.greenAccent,
+    );
+  }
+
+  Future<void> checkDockerStatus(
+    BuildContext context,
+    PosterItem response,
+  ) async {
+    if (response.dockerStatus == 'true') {
+      snackBarStatus(context, response.snackBarStatus);
+      dockerRestart(context);
+    } else {
+      snackBarStatus(context, response.snackBarStatus);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final provider = context.read<SettingProvider>();
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
@@ -60,13 +96,21 @@ class _SettingTextState extends State<SettingText> {
               controller: _controller,
               decoration: InputDecoration(
                 hintText: widget.hint,
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 8,
                   vertical: 4,
                 ),
               ),
-              onSubmitted: widget.onSubmitted,
+              onSubmitted: (value) async {
+                final response = await provider.setEnv(widget.label, value);
+                if (!context.mounted) return;
+                if (widget.label.contains('PATH')) {
+                  await checkDockerStatus(context, response);
+                } else {
+                  snackBarStatus(context, response.snackBarStatus);
+                }
+              },
             ),
           ),
         ],
