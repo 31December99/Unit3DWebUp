@@ -1,0 +1,38 @@
+services:
+  backend:
+    image: parzival2025/backend_app:0.0.1
+    container_name: backend_app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - DOCKER=true
+    volumes:
+      - ./scan:/home/app/scan
+      - ./watcher:/home/app/watcher
+      - ./watcher_destination:/home/app/watcher_destination_path
+      - ./torrent_archive:/home/app/torrent_archive
+      - ./app.env:/home/app/.env
+
+  frontend:
+    image: parzival2025/frontend_app:0.0.1
+    container_name: frontend_app
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis_server
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    command: [ "redis-server", "--appendonly", "yes" ]
+
+volumes:
+  redis_data:
