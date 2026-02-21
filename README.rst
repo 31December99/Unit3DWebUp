@@ -19,3 +19,8 @@ https://github.com/31December99/Unit3Dup
 
 now including an async backend and a web frontend
 
+.. image:: images/home.png
+   :alt: Uni3D webUp home
+   :width: 600
+   :align: center
+
