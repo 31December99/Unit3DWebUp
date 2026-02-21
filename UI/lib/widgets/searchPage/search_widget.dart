@@ -1,10 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:UI/providers/providers.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:UI/widgets/searchPage/search.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:UI/providers/providers.dart';
 import 'package:UI/widgets/widgets.dart';
 import 'package:UI/models/models.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 /// Search
 /// This page comes with a textbox and four icon button
@@ -46,7 +47,7 @@ class _SearchState extends State<Search> {
     final posterProvider = context.read<PosterProvider>();
 
     final scanPath = context.select<SettingProvider, String>(
-          (p) => p.getValue('SCAN_PATH')
+      (p) => p.getValue('SCAN_PATH'),
     );
 
     final logProvider = context.read<LogProvider>();
@@ -55,123 +56,169 @@ class _SearchState extends State<Search> {
       padding: const EdgeInsets.all(1),
       child: Column(
         children: [
-          /// A personal widget with hover function (tooltip)
-          Ctooltip(
-            message: "Carica tutto su tracker!",
-            child: IconButton(
-              /// Event button
-              onPressed: () {
-                /// Every poster has a job_id and a job_list_id
-                final jobListId = posterProvider.posterItems.first.jobListId;
+          Align(
+            alignment: Alignment.topRight,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 12, bottom: 8),
+              child: InkWell(
+                onTap: () async {
+                  final Uri url = Uri.parse(
+                    'https://github.com/tuo-username/tuo-repo',
+                  );
 
-                /// Preparare a message for the console log ( the job Page)
-                final String notifyString =
-                    'Uploading job list $jobListId Please wait...';
-
-                /// Access to console by provider
-                /// send message and defines its type
-                logProvider.add(notifyString, LogLevel.info);
-
-                /// Kind of message shown at the bottom
-                showAppSnackBar(context, notifyString);
-
-                /// Calls the endpoint
-                /// Passes the job list id and requests upload to the tracker
-                /// The backend reads data from Redis and start processing
-                posterProvider.uploadList(jobListId!);
-              },
-
-              /// Graphic for icon. See Asset folder
-              icon: SvgPicture.asset(
-                'lib/assets/upload-svgrepo-com.svg',
-                width: 25,
+                  if (await canLaunchUrl(url)) {
+                    await launchUrl(url);
+                  }
+                },
+                child: const Text(
+                  "GitHub",
+                  style: TextStyle(
+                    color: Colors.blueAccent,
+                    decoration: TextDecoration.underline,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ),
             ),
           ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Row(
+                children: const [
+                  Text(
+                    'UNIT3D',
+                    style: TextStyle(
+                      fontFamily: 'WhiteRabbit',
+                      fontSize: 20,
+                      color: Color(0xFFF30420),
+                      letterSpacing: 1,
+                    ),
+                  ),
+                  SizedBox(width: 4),
+                  Text(
+                    'WEBUP',
+                    style: TextStyle(
+                      fontFamily: 'WhiteRabbit',
+                      fontSize: 20,
+                      color: Colors.white,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                ],
+              ),
 
-          /// Label
-          Text(
-            'UNIT3D Up',
-            style: const TextStyle(
-              fontFamily: 'WhiteRabbit',
-              fontSize: 20,
-              color: Color(0xFFCF8F4F),
-              letterSpacing: 1,
-            ),
-          ),
+              const SizedBox(width: 25),
 
-          /// SEARCH TEXT BOX
-          /// Use a custom widget ( it returns a  customized..TextField)
-          /// as textbox
-          SearchTextField(
-            controller: _controller,
+              Row(
+                children: [
+                  Ctooltip(
+                    message: "Carica tutto su tracker!",
+                    child: IconButton(
+                      onPressed: () {
+                        final jobListId =
+                            posterProvider.posterItems.first.jobListId;
 
-            /// Enter a keyword
-            onSubmitted: (value) {
-              // check if the list is empty
-              if (posterProvider.posterItems.isEmpty) {
-                return;
-              }
+                        final String notifyString =
+                            'Uploading job list $jobListId Please wait...';
 
-              /// As above , get job_list_id, talk to console, run endpoint
-              final jobListId = posterProvider.posterItems.first.jobListId;
+                        logProvider.add(notifyString, LogLevel.info);
+                        showAppSnackBar(context, notifyString);
 
-              /// Console log ( the job Page)
-              final String notifyString =
-                  "Searching text... in jobList $jobListId";
+                        posterProvider.uploadList(jobListId!);
+                      },
+                      icon: SvgPicture.asset(
+                        'lib/assets/upload-svgrepo-com.svg',
+                        width: 25,
+                      ),
+                    ),
+                  ),
 
-              logProvider.add(notifyString, LogLevel.info);
+                  const SizedBox(width: 15),
 
-              /// Pop pop
-              showAppSnackBar(context, notifyString);
+                  InkWell(
+                    onTap: () => showAppSnackBar(context, "Filtro: Film"),
+                    child: const Text(
+                      "Film",
+                      style: TextStyle(
+                        color: Colors.blueAccent,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
 
-              /// Tracker Search in the results
-              posterProvider.searchPoster(value);
-            },
+                  const SizedBox(width: 10),
 
-            /// SCAN
-            onClickScan: () async {
-              /// setting Page
-              final String notifyString = "Reloading $scanPath ";
+                  InkWell(
+                    onTap: () => showAppSnackBar(context, "Filtro: Serie"),
+                    child: const Text(
+                      "Serie",
+                      style: TextStyle(
+                        color: Colors.blueAccent,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
 
-              ///Add notify to console
-              logProvider.add(notifyString, LogLevel.info);
+                  const SizedBox(width: 10),
+                ],
+              ),
 
-              /// popup message
-              showAppSnackBar(context, notifyString);
+              const SizedBox(width: 30),
 
-              /// https://dart.dev/tools/diagnostics/use_build_context_synchronously?utm_source=dartdev&utm_medium=redir&utm_id=diagcode&utm_content=use_build_context_synchronously
-              final String? error = await posterProvider.scan(
-                _controller.text,
-              );
-              if (error != null) {
-                if (error.isNotEmpty) {
-                  if (context.mounted) {
-                    notifyTheUser(context, error);
-                  }
-                }
-              }
-            },
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.5,
+                child: SearchTextField(
+                  controller: _controller,
+                  onSubmitted: (value) {
+                    if (posterProvider.posterItems.isEmpty) return;
 
-            /// TRACKER
-            onClickTracker: (value) {
-              /// Passes search value
-              final String notifyString = "Searching... '$value' in tracker";
-              logProvider.add(notifyString, LogLevel.info);
-              showAppSnackBar(context, notifyString);
-              posterProvider.searchPoster(value);
-            },
+                    final jobListId =
+                        posterProvider.posterItems.first.jobListId;
 
-            /// DELETE
-            onClickClear: () {
-              /// Request to backend to delete job_list_id (Page)
-              ///
-              final String notifyString =
-                  "Deleting... job list '${posterProvider.posterItems[0].jobListId}'";
-              logProvider.add(notifyString, LogLevel.info);
-              showAppSnackBar(context, notifyString);
-              posterProvider.clearPosterItems();
-            },
+                    final String notifyString =
+                        "Searching text... in jobList $jobListId";
+
+                    logProvider.add(notifyString, LogLevel.info);
+                    showAppSnackBar(context, notifyString);
+
+                    posterProvider.searchPoster(value);
+                  },
+                  onClickScan: () async {
+                    final String notifyString = "Reloading $scanPath ";
+
+                    logProvider.add(notifyString, LogLevel.info);
+                    showAppSnackBar(context, notifyString);
+
+                    final String? error = await posterProvider.scan(
+                      _controller.text,
+                    );
+
+                    if (error != null && error.isNotEmpty && context.mounted) {
+                      notifyTheUser(context, error);
+                    }
+                  },
+                  onClickTracker: (value) {
+                    final String notifyString =
+                        "Searching... '$value' in tracker";
+
+                    logProvider.add(notifyString, LogLevel.info);
+                    showAppSnackBar(context, notifyString);
+
+                    posterProvider.searchPoster(value);
+                  },
+                  onClickClear: () {
+                    final String notifyString =
+                        "Deleting... job list '${posterProvider.posterItems[0].jobListId}'";
+
+                    logProvider.add(notifyString, LogLevel.info);
+                    showAppSnackBar(context, notifyString);
+
+                    posterProvider.clearPosterItems();
+                  },
+                ),
+              ),
+            ],
           ),
 
           const SizedBox(height: 10),

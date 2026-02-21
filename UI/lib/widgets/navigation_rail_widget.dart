@@ -15,12 +15,15 @@ class NavigationRailMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return NavigationRail(
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: NavigationRail(
+      backgroundColor: Color(0xFF20252C),
       selectedIndex: selectedIndex,
       onDestinationSelected: onSelect,
       labelType: NavigationRailLabelType.selected,
+      groupAlignment: -0.89,
       destinations: [
-
         NavigationRailDestination(
           icon: SvgPicture.asset('lib/assets/home-svgrepo-com.svg', width: 20),
           selectedIcon: SvgPicture.asset(
@@ -54,6 +57,7 @@ class NavigationRailMenu extends StatelessWidget {
           label: const Text('Jobs'),
         ),
       ],
+      ),
     );
   }
 }

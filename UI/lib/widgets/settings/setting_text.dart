@@ -88,11 +88,18 @@ class _SettingTextState extends State<SettingText> {
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
         children: [
-          Expanded(flex: 2, child: Text(widget.label)),
+          Expanded(
+            flex: 2,
+            child: Text(
+              style: const TextStyle(color: Colors.white),
+              widget.label,
+            ),
+          ),
           const SizedBox(width: 12),
           Expanded(
             flex: 3,
             child: TextField(
+              style: const TextStyle(color: Colors.white),
               controller: _controller,
               decoration: InputDecoration(
                 hintText: widget.hint,
