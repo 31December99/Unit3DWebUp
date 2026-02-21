@@ -18,7 +18,7 @@ class NavigationRailMenu extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: NavigationRail(
-      backgroundColor: Color(0xFF20252C),
+      backgroundColor: Color(0xFF121630),
       selectedIndex: selectedIndex,
       onDestinationSelected: onSelect,
       labelType: NavigationRailLabelType.selected,
