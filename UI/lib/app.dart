@@ -37,6 +37,7 @@ class MainLayoutState extends State<MainLayout> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+        backgroundColor: Color(0xFF030E17),
         body: Row(
           children: [
             /// a menu that changes its selected index when the user clicks
