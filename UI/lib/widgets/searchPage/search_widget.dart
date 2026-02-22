@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 /// Search
-/// This page comes with a textbox and four icon button
+/// This page comes with a textbox and icon buttons
 class Search extends StatefulWidget {
   const Search({super.key});
 
@@ -18,7 +18,6 @@ class Search extends StatefulWidget {
 
 class _SearchState extends State<Search> {
   late final TextEditingController _controller;
-  bool isChecked = false;
 
   @override
   void initState() {
@@ -32,12 +31,11 @@ class _SearchState extends State<Search> {
     super.dispose();
   }
 
-  /// Notify the user: TODO: one or more errors
-  void notifyTheUser(BuildContext context, errorMessage) {
+  void notifyTheUser(BuildContext context, String errorMessage) {
     showAppSnackBar(
       context,
       errorMessage,
-      duration: Duration(seconds: 2),
+      duration: const Duration(seconds: 2),
       backgroundColor: Colors.redAccent,
     );
   }
@@ -45,129 +43,84 @@ class _SearchState extends State<Search> {
   @override
   Widget build(BuildContext context) {
     final posterProvider = context.read<PosterProvider>();
+    final logProvider = context.read<LogProvider>();
 
     final scanPath = context.select<SettingProvider, String>(
       (p) => p.getValue('SCAN_PATH'),
     );
 
-    final logProvider = context.read<LogProvider>();
-
     return Container(
-      padding: const EdgeInsets.all(1),
+      padding: const EdgeInsets.all(12),
       child: Column(
         children: [
-          Align(
-            alignment: Alignment.topRight,
-            child: Padding(
-              padding: const EdgeInsets.only(right: 12, bottom: 8),
-              child: InkWell(
-                onTap: () async {
-                  final Uri url = Uri.parse(
-                    'https://github.com/tuo-username/tuo-repo',
-                  );
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              const Text(
+                'UNIT3D',
+                style: TextStyle(
+                  fontFamily: 'WhiteRabbit',
+                  fontSize: 20,
+                  color: Color(0xFFF30420),
+                  letterSpacing: 1,
+                ),
+              ),
 
-                  if (await canLaunchUrl(url)) {
-                    await launchUrl(url);
-                  }
-                },
-                child: const Text(
-                  "GitHub",
-                  style: TextStyle(
-                    color: Colors.blueAccent,
-                    decoration: TextDecoration.underline,
-                    fontWeight: FontWeight.w500,
+              const SizedBox(width: 1),
+
+              const Text(
+                'web',
+                style: TextStyle(
+                  fontFamily: 'Orbitron',
+                  fontSize: 20,
+                  color: Color(0xFFFF6B35), //Color(0xFFF35F04),
+
+                  letterSpacing: 1,
+                ),
+              ),
+
+              const SizedBox(width: 1),
+
+              const Text(
+                'UP',
+                style: TextStyle(
+                  fontFamily: 'WhiteRabbit',
+                  fontSize: 20,
+                  color: Color(0xFFF30420),
+                  letterSpacing: 1,
+                ),
+              ),
+
+              Align(
+                alignment: Alignment.bottomCenter,
+                heightFactor: 0.8,
+                child: Ctooltip(
+                  message: "Carica tutto su tracker!",
+                  child: IconButton(
+                    onPressed: () {
+                      final jobListId =
+                          posterProvider.posterItems.first.jobListId;
+
+                      final String notifyString =
+                          'Uploading job list $jobListId Please wait...';
+
+                      logProvider.add(notifyString, LogLevel.info);
+                      showAppSnackBar(context, notifyString);
+
+                      posterProvider.uploadList(jobListId!);
+                    },
+                    icon: SvgPicture.asset(
+                      'lib/assets/upload-svgrepo-com.svg',
+                      width: 25,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Row(
-                children: const [
-                  Text(
-                    'UNIT3D',
-                    style: TextStyle(
-                      fontFamily: 'WhiteRabbit',
-                      fontSize: 20,
-                      color: Color(0xFFF30420),
-                      letterSpacing: 1,
-                    ),
-                  ),
-                  SizedBox(width: 4),
-                  Text(
-                    'WEBUP',
-                    style: TextStyle(
-                      fontFamily: 'WhiteRabbit',
-                      fontSize: 20,
-                      color: Colors.white,
-                      letterSpacing: 1,
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(width: 25),
-
-              Row(
-                children: [
-                  Ctooltip(
-                    message: "Carica tutto su tracker!",
-                    child: IconButton(
-                      onPressed: () {
-                        final jobListId =
-                            posterProvider.posterItems.first.jobListId;
-
-                        final String notifyString =
-                            'Uploading job list $jobListId Please wait...';
-
-                        logProvider.add(notifyString, LogLevel.info);
-                        showAppSnackBar(context, notifyString);
-
-                        posterProvider.uploadList(jobListId!);
-                      },
-                      icon: SvgPicture.asset(
-                        'lib/assets/upload-svgrepo-com.svg',
-                        width: 25,
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(width: 15),
-
-                  InkWell(
-                    onTap: () => showAppSnackBar(context, "Filtro: Film"),
-                    child: const Text(
-                      "Film",
-                      style: TextStyle(
-                        color: Colors.blueAccent,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(width: 10),
-
-                  InkWell(
-                    onTap: () => showAppSnackBar(context, "Filtro: Serie"),
-                    child: const Text(
-                      "Serie",
-                      style: TextStyle(
-                        color: Colors.blueAccent,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(width: 10),
-                ],
-              ),
-
               const SizedBox(width: 30),
 
               SizedBox(
-                width: MediaQuery.of(context).size.width * 0.5,
+                width: MediaQuery.of(context).size.width * 0.25,
                 child: SearchTextField(
                   controller: _controller,
                   onSubmitted: (value) {
@@ -218,10 +171,33 @@ class _SearchState extends State<Search> {
                   },
                 ),
               ),
+
+              const SizedBox(width: 20),
+
+              InkWell(
+                onTap: () async {
+                  final Uri url = Uri.parse(
+                    'https://github.com/31december1999/',
+                  );
+
+                  if (await canLaunchUrl(url)) {
+                    await launchUrl(url);
+                  }
+                },
+                child: const Text(
+                  "GitHub",
+                  style: TextStyle(
+                    color: Colors.blueAccent,
+                    decoration: TextDecoration.underline,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
             ],
           ),
+          const SizedBox(height: 20),
 
-          const SizedBox(height: 10),
           const AddPoster(),
         ],
       ),

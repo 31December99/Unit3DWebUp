@@ -23,10 +23,6 @@ class MainLayout extends StatefulWidget {
 class MainLayoutState extends State<MainLayout> {
   int _selectedIndex = 0;
 
-  /// SearchPage -> scan the user path and manage Poster
-  /// SettingPage -> get the last setting
-  /// JobPage -> write logs to the console window
-
   final List<Widget> pages = [
     const SearchPage(),
     const SettingPage(),
@@ -37,32 +33,30 @@ class MainLayoutState extends State<MainLayout> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        backgroundColor: Color(0xFF030E17),
-        body: Row(
-          children: [
-            /// a menu that changes its selected index when the user clicks
-            /// custom widget based on NavigationRail widget
-            NavigationRailMenu(
-              selectedIndex: _selectedIndex,
-              onSelect: (index) {
-                /// remove the focus from Textbox when user change the page
-                /// otherwise it could cause a crash
-                FocusScope.of(context).unfocus();
-                setState(() {
-                  _selectedIndex = index;
-                });
-              },
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF0B0F1A), Color(0xFF2C2D63), Color(0xFFA8411C)],
             ),
-            const VerticalDivider(width: 1, thickness: 1),
-            Expanded(
-              /// Use IndexedStack to save the page state
-              /// otherwise the page would be killed
-              /// ( removed from the widget tree)
-              /// with 'Expanded(child: pages[_selectedIndex])'
-              /// https://api.flutter.dev/flutter/widgets/IndexedStack-class.html
-              child: IndexedStack(index: _selectedIndex, children: pages),
-            ),
-          ],
+          ),
+          child: Row(
+            children: [
+              NavigationRailMenu(
+                selectedIndex: _selectedIndex,
+                onSelect: (index) {
+                  FocusScope.of(context).unfocus();
+                  setState(() {
+                    _selectedIndex = index;
+                  });
+                },
+              ),
+              Expanded(
+                child: IndexedStack(index: _selectedIndex, children: pages),
+              ),
+            ],
+          ),
         ),
       ),
     );

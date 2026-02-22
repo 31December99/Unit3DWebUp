@@ -33,7 +33,11 @@ class SearchTextField extends StatelessWidget {
       width: 400,
       child: TextField(
         controller: controller,
-        style: const TextStyle(fontSize: 12),
+        style: const TextStyle(
+            fontSize: 12,
+            color: Colors.white,
+            fontFamily: 'Orbitron',
+        ),
         decoration: InputDecoration(
           isDense: true,
           contentPadding: const EdgeInsets.symmetric(
@@ -44,16 +48,30 @@ class SearchTextField extends StatelessWidget {
           hintStyle: const TextStyle(
             color: Colors.white,
             fontSize: 12,
-            fontFamily: 'WhiteRabbit',
+            // fontFamily: 'WhiteRabbit',
+            fontFamily: 'Orbitron',
             letterSpacing: 0.8,
           ),
           focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.transparent),
+            // borderSide: BorderSide(color: Colors.transparent),
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(
+              color: Colors.white.withValues(alpha: 0.25),
+              width: 1,
+          ),
           ),
           hoverColor: Colors.transparent,
-          border: const OutlineInputBorder(),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: Colors.transparent),
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide.none,
+          ),
+
           suffixIconConstraints: const BoxConstraints(
-            minHeight: 30,
+            minHeight: 32,
             minWidth: 90,
           ),
           suffixIcon: Row(
@@ -64,12 +82,12 @@ class SearchTextField extends StatelessWidget {
                 child: IconButton(
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(
-                    minWidth: 24,
-                    minHeight: 24,
+                    minWidth: 28,
+                    minHeight: 28,
                   ),
                   icon: SvgPicture.asset(
                     'lib/assets/refresh-svgrepo-com.svg',
-                    width: 17,
+                    width: 21,
                   ),
                   onPressed: onClickScan,
                 ),
@@ -79,12 +97,12 @@ class SearchTextField extends StatelessWidget {
                 child: IconButton(
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(
-                    minWidth: 24,
-                    minHeight: 24,
+                    minWidth: 28,
+                    minHeight: 28,
                   ),
                   icon: SvgPicture.asset(
                     'lib/assets/network-share-svgrepo-com.svg',
-                    width: 17,
+                    width: 21,
                   ),
                   onPressed: () {
                     if (onClickTracker != null && controller != null) {
@@ -99,12 +117,12 @@ class SearchTextField extends StatelessWidget {
                 child: IconButton(
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(
-                    minWidth: 24,
-                    minHeight: 24,
+                    minWidth: 28,
+                    minHeight: 28,
                   ),
                   icon: SvgPicture.asset(
                     'lib/assets/clear-svgrepo-com.svg',
-                    width: 15,
+                    width: 19,
                   ),
                   onPressed: onClickClear,
                 ),
