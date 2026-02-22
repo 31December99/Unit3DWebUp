@@ -4,8 +4,9 @@ from functools import lru_cache
 from enum import Enum
 from pathlib import Path
 
-from pydantic import BaseModel, field_validator, model_validator, HttpUrl, Field
+from pydantic import BaseModel, field_validator, model_validator, HttpUrl, Field, ValidationError
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from config.logger import get_logger
 
 
 # /// Class to help avoid typos...
@@ -29,15 +30,15 @@ class BaseConfigModel(BaseModel):
 # /// TRACKER CONFIG
 class TrackerConfig(BaseConfigModel):
     ITT_URL: HttpUrl
-    ITT_APIKEY: str | None = None
+    ITT_APIKEY: str = None
     ITT_PID: str | None = None
     SIS_URL: HttpUrl
     SIS_APIKEY: str | None = None
     SIS_PID: str | None = None
     MULTI_TRACKER: list[str] | None = None
-    TMDB_APIKEY: str | None = None
-    TVDB_APIKEY: str | None = None
-    IMGBB_KEY: str | None = None
+    TMDB_APIKEY: str = None
+    TVDB_APIKEY: str = None
+    IMGBB_KEY: str = None
     FREE_IMAGE_KEY: str | None = None
     LENSDUMP_KEY: str | None = None
     PTSCREENS_KEY: str | None = None
@@ -66,26 +67,27 @@ class TrackerConfig(BaseConfigModel):
 
 # /// TORRENT CLIENT CONFIG
 class TorrentClientConfig(BaseConfigModel):
-    QBIT_USER: str | None = None
-    QBIT_PASS: str | None = None
-    QBIT_HOST: str = "http://localhost"
+    # Default value when the variable is commented out
+    QBIT_USER: str = "admin"
+    QBIT_PASS: str = "admin"
+    QBIT_HOST: str = "http://127.0.0.1"
     QBIT_PORT: int = 8080
-    SHARED_QBIT_PATH: str | None = None
+    SHARED_QBIT_PATH: str = "/tmp"
 
-    TRASM_USER: str | None = None
-    TRASM_PASS: str | None = None
-    TRASM_HOST: str = "http://localhost"
+    TRASM_USER: str = "admin"
+    TRASM_PASS: str = "admin"
+    TRASM_HOST: str = "http://127.0.0.1"
     TRASM_PORT: int = 9091
-    SHARED_TRASM_PATH: str | None = None
+    SHARED_TRASM_PATH: str = "/tmp"
 
-    RTORR_USER: str | None = None
-    RTORR_PASS: str | None = None
-    RTORR_HOST: str = "scgi://localhost"
+    RTORR_USER: str = "admin"
+    RTORR_PASS: str = "admin"
+    RTORR_HOST: str = "http://127.0.0.1"
     RTORR_PORT: int = 5000
-    SHARED_RTORR_PATH: str | None = None
+    SHARED_RTORR_PATH: str = "/tmp"
 
-    TORRENT_CLIENT: TorrentClient | None = None
-    TAG: str | None = None
+    TORRENT_CLIENT: TorrentClient  = "qbittorrent"
+    TAG: str = "TAG1"
 
     @field_validator("QBIT_PORT", "TRASM_PORT", "RTORR_PORT")
     @classmethod
@@ -142,8 +144,8 @@ class UserPreferences(BaseConfigModel):
     WATCHER_INTERVAL: int = 60
     WATCHER_PATH: str | None = None
     WATCHER_DESTINATION_PATH: str | None = None
-    TORRENT_ARCHIVE_PATH: str | None = None
-    SCAN_PATH: str | None = None
+    TORRENT_ARCHIVE_PATH: str = None
+    SCAN_PATH: str = None
     COMPRESS_SCSHOT: int = 4
     TORRENT_COMMENT: str | None = "no_comment"
     PREFERRED_LANG: str | None = "all"
@@ -198,11 +200,24 @@ def get_settings() -> Settings:
     """
     :return: settings cached
     """
+    logger = get_logger("settings_logger")
 
-    settings = Settings()
+    try:
+        settings = Settings()
+    except ValidationError as e:
+        for err in e.errors():
+            field_path = ".".join(str(loc) for loc in err["loc"])
+            logger.warning(f"{field_path} value not set or invalid")
+            logger.warning("-" * 50)
+
+        raise SystemExit(1)
 
     # Create a folder for each tracker name in the MULTI_TRACKER environment variable
     torrent_archive_path = Path("/home/app/torrent_archive") if os.getenv("DOCKER") == "true" else Path(settings.prefs.TORRENT_ARCHIVE_PATH)
+    if not Path.exists(torrent_archive_path):
+        logger.warning(f"The path {torrent_archive_path} does not exist")
+        raise SystemExit(1)
+
     for tracker_name in settings.tracker.MULTI_TRACKER:
         torrent_archive_tracker_path = Path(torrent_archive_path) / tracker_name.upper()
         os.makedirs(torrent_archive_tracker_path, exist_ok=True)
