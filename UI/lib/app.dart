@@ -38,7 +38,7 @@ class MainLayoutState extends State<MainLayout> {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Color(0xFF0B0F1A), Color(0xFF2C2D63), Color(0xFFA8411C)],
+              colors: [Color(0xFF0B0F1A), Color(0xFF2C2D63), Color(0xFFAE3812)],
             ),
           ),
           child: Row(
