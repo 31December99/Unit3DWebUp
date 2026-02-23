@@ -19,35 +19,35 @@ https://github.com/31December99/Unit3Dup
 
 now including an async backend and a web frontend
 
-.. image:: images/home.png
+.. image:: UI/lib/images/home.png
    :alt: Uni3D webUp home
    :width: 600
    :align: center
 
 |
 
-.. image:: images/settings1.png
+.. image:: UI/lib/images/settings1.png
    :alt: Uni3D webUp home
    :width: 600
    :align: center
 
 |
 
-.. image:: images/settings2.png
+.. image:: UI/lib/images/settings2.png
    :alt: Uni3D webUp home
    :width: 600
    :align: center
 
 |
 
-.. image:: images/settings3.png
+.. image:: UI/lib/images/settings3.png
    :alt: Uni3D webUp home
    :width: 600
    :align: center
 
 |
 
-.. image:: images/jobs.png
+.. image:: UI/lib/images/jobs.png
    :alt: Uni3D webUp home
    :width: 600
    :align: center
