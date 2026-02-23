@@ -61,7 +61,7 @@ It performs the following tasks:
 - Compiles various metadata information to create a torrent
 - Extracts a series of screenshots directly from the video
 - Add webp to your torrent description page
-- Searches for the corresponding ID on TMDB, IGDB, IMDB,TVDB
+- Searches for the corresponding ID on TMDB,IMDB,TVDB
 - Add trailer from TMDB or YouTube
 - Seeding in qBittorrent
 - Generates meta-info derived from the video
@@ -96,8 +96,10 @@ docker-compose pull
 
 The backend comes with FastAPI endpoints.
 For each video file, the uploader creates a job_id equal to the hash of its path
+
 A list of job_ids forms the job_list, which corresponds to the page you can view.
 For each page the uploader creates a job_list_id equal to the hash of the scan_path
+
 For now, a WebSocket is used mainly to send progress updates while creating the torrent file,
 or to send process logs to the frontend console.
 
@@ -118,29 +120,38 @@ Since the backend is based on these endpoints, you can create your own frontend.
 I didn’t want to rewrite the backend completely, so only the frontend was written in Dart,
 while the backend was refactored to be async.
 Every page is stored permanently in Redis, but you can also delete a page (remove it from Redis) if needed
+
 If you delete or add files in the scan folder you need to click on scan again to update the page
 
 # Build Frontend
 ===================
 
 flutter pub get
+
 flutter build web --release --wasm
 
 # Build Container
 ===================
 
 docker-compose build --no-cache -f build.yml
+
 docker-compose up
 
 # Docker HUB
 ====================
 
 docker login
+
 docker tag unit3dwebup-backend:latest parzival2025/backend_app:0.0.1
+
 docker tag unit3dwebup-frontend:latest parzival2025/frontend_app:0.0.1
 
 docker push parzival2025/backend_app:0.0.1
+
 docker push parzival2025/frontend_app:0.0.1
+
+
+work in progress..
 
 
 
