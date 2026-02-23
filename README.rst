@@ -51,3 +51,42 @@ now including an async backend and a web frontend
    :alt: Uni3D webUp home
    :width: 600
    :align: center
+
+
+|
+
+It performs the following tasks:
+
+- Scan folder and subfolders
+- Compiles various metadata information to create a torrent
+- Extracts a series of screenshots directly from the video
+- Add webp to your torrent description page
+- Searches for the corresponding ID on TMDB, IGDB, IMDB,TVDB
+- Add trailer from TMDB or YouTube
+- Seeding in qBittorrent
+- Generates meta-info derived from the video
+- Create and upload individual torrents or the page
+
+
+*NOT YET TESTED*
+
+- Extracts cover from the PDF documents
+- Reseeding one or more torrents at a time
+- Seed your torrents across different OS
+- Add a custom title to your seasons
+- Generate info for a title using MediaInfo
+- unit3dup can grab the first page, convert it to an image (using xpdf),
+  and then the bot can upload it to an image host, then add the link to the torrent page description.
+
+*NOT YET IMPLEMENTED*
+
+- Generates meta-info derived from the game
+- Seeding in Transmission or rTorrent
+
+
+Install
+===================
+
+run
+docker-compose pull
+
