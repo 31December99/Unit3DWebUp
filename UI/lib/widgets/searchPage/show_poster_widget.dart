@@ -5,8 +5,6 @@ import 'package:UI/providers/providers.dart';
 import 'package:UI/models/models.dart';
 import 'package:UI/widgets/widgets.dart';
 
-import '../snack.dart';
-
 /// Show Window when user click a poster only if source is local
 ///
 void showPosterPopup(BuildContext context, PosterItem item) {
