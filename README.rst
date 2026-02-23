@@ -84,9 +84,68 @@ It performs the following tasks:
 - Seeding in Transmission or rTorrent
 
 
-Install
-===================
+# Install from docker hub
+=========================
 
 run
 docker-compose pull
+
+
+# How it works
+===================
+
+The backend comes with FastAPI endpoints.
+For each video file, the uploader creates a job_id equal to the hash of its path
+A list of job_ids forms the job_list, which corresponds to the page you can view.
+For each page the uploader creates a job_list_id equal to the hash of the scan_path
+For now, a WebSocket is used mainly to send progress updates while creating the torrent file,
+or to send process logs to the frontend console.
+
+When you run the scan, the uploader goes through the following process:
+
+- Search for files or folder
+- Extract the title and search on TMDb based on the category, either movie or series.
+- Search on TVDB and extract IMDB ID from teh remote_ids field
+- Create screenshots
+- Create a description with mediainfo and screenshot
+
+Once you see the poster on the page, the process is complete.
+If there is an issue with the title or TMDb/TVDB/IMDb IDs, you can edit the individual poster by clicking on it.
+By clicking on it, a window popup opens. You can then choose whether to edit fields, create a torrent, upload, or start seeding.
+Alternatively, if you want to upload every video, you can click the icon button near the search box on the left
+
+Since the backend is based on these endpoints, you can create your own frontend.
+I didn’t want to rewrite the backend completely, so only the frontend was written in Dart,
+while the backend was refactored to be async.
+Every page is stored permanently in Redis, but you can also delete a page (remove it from Redis) if needed
+If you delete or add files in the scan folder you need to click on scan again to update the page
+
+# Build Frontend
+===================
+
+flutter pub get
+flutter build web --release --wasm
+
+# Build Container
+===================
+
+docker-compose build --no-cache -f build.yml
+docker-compose up
+
+# Docker HUB
+====================
+
+docker login
+docker tag unit3dwebup-backend:latest parzival2025/backend_app:0.0.1
+docker tag unit3dwebup-frontend:latest parzival2025/frontend_app:0.0.1
+
+docker push parzival2025/backend_app:0.0.1
+docker push parzival2025/frontend_app:0.0.1
+
+
+
+
+
+
+
 
