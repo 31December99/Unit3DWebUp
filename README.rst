@@ -87,8 +87,9 @@ It performs the following tasks:
 # Install from docker hub
 =========================
 
-run
-docker-compose pull
+- Complete the .env(example) file
+- Rename it in .env
+- run docker-compose pull
 
 
 # How it works
@@ -153,6 +154,45 @@ docker push parzival2025/frontend_app:0.0.1
 
 work in progress..
 
+
+Trackers
+========
+
+The Italian tracker: people from diverse technical and social backgrounds,
+united by a shared passion for torrents and more
+
++------------------+----------------------------+
+| **Trackers**     | **Description**            |
++==================+============================+
+| ``ITT``          | https://itatorrents.xyz/   |
++------------------+----------------------------+
+
+
+.. image:: https://img.shields.io/badge/Telegram-Join-blue?logo=telegram
+   :target: https://t.me/+hj294GabGWJlMDI8
+   :alt: Unisciti su Telegram
+
+.. image:: https://img.shields.io/discord/1214696147600408698?label=Discord&logo=discord&style=flat
+   :target: https://discord.gg/Skvune9P
+   :alt: Discord Server
+
+
+
+🎯 Streaming Community
+======================
+
+ `GitHub Project <https://github.com/Arrowar/StreamingCommunity>`_
+
+An open-source script for downloading movies, TV shows, and anime from various websites,
+built by a community of people with a shared interest in programming.
+
+.. image:: https://img.shields.io/badge/Telegram-Join-blue?logo=telegram
+   :target: https://t.me/+hj294GabGWJlMDI8
+   :alt: Unisciti su Telegram
+
+.. image:: https://img.shields.io/badge/StreamingCommunity-blue.svg
+   :target: https://github.com/Arrowar/StreamingCommunity
+   :alt: StreamingCommunity Badge
 
 
 
