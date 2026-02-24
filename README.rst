@@ -77,6 +77,7 @@ It performs the following tasks:
 - Generate info for a title using MediaInfo
 - unit3dup can grab the first page, convert it to an image (using xpdf),
   and then the bot can upload it to an image host, then add the link to the torrent page description.
+- Windows
 
 *NOT YET IMPLEMENTED*
 
