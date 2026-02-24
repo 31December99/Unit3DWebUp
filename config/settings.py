@@ -184,6 +184,7 @@ class Settings(BaseSettings):
     """
     Set default settings
     """
+    version: str = "0.0.1"
     tracker: TrackerConfig = Field(default_factory=TrackerConfig)
     torrent: TorrentClientConfig = Field(default_factory=TorrentClientConfig)
     prefs: UserPreferences = Field(default_factory=UserPreferences)
