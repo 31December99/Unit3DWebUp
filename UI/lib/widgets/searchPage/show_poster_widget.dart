@@ -194,13 +194,13 @@ void showPosterPopup(BuildContext context, PosterItem item) {
                         /// Print about JobID e JobListID
                         CtextIcon(
                           label: 'JOB ID: ${item.jobId ?? " "}',
-                          svgAsset: 'lib/assets/ladybug-bug-svgrepo-com.svg',
+                          svgAsset: 'lib/assets/job-search-svgrepo-com.svg',
                           iconWidth: 15,
                           /// onIconPressed: () {},
                         ),
                         CtextIcon(
                           label: 'JOBLIST ID: ${item.jobListId ?? " "}',
-                          svgAsset: 'lib/assets/ladybug-bug-svgrepo-com.svg',
+                          svgAsset: 'lib/assets/job-search-svgrepo-com.svg',
                           iconWidth: 15,
                           /// onIconPressed: () {},
                         ),
