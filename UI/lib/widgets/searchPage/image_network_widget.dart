@@ -81,6 +81,19 @@ class ImageNetwork extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
+              Text(
+                item.displayName ?? '',
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  // fontFamily: 'Roboto_Condensed',
+                  fontFamily: 'whitrabt.ttf',
+                  fontSize: 12,
+                  color: Color(0xFFF8F8D4),
+                  //letterSpacing: 1,
+                ),
+              ),
             ],
           ),
         );

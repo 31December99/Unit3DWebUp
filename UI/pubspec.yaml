@@ -70,18 +70,9 @@ flutter:
       fonts:
         - asset: lib/assets/fonts/whitrabt.ttf
 
-    - family: Orbitron
-      fonts:
-        - asset: lib/assets/fonts/orbitron-bold.otf
-
-    - family: Hackney
-      fonts:
-        - asset: lib/assets/fonts/HackneyPersonalUseOnly.ttf
-
     - family: Roboto_Condensed
       fonts:
         - asset: lib/assets/fonts/RobotoCondensed-VariableFont_wght.ttf
-
 
 
 
