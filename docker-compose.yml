@@ -1,7 +1,7 @@
 services:
   backend:
-    image: parzival2025/backend_app:0.0.1
-    container_name: backend_app
+    image: parzival2025/unit3dwebup_backend:0.0.1
+    container_name: unit3DwebUp_backend
     ports:
       - "8000:8000"
     env_file:
@@ -17,10 +17,11 @@ services:
       - ${PREFS__WATCHER_PATH}:/home/app/watcher
       - ${PREFS__WATCHER_DESTINATION_PATH}:/home/app/watcher_destination_path
       - ${PREFS__TORRENT_ARCHIVE_PATH}:/home/app/torrent_archive
-      - ${ENV_PATH}:/home/app/.env
+#      - ${ENV_PATH}:/home/app/.env
+      - .env:/home/app/.env
   frontend:
-    image: parzival2025/frontend_app:0.0.1
-    container_name: frontend_app
+    image: parzival2025/unit3dwebup_frontend:0.0.1
+    container_name: unit3dwebup_frontend
     ports:
       - "8080:80"
     depends_on:
