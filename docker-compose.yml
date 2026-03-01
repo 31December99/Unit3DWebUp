@@ -1,6 +1,6 @@
 services:
   backend:
-    image: parzival2025/unit3dwebup_backend:0.0.1
+    image: parzival2025/unit3dwebup_backend:${UNIT3DWEBUP__VERSION}
     container_name: unit3DwebUp_backend
     ports:
       - "8000:8000"
@@ -18,7 +18,7 @@ services:
       - ${PREFS__WATCHER_DESTINATION_PATH}:/home/app/watcher_destination_path
       - ${PREFS__TORRENT_ARCHIVE_PATH}:/home/app/torrent_archive
   frontend:
-    image: parzival2025/unit3dwebup_frontend:0.0.1
+    image: parzival2025/unit3dwebup_frontend:${UNIT3DWEBUP__VERSION}
     container_name: unit3dwebup_frontend
     ports:
       - "8080:80"
