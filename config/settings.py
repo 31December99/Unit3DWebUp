@@ -27,6 +27,11 @@ class BaseConfigModel(BaseModel):
         return v
 
 
+# /// version
+class Unit3DwebUp(BaseConfigModel):
+    VERSION: str = "build"
+
+
 # /// TRACKER CONFIG
 class TrackerConfig(BaseConfigModel):
     ITT_URL: HttpUrl
@@ -86,7 +91,7 @@ class TorrentClientConfig(BaseConfigModel):
     RTORR_PORT: int = 5000
     SHARED_RTORR_PATH: str = "/tmp"
 
-    TORRENT_CLIENT: TorrentClient  = "qbittorrent"
+    TORRENT_CLIENT: TorrentClient = "qbittorrent"
     TAG: str = "TAG1"
 
     @field_validator("QBIT_PORT", "TRASM_PORT", "RTORR_PORT")
@@ -137,8 +142,8 @@ class UserPreferences(BaseConfigModel):
 
     NUMBER_OF_SCREENSHOTS: int = 4
     YOUTUBE_CHANNEL_ENABLE: bool = False
-    DUPLICATE_ON: bool = False # Todo Not yet implemented
-    SKIP_DUPLICATE: bool = False #
+    DUPLICATE_ON: bool = False  # Todo Not yet implemented
+    SKIP_DUPLICATE: bool = False  #
     SKIP_YOUTUBE: bool = False
     SIZE_TH: int = 50
     WATCHER_INTERVAL: int = 60
@@ -184,14 +189,16 @@ class Settings(BaseSettings):
     """
     Set default settings
     """
-    version: str = "0.0.1"
+    unit3DwebUp: Unit3DwebUp = Field(default=Unit3DwebUp)
     tracker: TrackerConfig = Field(default_factory=TrackerConfig)
     torrent: TorrentClientConfig = Field(default_factory=TorrentClientConfig)
     prefs: UserPreferences = Field(default_factory=UserPreferences)
 
     model_config = SettingsConfigDict(
         env_nested_delimiter="__",
-        env_file=".env",
+        # /// lo utilizzo quando lo testo in locale
+        # docker utilizza 'env_file:' nel suo file yml
+        env_file=".env" if not os.getenv("DOCKER") else None,
         extra="ignore"
     )
 
@@ -214,7 +221,8 @@ def get_settings() -> Settings:
         raise SystemExit(1)
 
     # Create a folder for each tracker name in the MULTI_TRACKER environment variable
-    torrent_archive_path = Path("/home/app/torrent_archive") if os.getenv("DOCKER") == "true" else Path(settings.prefs.TORRENT_ARCHIVE_PATH)
+    torrent_archive_path = Path("/home/app/torrent_archive") if os.getenv("DOCKER") == "true" else Path(
+        settings.prefs.TORRENT_ARCHIVE_PATH)
     if not Path.exists(torrent_archive_path):
         logger.warning(f"The path {torrent_archive_path} does not exist")
         raise SystemExit(1)
