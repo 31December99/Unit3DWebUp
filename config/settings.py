@@ -113,7 +113,8 @@ class TorrentClientConfig(BaseConfigModel):
             return v
         p = Path(v)
         if not p.is_absolute():
-            raise ValueError("path must be absolute")
+            # Convert relative paths to absolute paths
+            p = Path.cwd() / p
         return str(p)
 
     @model_validator(mode="after")
