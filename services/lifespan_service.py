@@ -32,7 +32,8 @@ async def update_mounted_paths(app: FastAPI):
     app.state.env_file = Path(".env") if os.getenv("DOCKER") == "true" else Path(os.getenv("ENV_PATH", ""))
 
     # Main folder
-    logger.info("\nChecking Unit3D configuration file..\n")
+    logger.info("\nChecking Unit3DwebUp configuration file..\n")
+    logger.info(f"Unit3DwebUp          -> v.{settings.unit3DwebUp.VERSION}")
     logger.info(f"Docker mode          -> '{os.getenv("DOCKER")}'")
     logger.info(f"Scan Path            -> '{app.state.scan_path}'")
     logger.info(f"Env Path             -> '{app.state.env_file}'\n")
