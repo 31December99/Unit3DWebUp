@@ -35,8 +35,9 @@ from fastapi.responses import JSONResponse
 from fastapi import WebSocket
 from fastapi import FastAPI
 from fastapi import status
-from pydantic import BaseModel, constr
-from dotenv import load_dotenv, set_key
+from pydantic import BaseModel
+from dotenv import load_dotenv, dotenv_values
+
 import aiohttp
 import uvicorn
 
@@ -581,7 +582,18 @@ async def set_env(payload: HttpRequest):
     load_dotenv(dotenv_path=app.state.env_file, override=True)
 
     # Edit file env
-    set_key(str(app.state.env_file), payload.key, payload.value)
+    # Replace set_key in python dotenv
+    # Permission denied when tries to create a temporary file but it fails because the container is not running as root
+    # set_key(str(app.state.env_file), payload.key, payload.value)
+
+    # Current variabiles value
+    env_vars = dotenv_values(str(app.state.env_file))
+    # update the key
+    env_vars[payload.key] = payload.value
+    # Rewrite file env
+    with open(str(app.state.env_file), "w", encoding="utf-8") as f:
+        for k, v in env_vars.items():
+            f.write(f"{k}={v}\n")
 
     # Refresh memory
     os.environ[payload.key] = payload.value
