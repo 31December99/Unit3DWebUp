@@ -73,7 +73,7 @@ class NavigationRailMenu extends StatelessWidget {
                 'lib/assets/commentscircularbuttonwithtwoovalspeechbubblesinside_80089.svg',
                 width: 35,
               ),
-              label: const Text('Jobs'),
+              label: const Text('Log'),
             ),
           ],
         ),
