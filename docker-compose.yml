@@ -19,7 +19,7 @@ services:
       - ${PREFS__WATCHER_DESTINATION_PATH}:/home/app/watcher_destination_path
       - ${PREFS__TORRENT_ARCHIVE_PATH}:/home/app/torrent_archive
       # /// mount the env and allow the user to update env file from the frontend
-      - ${ENVPATH:-.}/.env:/home/app/.env
+      - ${ENVPATH:-.}/.env:/home/app/config/.env
 
   frontend:
     image: parzival2025/unit3dwebup_frontend:${UNIT3DWEBUP__VERSION}
