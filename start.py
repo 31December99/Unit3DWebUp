@@ -182,7 +182,8 @@ async def lifespan(app: FastAPI):
 
     # Start to watch
     observer.schedule(handler, app.state.watcher_path, recursive=True)
-    observer.start()
+    if app.state.settings.prefs.WATCHER_DESTINATION_PATH != os.getcwd():
+        observer.start()
 
     # Create a consumer that works in the background
     consumer_task = asyncio.create_task(redis_event_consumer(app))
@@ -191,8 +192,10 @@ async def lifespan(app: FastAPI):
     yield
 
     # Come back to clean and close
-    observer.stop()
-    observer.join()
+    if app.state.settings.prefs.WATCHER_DESTINATION_PATH != os.getcwd():
+        observer.stop()
+        observer.join()
+
     consumer_task.cancel()
     await job.close()
 
@@ -532,8 +535,36 @@ async def configuration(payload: HttpRequest):
     :return: none
     """
 
+    # Logger
+    frame = inspect.currentframe()
+    logger = get_logger(frame.f_code.co_name)
+
     # Load json settings and return it to the client
     job_data = await app.state.job.get_job(job_id='0')
+
+    # /// Check main paths
+    if app.state.settings.prefs.SCAN_PATH == os.getcwd():
+        logger.warning("SCAN PATHS NO SET")
+        await app.state.ws_manager.broadcast({
+            "type": "log",
+            "level": "warn",
+            "message": f"{frame.f_code.co_name} Scan Path not set",
+        })
+    if app.state.settings.prefs.TORRENT_ARCHIVE_PATH == os.getcwd():
+        logger.warning("TORRENT ARCHIVE PATH NOT SET")
+        await app.state.ws_manager.broadcast({
+            "type": "log",
+            "level": "warn",
+            "message": f"{frame.f_code.co_name} Torrent archive path not set",
+        })
+    if os.getcwd() in [app.state.settings.prefs.WATCHER_DESTINATION_PATH, app.state.settings.prefs.WATCHER_PATH]:
+        logger.warning("WATCHER PATHS NO SET")
+        await app.state.ws_manager.broadcast({
+            "type": "log",
+            "level": "warn",
+            "message": f"{frame.f_code.co_name} Watcher Paths not set",
+        })
+
 
     # Get data
     user_prefs = json.loads(job_data)
@@ -597,6 +628,7 @@ async def set_env(payload: HttpRequest):
             "message": f"Saved {payload.key}",
         }
     )
+
 
 @app.post("/filter")
 async def filter_search(payload: HttpRequest):
