@@ -254,7 +254,7 @@ class BuildService(DescriptionBuilderInterface):
         settings = get_settings()
         self.sign = (
             f"[url=https://github.com/31December99/Unit3DWebUp][code][color=#00BFFF][size=14]Uploaded with Unit3DwebUp"
-            f" {settings.version}[/size][/color][/code][/url]")
+            f" {settings.unit3DwebUp.VERSION}[/size][/color][/code][/url]")
 
     async def description(self):
 
