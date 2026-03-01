@@ -5,18 +5,22 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - .env
+      - ${ENVPATH:-.}/.env
     depends_on:
       - redis
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - DOCKER=true
+      - ENVPATH=${ENVPATH}
     volumes:
       - ${PREFS__SCAN_PATH}:/home/app/scan:ro
       - ${PREFS__WATCHER_PATH}:/home/app/watcher
       - ${PREFS__WATCHER_DESTINATION_PATH}:/home/app/watcher_destination_path
       - ${PREFS__TORRENT_ARCHIVE_PATH}:/home/app/torrent_archive
+      # /// mount the env and allow the user to update env file from the frontend
+      - ${ENVPATH:-.}/.env:/home/app/.env
+
   frontend:
     image: parzival2025/unit3dwebup_frontend:${UNIT3DWEBUP__VERSION}
     container_name: unit3dwebup_frontend

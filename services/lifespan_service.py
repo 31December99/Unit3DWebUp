@@ -29,17 +29,19 @@ async def update_mounted_paths(app: FastAPI):
     app.state.torrent_archive_path = torrent_archive_path.expanduser().resolve()
 
     # Env file mount: used to edit Env file from the frontend
-    app.state.env_file = Path(".env") if os.getenv("DOCKER") == "true" else Path(os.getenv("ENV_PATH", ""))
+    app.state.env_file = "/home/app/.env" if os.getenv("DOCKER") == "true" else Path(".env")
 
     # Main folder
     logger.info("\nChecking Unit3DwebUp configuration file..\n")
-    logger.info(f"Unit3DwebUp          -> v.{settings.unit3DwebUp.VERSION}")
-    logger.info(f"Docker mode          -> '{os.getenv("DOCKER")}'")
-    logger.info(f"Scan Path            -> '{app.state.scan_path}'")
-    logger.info(f"Env Path             -> '{app.state.env_file}'\n")
-    logger.info(f"Torrent Archive Path -> '{app.state.torrent_archive_path}'")
-    logger.info(f"Watcher Path         -> '{app.state.watcher_path}'")
-    logger.info(f"Watcher Dest. Path   -> '{app.state.watcher_destination_path}'\n")
+    logger.info(f"Unit3DwebUp          : v.{settings.unit3DwebUp.VERSION}")
+    logger.info(f"Docker mode          : '{os.getenv("DOCKER")}'")
+    logger.info(f"Env Path             : '{app.state.env_file}'\n")
+
+    logger.info(f"Scan Path            : '{app.state.scan_path}' <-> {app.state.settings.prefs.SCAN_PATH}")
+    logger.info(f"Torrent Archive Path : '{app.state.torrent_archive_path}' <-> {app.state.settings.prefs.TORRENT_ARCHIVE_PATH}")
+    logger.info(f"Watcher Path         : '{app.state.watcher_path}' <-> {app.state.settings.prefs.WATCHER_PATH}")
+    logger.info(f"Watcher Dest. Path   : '{app.state.watcher_destination_path}' <-> {app.state.settings.prefs.WATCHER_DESTINATION_PATH}\n")
+
 
 async def checking_env_file(app: FastAPI):
     settings = Settings()
@@ -52,4 +54,3 @@ async def checking_env_file(app: FastAPI):
             value = getattr(settings.tracker, field_name)
             if value is None:
                 logger.warning(f"{field_name} not set in .env – related feature may be disabled")
-
