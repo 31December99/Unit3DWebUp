@@ -26,31 +26,8 @@ https://github.com/31December99/Unit3Dup
 
 |
 
-.. image:: images/settings1.png
-   :alt: Uni3D webUp home
-   :width: 600
-   :align: center
-
-|
-
-.. image:: images/settings2.png
-   :alt: Uni3D webUp home
-   :width: 600
-   :align: center
-
-|
-
-.. image:: images/settings3.png
-   :alt: Uni3D webUp home
-   :width: 600
-   :align: center
-
-|
-
-.. image:: images/jobs.png
-   :alt: Uni3D webUp home
-   :width: 600
-   :align: center
+See Demo 1: `here <images/CreaTorrents.webm>`_
+See Demo 2: `here <images/DemoRicerca.webm>`_
 
 
 |
