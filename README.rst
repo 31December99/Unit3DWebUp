@@ -26,10 +26,12 @@ https://github.com/31December99/Unit3Dup
 
 |
 
-Download *.webm (about 7MB) Demo 1: `Save link as <images/CreaTorrents.webm>`_
+# Download Demo video WebM (play in browser)
+-----------------------------------
 
-Download *.webm (about 7MB) Demo 2: `Save link as <images/DemoRicerca.webm>`_
+Download the *.webm file (about 7 MB) – Demo 1: `Save link as <images/CreaTorrents.webm>`_
 
+Download the *.webm file (about 7 MB) – Demo 2: `Save link as <images/DemoRicerca.webm>`_
 
 |
 
