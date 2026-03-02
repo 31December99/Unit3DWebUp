@@ -169,6 +169,10 @@ class _SearchState extends State<Search> {
                     posterProvider.searchPoster(value);
                   },
                   onClickClear: () {
+                    /// Cant delete an empty list
+                    if (posterProvider.posterItems.isEmpty) {
+                        return;
+                    }
                     final String notifyString =
                         "Deleting... job list '${posterProvider.posterItems[0].jobListId}'";
 
