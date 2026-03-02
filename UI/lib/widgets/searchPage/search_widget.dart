@@ -45,9 +45,9 @@ class _SearchState extends State<Search> {
     final posterProvider = context.read<PosterProvider>();
     final logProvider = context.read<LogProvider>();
 
-    final scanPath = context.select<SettingProvider, String>(
-      (p) => p.getValue('SCAN_PATH'),
-    );
+    // final scanPath = context.select<SettingProvider, String>(
+    //   (p) => p.getValue('SCAN_PATH'),
+    // );
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -138,6 +138,15 @@ class _SearchState extends State<Search> {
                     posterProvider.searchPoster(value);
                   },
                   onClickScan: () async {
+                    await context.read<SettingProvider>().readSetting();
+
+                    if (!context.mounted) {
+                      return;
+                    }
+
+                    final scanPath = context.read<SettingProvider>().getValue(
+                      'SCAN_PATH',
+                    );
                     final String notifyString = "Reloading $scanPath ";
 
                     logProvider.add(notifyString, LogLevel.info);
@@ -157,7 +166,6 @@ class _SearchState extends State<Search> {
 
                     logProvider.add(notifyString, LogLevel.info);
                     showAppSnackBar(context, notifyString);
-
                     posterProvider.searchPoster(value);
                   },
                   onClickClear: () {
