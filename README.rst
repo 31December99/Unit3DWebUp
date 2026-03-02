@@ -17,7 +17,7 @@ Auto Torrent Generator and Uploader
 Reworked from the original Unit3Dup:
 https://github.com/31December99/Unit3Dup
 
-now including an async backend and a web frontend
+
 
 .. image:: images/home.png
    :alt: Uni3D webUp home
