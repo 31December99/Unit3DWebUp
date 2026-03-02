@@ -24,6 +24,7 @@ class CtextField extends StatelessWidget {
     return TextField(
       controller: controller,
       style: TextStyle(
+        color: Colors.white70,
         fontSize: fontSize,
         fontFamily: fontFamily,
         letterSpacing: letterSpacing,
