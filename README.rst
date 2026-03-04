@@ -26,15 +26,11 @@ https://github.com/31December99/Unit3Dup
 
 |
 
-# Demo video
+# Demo video `Here <https://streamable.com/agoizj>`_
 -----------------------------------
 
-.. raw:: html
-   <video width="480" controls>
-     <source src="images/Demo.mp4" type="video/mp4">
-     Il tuo browser non supporta il video.
-   </video>
-|
+
+
 
 It performs the following tasks:
 
