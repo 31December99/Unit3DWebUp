@@ -101,22 +101,6 @@ class TorrentClientConfig(BaseConfigModel):
             raise ValueError("invalid port range")
         return v
 
-    @field_validator(
-        "SHARED_QBIT_PATH",
-        "SHARED_TRASM_PATH",
-        "SHARED_RTORR_PATH",
-        mode="before"
-    )
-    @classmethod
-    def validate_paths(cls, v):
-        if v is None:
-            return v
-        p = Path(v)
-        if not p.is_absolute():
-            # Convert relative paths to absolute paths
-            p = Path.cwd() / p
-        return str(p)
-
     @model_validator(mode="after")
     def validate_selected_client(self):
         if self.TORRENT_CLIENT == TorrentClient.qbittorrent:
@@ -159,23 +143,6 @@ class UserPreferences(BaseConfigModel):
     WEBP_ENABLED: bool = False
     PERSONAL_RELEASE: bool = False
     FAST_LOAD: int = 0
-
-    @field_validator(
-        "WATCHER_PATH",
-        "WATCHER_DESTINATION_PATH",
-        "TORRENT_ARCHIVE_PATH",
-        "SCAN_PATH",
-        mode="before"
-    )
-    @classmethod
-    def validate_paths(cls, v):
-        if v is None:
-            return v
-        p = Path(v)
-        if not p.is_absolute():
-            # Convert relative paths to absolute paths
-            p = Path.cwd() / p
-        return str(p)
 
     @field_validator("WATCHER_INTERVAL")
     @classmethod

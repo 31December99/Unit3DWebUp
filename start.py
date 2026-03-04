@@ -330,7 +330,9 @@ async def scan(payload: HttpRequest) -> JSONResponse:
 
     # Get the id for the current path
     job_list_id = hashlib.sha256(app.state.settings.prefs.SCAN_PATH.encode()).hexdigest()
-    logger.info(f"Current joblist_id {job_list_id}")
+    logger.info(f"Current joblist_id {job_list_id} {app.state.settings.prefs.SCAN_PATH}")
+
+
 
     # Load the jobs list using the previous id
     job_list = await app.state.job.get_job_list(job_id=job_list_id)
