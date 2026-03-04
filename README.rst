@@ -26,13 +26,14 @@ https://github.com/31December99/Unit3Dup
 
 |
 
-# Download Demo video WebM (play in browser)
+# Demo video
 -----------------------------------
 
-Download the *.webm file (about 7 MB) – Demo 1: `Save link as <images/CreaTorrents.webm>`_
-
-Download the *.webm file (about 7 MB) – Demo 2: `Save link as <images/DemoRicerca.webm>`_
-
+.. raw:: html
+   <video width="480" controls>
+     <source src="images/Demo.mp4" type="video/mp4">
+     Il tuo browser non supporta il video.
+   </video>
 |
 
 It performs the following tasks:
