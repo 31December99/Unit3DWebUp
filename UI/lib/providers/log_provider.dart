@@ -83,7 +83,10 @@ class LogProvider extends ChangeNotifier {
         }
       },
       onError: (err) => add('WebSocket error: $err', LogLevel.error),
-      onDone: () => add('WebSocket closed', LogLevel.warn),
+      onDone: () {
+          add('WebSocket closed', LogLevel.warn);
+          Future.delayed(const Duration(seconds: 10), _connect);
+        }
     );
   }
 
