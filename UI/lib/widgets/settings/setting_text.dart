@@ -122,8 +122,9 @@ class _SettingTextState extends State<SettingText> {
                 if (!context.mounted) return;
                 if (widget.label.contains('PATH')) {
                   await checkDockerStatus(context, response);
+                } else {
+                  showAppSnackBar(context, response);
                 }
-                showAppSnackBar(context, response);
               },
             ),
           ),
