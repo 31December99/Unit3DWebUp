@@ -79,7 +79,10 @@ class QbittorrentClientService(TorrentClientServiceInterface):
         except qbittorrentapi.exceptions.TorrentFileError as e:
             logging.info(f"Add torrents {e}")
             return False
-
+        # File is already seeding
+        except qbittorrentapi.exceptions.Conflict409Error as e:
+            logging.info(f"Add torrents {e}")
+            return False
         return True
 
     async def list_torrents(self) -> list:
