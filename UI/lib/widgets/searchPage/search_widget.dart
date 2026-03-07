@@ -31,10 +31,19 @@ class _SearchState extends State<Search> {
     super.dispose();
   }
 
-  void notifyTheUser(BuildContext context, String errorMessage) {
+  // void notifyTheUser(BuildContext context, String errorMessage) {
+  //   showAppSnackBar(
+  //     context,
+  //     errorMessage,
+  //     duration: const Duration(seconds: 2),
+  //     backgroundColor: Colors.redAccent,
+  //   );
+  // }
+
+  void notifyTheUser(BuildContext context, PosterItem message) {
     showAppSnackBar(
       context,
-      errorMessage,
+      message,
       duration: const Duration(seconds: 2),
       backgroundColor: Colors.redAccent,
     );
@@ -98,17 +107,19 @@ class _SearchState extends State<Search> {
                 child: Ctooltip(
                   message: "Carica tutto su tracker!",
                   child: IconButton(
-                    onPressed: () {
+                    onPressed: () async {
                       final jobListId =
                           posterProvider.posterItems.first.jobListId;
+                      final PosterItem notify = await posterProvider.uploadList(
+                        jobListId!,
+                      );
 
-                      final String notifyString =
-                          'Uploading job list $jobListId Please wait...';
-
-                      logProvider.add(notifyString, LogLevel.info);
-                      showAppSnackBar(context, notifyString);
-
-                      posterProvider.uploadList(jobListId!);
+                      logProvider.add(notify.snackBarStatus, LogLevel.info);
+                      showAppSnackBar(
+                        context,
+                        backgroundColor: Colors.redAccent,
+                        notify,
+                      );
                     },
                     icon: SvgPicture.asset(
                       'lib/assets/upload-svgrepo-com.svg',
@@ -129,12 +140,14 @@ class _SearchState extends State<Search> {
                     final jobListId =
                         posterProvider.posterItems.first.jobListId;
 
-                    final String notifyString =
-                        "Searching text... in jobList $jobListId";
+                    // final String notifyString =
+                    //     "Searching text... in jobList $jobListId";
 
-                    logProvider.add(notifyString, LogLevel.info);
-                    showAppSnackBar(context, notifyString);
-
+                    PosterItem notify = PosterItem(
+                      snackBarStatus: "Searching text... in jobList $jobListId",
+                    );
+                    logProvider.add(notify.snackBarStatus, LogLevel.info);
+                    showAppSnackBar(context, notify);
                     posterProvider.searchPoster(value);
                   },
                   onClickScan: () async {
@@ -148,37 +161,35 @@ class _SearchState extends State<Search> {
                       'SCAN_PATH',
                     );
                     final String notifyString = "Reloading $scanPath ";
-
-                    logProvider.add(notifyString, LogLevel.info);
-                    showAppSnackBar(context, notifyString);
-
-                    final String? error = await posterProvider.scan(
-                      _controller.text,
+                    PosterItem notify = PosterItem(
+                      snackBarStatus: "Reloading $scanPath ",
                     );
 
-                    if (error != null && error.isNotEmpty && context.mounted) {
-                      notifyTheUser(context, error);
-                    }
+                    logProvider.add(notifyString, LogLevel.info);
+                    showAppSnackBar(context, notify);
+                    await posterProvider.scan(_controller.text);
+
                   },
                   onClickTracker: (value) {
-                    final String notifyString =
-                        "Searching... '$value' in tracker";
-
-                    logProvider.add(notifyString, LogLevel.info);
-                    showAppSnackBar(context, notifyString);
+                    // final String notifyString = "Searching... '$value' in tracker";
+                    PosterItem notify = PosterItem(
+                      snackBarStatus: "Searching... '$value' in tracker",
+                    );
+                    logProvider.add(notify.snackBarStatus, LogLevel.info);
+                    showAppSnackBar(context, notify);
                     posterProvider.searchPoster(value);
                   },
                   onClickClear: () {
                     /// Cant delete an empty list
                     if (posterProvider.posterItems.isEmpty) {
-                        return;
+                      return;
                     }
-                    final String notifyString =
-                        "Deleting... job list '${posterProvider.posterItems[0].jobListId}'";
+                    PosterItem notify = PosterItem(
+                      snackBarStatus: "Deleting... job list '${posterProvider.posterItems[0].jobListId}'"
+                    );
 
-                    logProvider.add(notifyString, LogLevel.info);
-                    showAppSnackBar(context, notifyString);
-
+                    logProvider.add(notify.snackBarStatus, LogLevel.info);
+                    showAppSnackBar(context, notify);
                     posterProvider.clearPosterItems();
                   },
                 ),

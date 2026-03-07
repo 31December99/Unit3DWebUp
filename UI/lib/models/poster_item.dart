@@ -40,10 +40,10 @@ class PosterItem {
   List<dynamic>? screenshots;
 
   /// Show an error message on the page using the snackBar
-  final String? snackBarError;
+  String? snackBarError;
 
   /// Show a status message on the page using the snackBar
-  final String? snackBarStatus;
+  String? snackBarStatus;
 
   /// The backend runs in the container if dockerStatus is true
   final String? dockerStatus;

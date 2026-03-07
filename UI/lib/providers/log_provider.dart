@@ -19,7 +19,7 @@ class LogProvider extends ChangeNotifier {
     _connect();
   }
 
-  void add(String msg, LogLevel level) {
+  void add(String? msg, LogLevel level) {
     _logs.add(LogLine("Client $msg", level));
     notifyListeners();
   }

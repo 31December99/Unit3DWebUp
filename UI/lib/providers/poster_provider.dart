@@ -8,8 +8,14 @@ class PosterProvider extends ChangeNotifier {
   /// PosterItem list received from api endpoints
   List<PosterItem> posterItems = [];
 
+  /// PosterItem list received from api endpoints
+  PosterItem posterItem = PosterItem();
+
   /// Use different name for PosterItem list for poster Popup
   List<PosterItem> posterPopUpItems = [];
+
+  /// PosterPopUpItem list received from api endpoints
+  PosterItem posterPopUpItem = PosterItem();
 
   /// URL corrente del poster selezionato
   String? selectedPosterUrl;
@@ -28,16 +34,8 @@ class PosterProvider extends ChangeNotifier {
   /// Request to scan the user path
   /// TODO same as -scan flag in unit3dup
   /// TODO Add creation torrent for -f and -u flag
-  Future<String?> scan(String query) async {
+  Future<void> scan(String query) async {
     posterItems = await ApiService.scan();
-
-    /// When there is only one item and the error attribute is not null
-    /// Check for possible errors
-    if (posterItems.isNotEmpty) {
-      if (posterItems[0].snackBarError != null) {
-        return posterItems[0].snackBarError;
-      }
-    }
 
     isLoading = true;
     notifyListeners();
@@ -53,46 +51,37 @@ class PosterProvider extends ChangeNotifier {
     posterItems = filteredList;
     isLoading = false;
     notifyListeners();
-    return null;
+    posterItem.snackBarStatus = "JobId not found";
   }
 
   /// Create torrents
-  Future<String?> makeTorrent(String jobId, String? jobListId) async {
-    final String? response = await ApiService.fetchTorrent(jobId, jobListId);
-    if (response != null) return response;
-
-    isLoading = false;
-    notifyListeners();
-    return null;
+  Future<PosterItem> makeTorrent(String jobId, String? jobListId) async {
+    posterItem = await ApiService.fetchTorrent(jobId, jobListId);
+    return posterItem;
   }
 
   /// Request to start processing the entire job list (page)
-  Future<String?> uploadList(String jobIdList) async {
-    await ApiService.processList(jobIdList);
-    isLoading = false;
-    notifyListeners();
-    return null;
-  }
-
-  /// Upload torrents
-  Future<void> uploadTorrent(String jobId) async {
-    posterPopUpItems = await ApiService.uploadTorrent(jobId);
-    isLoading = false;
-    notifyListeners();
+  Future<PosterItem> uploadList(String jobIdList) async {
+    return await ApiService.processList(jobIdList);
   }
 
   /// Seed torrents
-  Future<void> seedTorrent(String jobId) async {
-    posterPopUpItems = await ApiService.seedTorrent(jobId);
-    isLoading = false;
-    notifyListeners();
+  Future<PosterItem> seedTorrent(String jobId) async {
+    posterPopUpItem = await ApiService.seedTorrent(jobId);
+    return posterPopUpItem;
+  }
+
+  /// Upload torrents
+  Future<PosterItem> uploadTorrent(String jobId) async {
+    posterPopUpItem = await ApiService.uploadTorrent(jobId);
+    return posterPopUpItem;
   }
 
   /// Clicking a poster opens a new window with new functions
   ///
   ///
   /// Send to backend the new TMDB ID
-  Future<void> updatePosterId(
+  Future<PosterItem> updatePosterId(
     String jobId,
     String fieldId,
     String newId,
@@ -100,84 +89,108 @@ class PosterProvider extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
 
-    posterPopUpItems = await ApiService.fetchPosterId(jobId, fieldId, newId);
     final poster = posterItems.where((p) => p.jobId == jobId).firstOrNull;
+
     if (poster != null) {
       poster.tmdbId = newId;
+      await ApiService.fetchPosterId(jobId, fieldId, newId, poster);
+      isLoading = false;
+      notifyListeners();
+      return poster;
     }
-    isLoading = false;
-    notifyListeners();
-  }
+    return posterItem;
+  } // fetchTvdbId
 
   /// Send to backend the new TVDB ID
-  Future<void> updateTvdbId(String jobId, String fieldId, String newId) async {
+  Future<PosterItem> updateTvdbId(
+    String jobId,
+    String fieldId,
+    String newId,
+  ) async {
     isLoading = true;
     notifyListeners();
 
-    posterPopUpItems = await ApiService.fetchTvdbId(jobId, fieldId, newId);
     final poster = posterItems.where((p) => p.jobId == jobId).firstOrNull;
+
     if (poster != null) {
-      poster.tvdbId = newId;
+      poster.tmdbId = newId;
+      await ApiService.fetchTvdbId(jobId, fieldId, newId, poster);
+      isLoading = false;
+      notifyListeners();
+      return poster;
     }
-    isLoading = false;
-    notifyListeners();
+    return posterItem;
   }
 
   /// Send to backend the new IMDB ID
-  Future<void> updateImdbId(String jobId, String fieldId, String newId) async {
+  Future<PosterItem> updateImdbId(
+    String jobId,
+    String fieldId,
+    String newId,
+  ) async {
     isLoading = true;
     notifyListeners();
 
-    posterPopUpItems = await ApiService.fetchImdbId(jobId, fieldId, newId);
     final poster = posterItems.where((p) => p.jobId == jobId).firstOrNull;
+
     if (poster != null) {
       poster.imdbId = newId;
+      await ApiService.fetchImdbId(jobId, fieldId, newId, poster);
+      isLoading = false;
+      notifyListeners();
+      return poster;
     }
-    isLoading = false;
-    notifyListeners();
+    posterItem.snackBarStatus = "JobId not found";
+    return posterItem;
   }
 
   /// Send to backend the new Poster Url ( TMDB backdrop url)
-  Future<void> updatePosterUrl(
+  Future<PosterItem> updatePosterUrl(
     String jobId,
     String fieldId,
     String newId,
   ) async {
     isLoading = true;
     notifyListeners();
-    posterPopUpItems = await ApiService.fetchPosterUrl(jobId, fieldId, newId);
 
     final poster = posterItems.where((p) => p.jobId == jobId).firstOrNull;
+
     if (poster != null) {
       poster.posterUrl = newId;
+      await ApiService.fetchPosterUrl(jobId, fieldId, newId, poster);
+      isLoading = false;
+      notifyListeners();
+      return poster;
     }
-    isLoading = false;
-    notifyListeners();
+    posterItem.snackBarStatus = "JobId not found";
+    return posterItem;
   }
 
   /// Send to backend the new displayName
-  Future<void> updatePosterDname(
+  Future<String?> updatePosterDname(
     String jobId,
     String fieldId,
     String newId,
   ) async {
     isLoading = true;
     notifyListeners();
-    posterPopUpItems = await ApiService.fetchPosterDname(jobId, fieldId, newId);
 
     final poster = posterItems.where((p) => p.jobId == jobId).firstOrNull;
+
     if (poster != null) {
       poster.displayName = newId;
+      await ApiService.fetchPosterDname(jobId, fieldId, newId, poster);
+      isLoading = false;
+      notifyListeners();
+      return poster.snackBarStatus;
     }
-    isLoading = false;
-    notifyListeners();
-  }  /// End poster popup functions
+    return posterItem.snackBarStatus = "JobId not found";
+  }
 
   /// Request backend to search for torrents in the tracker
   Future<void> searchPoster(String title) async {
     isLoading = true;
     notifyListeners();
-
     posterItems = await ApiService.fetchFilteredItem(title);
     isLoading = false;
     notifyListeners();

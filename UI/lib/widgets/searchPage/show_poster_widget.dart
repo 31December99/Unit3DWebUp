@@ -48,16 +48,16 @@ void showPosterPopup(BuildContext context, PosterItem item) {
           horizontal: isMobile ? 12 : 24,
           vertical: isMobile ? 12 : 24,
         ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Container(
           decoration: BoxDecoration(
             color: Color(0xFF121522),
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Color(0xFF59182C).withValues(alpha: 0.4), /// 0xFF182A59
+                color: Color(0xFF59182C).withValues(alpha: 0.4),
+
+                /// 0xFF182A59
                 blurRadius: 20,
                 spreadRadius: 2,
                 offset: Offset(0, 8),
@@ -115,10 +115,14 @@ void showPosterPopup(BuildContext context, PosterItem item) {
                                 titleController.text,
                               );
                               // Update the log console
-                              final String notifyString =
-                                  'Edit DisplayName job $jobId';
-                              logProvider.add(notifyString, LogLevel.info);
-                              showAppSnackBar(context, notifyString);
+                              PosterItem notify = PosterItem(
+                                snackBarStatus: 'Edit DisplayName job $jobId',
+                              );
+                              logProvider.add(
+                                notify.snackBarStatus,
+                                LogLevel.info,
+                              );
+                              showAppSnackBar(context, notify);
                             },
                           ),
                           const SizedBox(height: 12),
@@ -127,18 +131,20 @@ void showPosterPopup(BuildContext context, PosterItem item) {
                           CtextField(
                             label: "TMDB id",
                             controller: tmdbController,
-                            onSubmitted: (_) {
+                            onSubmitted: (_) async {
                               final jobId = item.jobId;
                               if (jobId == null || jobId.isEmpty) return;
-                              final String notifyString =
-                                  'Edit TMDB id job $jobId';
-                              logProvider.add(notifyString, LogLevel.info);
-                              showAppSnackBar(context, notifyString);
-                              posterProvider.updatePosterId(
-                                jobId,
-                                'tmdb_id',
-                                tmdbController.text,
+                              final message = await posterProvider
+                                  .updatePosterId(
+                                    jobId,
+                                    'tmdb_id',
+                                    tmdbController.text,
+                                  );
+                              logProvider.add(
+                                message.snackBarStatus,
+                                LogLevel.info,
                               );
+                              showAppSnackBar(context, message);
                             },
                           ),
                           const SizedBox(height: 12),
@@ -147,18 +153,20 @@ void showPosterPopup(BuildContext context, PosterItem item) {
                           CtextField(
                             label: "TVDB id",
                             controller: tvdbController,
-                            onSubmitted: (_) {
+                            onSubmitted: (_) async {
                               final jobId = item.jobId;
                               if (jobId == null || jobId.isEmpty) return;
-                              final String notifyString =
-                                  'Edit TVDB id job $jobId';
-                              logProvider.add(notifyString, LogLevel.info);
-                              showAppSnackBar(context, notifyString);
-                              posterProvider.updateTvdbId(
+
+                              final message = await posterProvider.updateTvdbId(
                                 jobId,
                                 'tvdb_id',
                                 tvdbController.text,
                               );
+                              logProvider.add(
+                                message.snackBarStatus,
+                                LogLevel.info,
+                              );
+                              showAppSnackBar(context, message);
                             },
                           ),
                           const SizedBox(height: 12),
@@ -167,18 +175,20 @@ void showPosterPopup(BuildContext context, PosterItem item) {
                           CtextField(
                             label: "IMDB id",
                             controller: imdbController,
-                            onSubmitted: (_) {
+                            onSubmitted: (_) async {
                               final jobId = item.jobId;
                               if (jobId == null || jobId.isEmpty) return;
-                              final String notifyString =
-                                  'Edit IMDB id job $jobId';
-                              logProvider.add(notifyString, LogLevel.info);
-                              showAppSnackBar(context, notifyString);
-                              posterProvider.updateImdbId(
-                                jobId,
-                                'imdb_id_from_tvdb',
-                                imdbController.text,
+                              final PosterItem message = await posterProvider
+                                  .updateImdbId(
+                                    jobId,
+                                    'imdb_id_from_tvdb',
+                                    imdbController.text,
+                                  );
+                              logProvider.add(
+                                message.snackBarStatus,
+                                LogLevel.info,
                               );
+                              showAppSnackBar(context, message);
                             },
                           ),
                           const SizedBox(height: 12),
@@ -187,18 +197,20 @@ void showPosterPopup(BuildContext context, PosterItem item) {
                           CtextField(
                             label: "Poster Url",
                             controller: posterController,
-                            onSubmitted: (_) {
+                            onSubmitted: (_) async {
                               final jobId = item.jobId;
                               if (jobId == null || jobId.isEmpty) return;
-                              final String notifyString =
-                                  'Edit Poster Url job $jobId';
-                              logProvider.add(notifyString, LogLevel.info);
-                              showAppSnackBar(context, notifyString);
-                              posterProvider.updatePosterUrl(
-                                jobId,
-                                'backdrop_path',
-                                posterController.text,
+                              final PosterItem message = await posterProvider
+                                  .updatePosterUrl(
+                                    jobId,
+                                    'backdrop_path',
+                                    posterController.text,
+                                  );
+                              logProvider.add(
+                                message.snackBarStatus,
+                                LogLevel.info,
                               );
+                              showAppSnackBar(context, message);
                             },
                           ),
                           const SizedBox(height: 12),
@@ -235,11 +247,13 @@ void showPosterPopup(BuildContext context, PosterItem item) {
                           final jobListId = item.jobListId;
                           final jobId = item.jobId;
                           if (jobId == null || jobId.isEmpty) return;
-                          final String notifyString =
-                              'Make Torrent job $jobId Please wait...';
-                          logProvider.add(notifyString, LogLevel.info);
+                          final PosterItem notifyString = await posterProvider
+                              .makeTorrent(jobId, jobListId);
                           showAppSnackBar(context, notifyString);
-                          await posterProvider.makeTorrent(jobId, jobListId);
+                          logProvider.add(
+                            notifyString.snackBarStatus,
+                            LogLevel.info,
+                          );
                         },
                         child: const Text(
                           "MAKE TORRENT",
@@ -247,14 +261,13 @@ void showPosterPopup(BuildContext context, PosterItem item) {
                         ),
                       ),
                       TextButton(
-                        onPressed: () {
+                        onPressed: () async {
                           final jobId = item.jobId;
                           if (jobId == null || jobId.isEmpty) return;
-                          final String notifyString =
-                              'Upload Torrent job $jobId Please wait...';
-                          logProvider.add(notifyString, LogLevel.info);
-                          showAppSnackBar(context, notifyString);
-                          posterProvider.uploadTorrent(jobId);
+                          final PosterItem notify = await posterProvider
+                              .uploadTorrent(jobId);
+                          logProvider.add(notify.snackBarStatus, LogLevel.info);
+                          showAppSnackBar(context, notify);
                         },
                         child: const Text(
                           "UPLOAD",
@@ -262,15 +275,15 @@ void showPosterPopup(BuildContext context, PosterItem item) {
                         ),
                       ),
                       TextButton(
-                        onPressed: () {
+                        onPressed: () async {
                           final jobId = item.jobId;
                           if (jobId == null || jobId.isEmpty) return;
-                          final String notifyString =
-                              'Seed Torrent job $jobId Please wait...';
-                          logProvider.add(notifyString, LogLevel.info);
-                          showAppSnackBar(context, notifyString);
-                          posterProvider.seedTorrent(jobId);
+                          final PosterItem notify = await posterProvider
+                              .seedTorrent(jobId);
+                          logProvider.add(notify.snackBarStatus, LogLevel.info);
+                          showAppSnackBar(context, notify);
                         },
+
                         child: const Text(
                           "SEED TORRENT",
                           style: TextStyle(fontSize: 10),

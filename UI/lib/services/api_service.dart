@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:UI/models/models.dart';
 
@@ -65,14 +66,35 @@ class ApiService {
     }).toList();
   }
 
-  /// Scan remote path
+  static Future<http.Response?> _post(
+    String endpoint,
+    Map<String, dynamic> body,
+  ) async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://127.0.0.1:8000/$endpoint'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(body),
+      );
+
+      return response;
+    } on http.ClientException catch (e) {
+      print("Backend offline: $e");
+      return null;
+    } on SocketException catch (e) {
+      print("Socket error: $e");
+      return null;
+    } catch (e) {
+      print("Unknown API error: $e");
+      return null;
+    }
+  }
+
   static Future<List<PosterItem>> scan() async {
-    final response = await http.post(
-      Uri.parse('http://127.0.0.1:8000/scan'),
-      headers: {'Content-Type': 'application/json'},
-      //Todo later
-      body: jsonEncode({'scan': "nothing"}),
-    );
+    final response = await _post("scan", {'scan': "nothing"});
+    if (response == null) {
+      return [PosterItem(snackBarError: "Backend offline")];
+    }
 
     if (response.statusCode == 200) {
       return getScanUrls(jsonDecode(response.body));
@@ -80,199 +102,227 @@ class ApiService {
 
     if (response.statusCode == 403) {
       final result = jsonDecode(response.body);
-      return [PosterItem(snackBarError: result['message'])];
+      return [PosterItem(snackBarStatus: result['message'])];
     }
 
-    return [PosterItem(snackBarError: response.statusCode.toString())];
+    return [PosterItem(snackBarStatus: response.statusCode.toString())];
   }
 
   /// Create torrents
-  static Future<String?> fetchTorrent(String jobId, String? jobListId) async {
-    if (jobId != '-1') {
-      final response = await http.post(
-        Uri.parse('http://127.0.0.1:8000/maketorrent'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'job_id': jobId, 'job_list_id': jobListId}),
+  static Future<PosterItem> fetchTorrent(
+    String jobId,
+    String? jobListId,
+  ) async {
+    final response = await _post("maketorrent", {
+      'job_id': jobId,
+      'job_list_id': jobListId,
+    });
+
+    if (response == null) {
+      return PosterItem(snackBarError: "Backend offline");
+    } else {
+      return PosterItem(
+        snackBarStatus: 'Make Torrent job $jobId Please wait...',
       );
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else {
-        print('Errore: ${response.statusCode}');
-        return jsonDecode(response.body);
-      }
     }
-    return null;
   }
 
   /// Process all ( create torrent and upload from a media list)
-  static Future<List<PosterItem>> processList(String jobListId) async {
-    if (jobListId.isNotEmpty) {
-      final response = await http.post(
-        Uri.parse('http://127.0.0.1:8000/processall'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'job_list_id': jobListId}),
+  static Future<PosterItem> processList(String jobListId) async {
+    final response = await _post("processall", {'job_list_id': jobListId});
+    if (response == null) {
+      return PosterItem(snackBarError: "Backend offline");
+    } else {
+      return PosterItem(
+        snackBarStatus: "Upload ALL job $jobListId Please wait...",
       );
-
-      if (response.statusCode == 200) {
-        print(jsonDecode(response.body));
-        // return getPosterUrls(jsonDecode(response.body));
-      } else {
-        print('Errore: ${response.statusCode}');
-        print(jsonDecode(response.body));
-
-        return [];
-      }
     }
-    return [];
   }
 
   /// Upload to tracker
-  static Future<List<PosterItem>> uploadTorrent(String jobId) async {
-    if (jobId != '-1') {
-      final response = await http.post(
-        Uri.parse('http://127.0.0.1:8000/upload'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'job_id': jobId}),
+  static Future<PosterItem> uploadTorrent(String jobId) async {
+    final response = await _post("upload", {'job_id': jobId});
+    if (response == null) {
+      return PosterItem(snackBarError: "Backend offline");
+    } else {
+      return PosterItem(
+        snackBarStatus: 'Upload Torrent job $jobId Please wait...',
       );
-
-      if (response.statusCode == 200) {
-        print(jsonDecode(response.body));
-        return getPosterUrls(jsonDecode(response.body));
-      } else {
-        print('Errore: ${response.statusCode}');
-        print(jsonDecode(response.body));
-        return [];
-      }
     }
-    return [];
   }
 
   /// Seed torrents
-  static Future<List<PosterItem>> seedTorrent(String jobId) async {
-    if (jobId != '-1') {
-      final response = await http.post(
-        Uri.parse('http://127.0.0.1:8000/seed'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'job_id': jobId}),
+  static Future<PosterItem> seedTorrent(String jobId) async {
+    final response = await _post("seed", {'job_id': jobId});
+    if (response == null) {
+      return PosterItem(snackBarError: "Backend offline");
+    } else {
+      return PosterItem(
+        snackBarStatus: 'Seeding Torrent job $jobId Please wait...',
       );
-
-      if (response.statusCode == 200) {
-        print(jsonDecode(response.body));
-      } else {
-        print('Errore: ${response.statusCode}');
-        print(jsonDecode(response.body));
-      }
     }
-    return [];
   }
 
-  /// Update TMDB ID
-  static Future<List<PosterItem>> fetchPosterId(
+  static Future<PosterItem> fetchPosterId(
     String jobId,
     String fieldId,
     String newId,
+    PosterItem posterItem,
   ) async {
-    if (jobId != '-1') {
-      final response = await http.post(
-        Uri.parse('http://127.0.0.1:8000/settmdbid'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'job_id': jobId,
-          'field_id': fieldId,
-          'new_id': newId,
-        }),
-      );
+    final response = await _post("settmdbid", {
+      'job_id': jobId,
+      'field_id': fieldId,
+      'new_id': newId,
+    });
+
+    if (response == null) {
+      posterItem.snackBarStatus = "Backend offline";
+      return posterItem;
     }
-    return [];
+
+    if (response.statusCode == 200) {
+      posterItem.snackBarStatus = "Update Poster Id job $jobId Please wait...";
+    } else {
+      posterItem.snackBarStatus = "Request failed (${response.statusCode})";
+    }
+    return posterItem;
   }
 
   /// Update TVDB ID
-  static Future<List<PosterItem>> fetchTvdbId(
+  static Future<PosterItem> fetchTvdbId(
     String jobId,
     String fieldId,
     String newId,
+    PosterItem posterItem,
   ) async {
-    if (jobId != '-1') {
-      final response = await http.post(
-        Uri.parse('http://127.0.0.1:8000/settvdbid'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'job_id': jobId,
-          'field_id': fieldId,
-          'new_id': newId,
-        }),
-      );
+    final response = await _post("settvdbid", {
+      'job_id': jobId,
+      'field_id': fieldId,
+      'new_id': newId,
+    });
+
+    if (response == null) {
+      posterItem.snackBarStatus = "Backend offline";
+      return posterItem;
     }
-    return [];
+
+    if (response.statusCode == 200) {
+      posterItem.snackBarStatus = "Update TVDB job $jobId Please wait...";
+      return posterItem;
+    } else {
+      posterItem.snackBarStatus = "Request failed (${response.statusCode})";
+    }
+
+    return posterItem;
   }
 
   /// Update IMDB from TVDB ID
-  static Future<List<PosterItem>> fetchImdbId(
+  static Future<PosterItem> fetchImdbId(
     String jobId,
     String fieldId,
     String newId,
+    PosterItem posterItem,
   ) async {
-    if (jobId != '-1') {
-      final response = await http.post(
-        Uri.parse('http://127.0.0.1:8000/setimdbid'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'job_id': jobId,
-          'field_id': fieldId,
-          'new_id': newId,
-        }),
-      );
+    final response = await _post("setimdbid", {
+      'job_id': jobId,
+      'field_id': fieldId,
+      'new_id': newId,
+    });
+
+    if (response == null) {
+      posterItem.snackBarStatus = "Backend offline";
+      return posterItem;
     }
-    return [];
+
+    if (response.statusCode == 200) {
+      posterItem.snackBarStatus = "Update IMDB job $jobId Please wait...";
+      return posterItem;
+    } else {
+      posterItem.snackBarStatus = "Request failed (${response.statusCode})";
+    }
+
+    return posterItem;
   }
 
   /// Update poster TMDB Url
-  static Future<List<PosterItem>> fetchPosterUrl(
+  static Future<PosterItem> fetchPosterUrl(
     String jobId,
     String fieldId,
     String newId,
+    PosterItem posterItem,
   ) async {
-    if (jobId != '-1') {
-      final response = await http.post(
-        Uri.parse('http://127.0.0.1:8000/setposterurl'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'job_id': jobId,
-          'field_id': fieldId,
-          'new_id': newId,
-        }),
-      );
+    final response = await _post("setposterurl", {
+      'job_id': jobId,
+      'field_id': fieldId,
+      'new_id': newId,
+    });
+
+    if (response == null) {
+      posterItem.snackBarStatus = "Backend offline";
+      return posterItem;
     }
-    return [];
+
+    if (response.statusCode == 200) {
+      posterItem.snackBarStatus = "Update TMDB Url job $jobId Please wait...";
+      return posterItem;
+    } else {
+      posterItem.snackBarStatus = "Request failed (${response.statusCode})";
+    }
+
+    return posterItem;
   }
 
   /// Update poster Display Name
-  static Future<List<PosterItem>> fetchPosterDname(
+  static Future<PosterItem> fetchPosterDname(
     String jobId,
     String fieldId,
     String newId,
+    PosterItem posterItem,
   ) async {
-    if (jobId != '-1') {
-      final response = await http.post(
-        Uri.parse('http://127.0.0.1:8000/setposterdname'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'job_id': jobId,
-          'field_id': fieldId,
-          'new_id': newId,
-        }),
-      );
+    final response = await _post("setposterdname", {
+      'job_id': jobId,
+      'field_id': fieldId,
+      'new_id': newId,
+    });
+
+    if (response == null) {
+      posterItem.snackBarStatus = "Backend offline";
+      return posterItem;
     }
-    return [];
+
+    if (response.statusCode == 200) {
+      posterItem.snackBarStatus =
+          "Update Display Name job $jobId Please wait...";
+      return posterItem;
+    } else {
+      posterItem.snackBarStatus = "Request failed (${response.statusCode})";
+    }
+
+    return posterItem;
   }
 
   /// Fetch Filtered Item
   static Future<List<PosterItem>> fetchFilteredItem(String title) async {
-    final response = await http.post(
-      Uri.parse('http://127.0.0.1:8000/filter'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'title': title}),
-    );
+    final response = await _post("filter", {'title': title});
+
+    if (response == null) {
+      return [PosterItem(snackBarError: "Backend offline")];
+    }
+
+    if (response.statusCode == 200) {
+      return getPosterUrls(jsonDecode(response.body));
+    } else {
+      return [];
+    }
+  }
+
+  /// Fetch Filtered Item
+  static Future<List<PosterItem>> clearJobListId(String? jobListId) async {
+    final response = await _post("cjoblist", {'job_list_id': jobListId});
+
+    if (response == null) {
+      return [PosterItem(snackBarError: "Backend offline")];
+    }
 
     if (response.statusCode == 200) {
       return getPosterUrls(jsonDecode(response.body));
@@ -284,56 +334,40 @@ class ApiService {
 
   /// Fetch Setting From Backend
   static Future<SettingItem?> fetchSettingFromBackend(String title) async {
-    final response = await http.post(
-      Uri.parse('http://127.0.0.1:8000/setting'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'title': title}),
-    );
+    try {
+      final response = await _post("setting", {'title': title});
 
-    if (response.statusCode == 200) {
-      final decoded = jsonDecode(response.body) as Map<String, dynamic>;
-      return SettingItem.fromJson(decoded);
-    } else {
-      print('Errore: ${response.statusCode}');
+      if (response == null) {
+        return null;
+      }
+
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+        return SettingItem.fromJson(decoded);
+      } else {
+        return null;
+      }
+    } on http.ClientException catch (e) {
+      print("Backend offline");
       return null;
     }
   }
 
   /// Edit env variables PREFS__
   static Future<PosterItem> setEnv(String key, String value) async {
-    final response = await http.post(
-      Uri.parse('http://127.0.0.1:8000/setenv'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'value': value, 'key': key}),
-    );
+    final response = await _post("setenv", {'value': value, 'key': key});
+
+    if (response == null) {
+      return PosterItem(snackBarError: "Backend offline");
+    }
 
     if (response.statusCode == 200) {
       final result = jsonDecode(response.body);
-
       return PosterItem(
         dockerStatus: result['docker'],
         snackBarStatus: result['message'],
       );
     }
-    return PosterItem(snackBarError: response.statusCode.toString());
-  }
-
-  /// Fetch Filtered Item
-  static Future<List<PosterItem>> clearJobListId(String? jobListId) async {
-    if (jobListId != null) {
-      final response = await http.post(
-        Uri.parse('http://127.0.0.1:8000/cjoblist'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'job_list_id': jobListId}),
-      );
-
-      if (response.statusCode == 200) {
-        return getPosterUrls(jsonDecode(response.body));
-      } else {
-        print('Errore: ${response.statusCode}');
-        return [];
-      }
-    }
-    return []; // joblistId Null. ( from the remote tracker)
+    return PosterItem(snackBarStatus: response.statusCode.toString());
   }
 }

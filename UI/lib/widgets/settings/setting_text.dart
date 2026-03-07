@@ -27,6 +27,11 @@ class _SettingTextState extends State<SettingText> {
   @override
   void initState() {
     super.initState();
+
+    if (widget.value.isEmpty) {
+      snackBarStatus(context, "offline");
+    }
+
     _controller = TextEditingController(text: widget.value);
   }
 
@@ -52,7 +57,10 @@ class _SettingTextState extends State<SettingText> {
   void dockerRestart(BuildContext context) {
     showAppSnackBar(
       context,
-      "Please restart the container or run docker-compose restart",
+      PosterItem(
+        snackBarStatus:
+            "Please restart the container or run docker-compose restart",
+      ),
       duration: const Duration(seconds: 2),
       backgroundColor: Colors.redAccent,
     );
@@ -62,7 +70,7 @@ class _SettingTextState extends State<SettingText> {
   void snackBarStatus(BuildContext context, String? message) {
     showAppSnackBar(
       context,
-      message ?? '',
+      PosterItem(snackBarStatus: message),
       duration: const Duration(seconds: 2),
       backgroundColor: Colors.greenAccent,
     );
@@ -114,9 +122,8 @@ class _SettingTextState extends State<SettingText> {
                 if (!context.mounted) return;
                 if (widget.label.contains('PATH')) {
                   await checkDockerStatus(context, response);
-                } else {
-                  snackBarStatus(context, response.snackBarStatus);
                 }
+                showAppSnackBar(context, response);
               },
             ),
           ),
