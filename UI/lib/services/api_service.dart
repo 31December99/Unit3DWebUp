@@ -154,6 +154,13 @@ class ApiService {
   /// Seed torrents
   static Future<PosterItem> seedTorrent(String jobId) async {
     final response = await _post("seed", {'job_id': jobId});
+
+    if (response != null) {
+      if (jsonDecode(response.body) == null) {
+        return PosterItem(snackBarError: "Torrent client offline");
+      }
+    }
+
     if (response == null) {
       return PosterItem(snackBarError: "Backend offline");
     } else {
