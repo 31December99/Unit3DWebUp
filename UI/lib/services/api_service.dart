@@ -156,17 +156,21 @@ class ApiService {
     final response = await _post("seed", {'job_id': jobId});
 
     if (response != null) {
-      if (jsonDecode(response.body) == null) {
+      if (response.statusCode == 503) {
         return PosterItem(snackBarError: "Torrent client offline");
       }
-    }
-
-    if (response == null) {
-      return PosterItem(snackBarError: "Backend offline");
+      if (response.statusCode == 409) {
+        return PosterItem(snackBarError: "File torrent is already seeding");
+      }
+      if (response.statusCode == 404) {
+        return PosterItem(snackBarError: "Torrent list is empty");
+      } else {
+        return PosterItem(
+          snackBarStatus: 'Seeding Torrent job $jobId Please wait...',
+        );
+      }
     } else {
-      return PosterItem(
-        snackBarStatus: 'Seeding Torrent job $jobId Please wait...',
-      );
+      return PosterItem(snackBarError: "Backend offline");
     }
   }
 

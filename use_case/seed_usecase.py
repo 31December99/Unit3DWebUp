@@ -5,7 +5,8 @@ from pathlib import Path
 from services.interfaces import TorrentClientServiceInterface
 from services.torrent_client_service import QbittorrentClientService
 from models.media import Media
-from fastapi import FastAPI
+from fastapi import FastAPI, status
+from fastapi.responses import JSONResponse
 
 
 class SeedUseCase:
@@ -20,7 +21,7 @@ class SeedUseCase:
         self.job_id = job_id
         self.client = client
 
-    async def execute(self, media_list: list[Media] | None = None) -> bool:
+    async def execute(self, media_list: list[Media] | None = None) -> JSONResponse:
         """
         Execute the seed use case : load one or more jobs, login to client, verify torrent files,
                                     add torrents file to the client
@@ -58,7 +59,7 @@ class SeedUseCase:
             # Login failed
             if not response:
                 await self.broadcast_messages(f"{self.client} Login failed")
-                return False
+                return JSONResponse(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, content={})
 
             torrent_path_list = [m.torrent_file_path for m in filtered_torrent_list]
             save_path = self.app.state.settings.prefs.SCAN_PATH
@@ -71,8 +72,12 @@ class SeedUseCase:
 
             if execution:
                 await self.broadcast_messages(f"Added to {self.client}")
-                return True
-        return False
+                return JSONResponse(status_code=status.HTTP_200_OK, content={})
+            else:
+                return JSONResponse(status_code=status.HTTP_409_CONFLICT, content={})
+        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={})
+
+
 
     @staticmethod
     async def get_fact_client(name: str) -> TorrentClientServiceInterface | None:

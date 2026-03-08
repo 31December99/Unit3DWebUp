@@ -332,8 +332,6 @@ async def scan(payload: HttpRequest) -> JSONResponse:
     job_list_id = hashlib.sha256(app.state.settings.prefs.SCAN_PATH.encode()).hexdigest()
     logger.info(f"Current joblist_id {job_list_id} {app.state.settings.prefs.SCAN_PATH}")
 
-
-
     # Load the jobs list using the previous id
     job_list = await app.state.job.get_job_list(job_id=job_list_id)
 
@@ -458,13 +456,13 @@ async def upload(payload: HttpRequest):
 
 
 @app.post("/seed")
-async def seed(payload: HttpRequest):
+async def seed(payload: HttpRequest) -> JSONResponse:
     """
     :param payload:  - job_id: Identifies each poster. Corresponds to Media.job_id
     :return: none
     """
     use_case = SeedUseCase(app=app, client=app.state.settings.torrent.TORRENT_CLIENT, job_id=payload.job_id)
-    await use_case.execute()
+    return await use_case.execute()
 
 
 @app.post("/settmdbid")
@@ -567,7 +565,6 @@ async def configuration(payload: HttpRequest):
             "level": "warn",
             "message": f"{frame.f_code.co_name} Watcher Paths not set",
         })
-
 
     # Get data
     user_prefs = json.loads(job_data)
