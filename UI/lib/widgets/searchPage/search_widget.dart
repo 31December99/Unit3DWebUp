@@ -44,11 +44,6 @@ class _SearchState extends State<Search> {
   Widget build(BuildContext context) {
     final posterProvider = context.read<PosterProvider>();
     final logProvider = context.read<LogProvider>();
-
-    // final scanPath = context.select<SettingProvider, String>(
-    //   (p) => p.getValue('SCAN_PATH'),
-    // );
-
     return Container(
       padding: const EdgeInsets.all(12),
       child: Column(
@@ -144,20 +139,16 @@ class _SearchState extends State<Search> {
                     if (!context.mounted) {
                       return;
                     }
-
-                    final scanPath = context.read<SettingProvider>().getValue(
-                      'SCAN_PATH',
+                    final PosterItem notify = await posterProvider.scan(
+                      _controller.text,
                     );
-                    PosterItem notify = PosterItem(
-                      snackBarStatus: "Reloading $scanPath ",
-                    );
-
                     logProvider.add(notify, LogLevel.info);
                     showAppSnackBar(context, notify);
-                    await posterProvider.scan(_controller.text);
                   },
                   onClickTracker: (value) async {
-                    final notify = await posterProvider.searchPoster(value);
+                    final PosterItem notify = await posterProvider.searchPoster(
+                      value,
+                    );
                     showAppSnackBar(context, notify);
                   },
                   onClickClear: () async {

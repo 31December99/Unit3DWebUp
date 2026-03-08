@@ -34,11 +34,14 @@ class PosterProvider extends ChangeNotifier {
   /// Request to scan the user path
   /// TODO same as -scan flag in unit3dup
   /// TODO Add creation torrent for -f and -u flag
-  Future<void> scan(String query) async {
+  Future<PosterItem> scan(String query) async {
     posterItems = await ApiService.scan();
-
     isLoading = true;
     notifyListeners();
+
+    if (posterItems[0].snackBarError != null) {
+      return posterItems[0];
+    }
 
     /// Filter results based on the query string
     final filteredList = posterItems
@@ -49,9 +52,10 @@ class PosterProvider extends ChangeNotifier {
         )
         .toList();
     posterItems = filteredList;
+
     isLoading = false;
     notifyListeners();
-    posterItem.snackBarStatus = "JobId not found";
+    return PosterItem(snackBarStatus: "Searching...$query");
   }
 
   /// Create torrents
@@ -212,8 +216,7 @@ class PosterProvider extends ChangeNotifier {
 
     if (posterItems.isEmpty) {
       return PosterItem(snackBarError: "The page is empty");
-    }
-    else {
+    } else {
       posterItem = await ApiService.clearJobListId(posterItems[0].jobListId);
       posterItems = [];
       isLoading = false;
