@@ -19,8 +19,9 @@ class LogProvider extends ChangeNotifier {
     _connect();
   }
 
-  void add(String? msg, LogLevel level) {
-    _logs.add(LogLine("Client $msg", level));
+  void add(PosterItem msg, LogLevel level) {
+    String? message = msg.snackBarStatus ?? msg.snackBarError ?? "Log Error";
+    _logs.add(LogLine("Client $message", level));
     notifyListeners();
   }
 
@@ -82,11 +83,14 @@ class LogProvider extends ChangeNotifier {
           rcvPosterMessage(decoded['message'], decoded['job_id']);
         }
       },
-      onError: (err) => add('WebSocket error: $err', LogLevel.error),
+      onError: (err) => add(
+        PosterItem(snackBarError: "WebSocket error: $err"),
+        LogLevel.error,
+      ),
       onDone: () {
-          add('WebSocket closed', LogLevel.warn);
-          Future.delayed(const Duration(seconds: 10), _connect);
-        }
+        add(PosterItem(snackBarError: "WebSocket closed"), LogLevel.warn);
+        Future.delayed(const Duration(seconds: 10), _connect);
+      },
     );
   }
 

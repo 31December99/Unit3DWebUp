@@ -105,7 +105,7 @@ class _SearchState extends State<Search> {
                         jobListId!,
                       );
 
-                      logProvider.add(notify.snackBarStatus, LogLevel.info);
+                      logProvider.add(notify, LogLevel.info);
                       showAppSnackBar(
                         context,
                         backgroundColor: Colors.redAccent,
@@ -134,7 +134,7 @@ class _SearchState extends State<Search> {
                     PosterItem notify = PosterItem(
                       snackBarStatus: "Searching text... in jobList $jobListId",
                     );
-                    logProvider.add(notify.snackBarStatus, LogLevel.info);
+                    logProvider.add(notify, LogLevel.info);
                     showAppSnackBar(context, notify);
                     posterProvider.searchPoster(value);
                   },
@@ -148,15 +148,13 @@ class _SearchState extends State<Search> {
                     final scanPath = context.read<SettingProvider>().getValue(
                       'SCAN_PATH',
                     );
-                    final String notifyString = "Reloading $scanPath ";
                     PosterItem notify = PosterItem(
                       snackBarStatus: "Reloading $scanPath ",
                     );
 
-                    logProvider.add(notifyString, LogLevel.info);
+                    logProvider.add(notify, LogLevel.info);
                     showAppSnackBar(context, notify);
                     await posterProvider.scan(_controller.text);
-
                   },
                   onClickTracker: (value) async {
                     final notify = await posterProvider.searchPoster(value);
@@ -165,7 +163,6 @@ class _SearchState extends State<Search> {
                   onClickClear: () async {
                     final notify = await posterProvider.clearPosterItems();
                     showAppSnackBar(context, notify);
-
                   },
                 ),
               ),
