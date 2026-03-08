@@ -167,7 +167,7 @@ class PosterProvider extends ChangeNotifier {
   }
 
   /// Send to backend the new displayName
-  Future<String?> updatePosterDname(
+  Future<PosterItem> updatePosterDname(
     String jobId,
     String fieldId,
     String newId,
@@ -182,30 +182,44 @@ class PosterProvider extends ChangeNotifier {
       await ApiService.fetchPosterDname(jobId, fieldId, newId, poster);
       isLoading = false;
       notifyListeners();
-      return poster.snackBarStatus;
+      return poster;
     }
-    return posterItem.snackBarStatus = "JobId not found";
+    posterItem.snackBarStatus = "JobId not found";
+    return posterItem;
   }
 
   /// Request backend to search for torrents in the tracker
-  Future<void> searchPoster(String title) async {
+  Future<PosterItem> searchPoster(String title) async {
     isLoading = true;
     notifyListeners();
     posterItems = await ApiService.fetchFilteredItem(title);
+
+    if (posterItems[0].snackBarError != null) {
+      return posterItems[0];
+    }
+
     isLoading = false;
     notifyListeners();
+    return PosterItem(snackBarStatus: "Searching...$title");
   }
 
   /// Request backend to delete the job list
   /// The SearchPage will be cleared
   /// user paths need to be rescanned
-  Future<void> clearPosterItems() async {
-    if (posterItems.isNotEmpty) {
-      await ApiService.clearJobListId(posterItems[0].jobListId);
-    }
-
-    posterItems = [];
+  Future<PosterItem> clearPosterItems() async {
+    isLoading = true;
     notifyListeners();
+
+    if (posterItems.isEmpty) {
+      return PosterItem(snackBarError: "The page is empty");
+    }
+    else {
+      posterItem = await ApiService.clearJobListId(posterItems[0].jobListId);
+      posterItems = [];
+      isLoading = false;
+      notifyListeners();
+      return posterItem;
+    }
   }
 
   /// Update the poster status in percentage progress

@@ -31,15 +31,6 @@ class _SearchState extends State<Search> {
     super.dispose();
   }
 
-  // void notifyTheUser(BuildContext context, String errorMessage) {
-  //   showAppSnackBar(
-  //     context,
-  //     errorMessage,
-  //     duration: const Duration(seconds: 2),
-  //     backgroundColor: Colors.redAccent,
-  //   );
-  // }
-
   void notifyTheUser(BuildContext context, PosterItem message) {
     showAppSnackBar(
       context,
@@ -140,9 +131,6 @@ class _SearchState extends State<Search> {
                     final jobListId =
                         posterProvider.posterItems.first.jobListId;
 
-                    // final String notifyString =
-                    //     "Searching text... in jobList $jobListId";
-
                     PosterItem notify = PosterItem(
                       snackBarStatus: "Searching text... in jobList $jobListId",
                     );
@@ -170,27 +158,14 @@ class _SearchState extends State<Search> {
                     await posterProvider.scan(_controller.text);
 
                   },
-                  onClickTracker: (value) {
-                    // final String notifyString = "Searching... '$value' in tracker";
-                    PosterItem notify = PosterItem(
-                      snackBarStatus: "Searching... '$value' in tracker",
-                    );
-                    logProvider.add(notify.snackBarStatus, LogLevel.info);
+                  onClickTracker: (value) async {
+                    final notify = await posterProvider.searchPoster(value);
                     showAppSnackBar(context, notify);
-                    posterProvider.searchPoster(value);
                   },
-                  onClickClear: () {
-                    /// Cant delete an empty list
-                    if (posterProvider.posterItems.isEmpty) {
-                      return;
-                    }
-                    PosterItem notify = PosterItem(
-                      snackBarStatus: "Deleting... job list '${posterProvider.posterItems[0].jobListId}'"
-                    );
-
-                    logProvider.add(notify.snackBarStatus, LogLevel.info);
+                  onClickClear: () async {
+                    final notify = await posterProvider.clearPosterItems();
                     showAppSnackBar(context, notify);
-                    posterProvider.clearPosterItems();
+
                   },
                 ),
               ),

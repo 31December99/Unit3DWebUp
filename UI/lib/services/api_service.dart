@@ -319,23 +319,20 @@ class ApiService {
     if (response.statusCode == 200) {
       return getPosterUrls(jsonDecode(response.body));
     } else {
-      return [];
+      return [
+        PosterItem(snackBarError: "Request failed ${response.statusCode}"),
+      ];
     }
   }
 
   /// Fetch Filtered Item
-  static Future<List<PosterItem>> clearJobListId(String? jobListId) async {
+  static Future<PosterItem> clearJobListId(String? jobListId) async {
     final response = await _post("cjoblist", {'job_list_id': jobListId});
 
     if (response == null) {
-      return [PosterItem(snackBarError: "Backend offline")];
-    }
-
-    if (response.statusCode == 200) {
-      return getPosterUrls(jsonDecode(response.body));
+      return PosterItem(snackBarError: "Backend offline");
     } else {
-      print('Errore: ${response.statusCode}');
-      return [];
+      return PosterItem(snackBarError: "Deleted joblist $jobListId");
     }
   }
 
