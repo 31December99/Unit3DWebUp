@@ -111,7 +111,8 @@ class ScanMediaUseCase:
             # Upload the screenshot to imagehost and return a html code for the description
             builder = BuildService(
                 media_list=[media],
-                session=self.session
+                session=self.session,
+                app= self.manager.app
             )
             await builder.description()
 

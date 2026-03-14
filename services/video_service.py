@@ -17,6 +17,7 @@ from models.media import Media
 
 from pymediainfo import MediaInfo
 from aiohttp import FormData
+from fastapi import FastAPI
 import numpy as np
 import asyncio
 
@@ -241,7 +242,7 @@ class BuildService(DescriptionBuilderInterface):
         Upload all previously created screenshots to hostimage, get their URLs, build a description for the tracker
     """
 
-    def __init__(self, media_list: list[Media], session: aiohttp.ClientSession | None = None):
+    def __init__(self, media_list: list[Media], app: FastAPI, session: aiohttp.ClientSession | None = None):
         """
         :param media_list: a list of Media objects
         :param session: aiohttp.ClientSession | None
@@ -249,6 +250,7 @@ class BuildService(DescriptionBuilderInterface):
         self.session = session or aiohttp.ClientSession()
         self.http = AsyncHttpClient(self.session)
         self.media_list = media_list
+        self.app = app
         self.screenshots = []
         self.logger = get_logger(self.__class__.__name__)
         settings = get_settings()
@@ -341,6 +343,13 @@ class BuildService(DescriptionBuilderInterface):
                 media.description = desc
             else:
                 self.logger.warning("Description error")
+                # Send a message to the frontend by ws
+                await self.app.state.ws_manager.broadcast({
+                    "type": "log",
+                    "level": "error",
+                    "message": f"Failed to build description for {media.file_name}",
+                })
+
         return None
 
     async def close(self) -> None:
