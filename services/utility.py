@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Same as old code unit3dup 0.8.21
+# Same as old code unit3dup 0.9.31
 from datetime import datetime
 from pathlib import Path
 
@@ -23,39 +23,74 @@ class ManageTitles:
         "\\", "&", "*", "$", "%", "#", "@", "_", "+", "|"
     ]
 
-    # TAG Audio in title
-    iso_3166_alpha3 = ["ENG", "USA", "ITA", "DEU", "FRA", "GBR", "ESP", "JPN", "BRA", "RUS", "CHN"]
 
-    # TAG Audio in title
+    iso_3166_alpha3 = [
+        "ENG", "USA", "GBR", "ITA", "DEU", "GER", "FRA", "ESP", "SPA",
+        "BRA", "JPN", "CHN", "RUS", "PER", "NOR",
+        "SWE", "DAN", "POL", "HIN", "TUR", "ARA", "KOR", "VIE", "IND"
+    ]
+
     iso_3166_alpha2_to_alpha3 = {
-        "EN": "ENG",  # exception
-        "US": "USA",
+        "EN": "ENG", "US": "USA", "GB": "GBR", "EN-US": "ENG", "EN-GB": "ENG", "EN-AU": "ENG",
         "IT": "ITA",
-        "DE": "DEU",
+        "DE": "GER",
         "FR": "FRA",
-        "GB": "GBR",
-        "ES": "ESP",
-        "JP": "JPN",
+        "ES": "SPA", "ES-ES": "SPA", "ES-MX": "SPA",
         "BR": "BRA",
-        "RU": "RUS",
+        "JP": "JPN",
         "CN": "CHN",
-        "EN-US": "ENG",
-        "EN-GB": "ENG",
-        "EN-AU": "ENG",
-        "ES-ES": "ESP",
-        "ES-MX": "ESP"
+        "RU": "RUS",
+        "FA": "PER", "IR": "PER",
+        "NO": "NOR",
+        "SE": "SWE",
+        "DK": "DAN",
+        "PL": "POL",
+        "HI": "HIN",
+        "TR": "TUR",
+        "AR": "ARA",
+        "KO": "KOR",
+        "VI": "VIE",
+        "ID": "IND"
+    }
+
+    long_name = {
+        "ENGLISH": "ENG",
+        "AMERICAN": "ENG",
+        "BRITISH": "ENG",
+        "ITALIAN": "ITA",
+        "GERMAN": "GER",
+        "FRENCH": "FRA",
+        "SPANISH": "SPA",
+        "BRAZILIAN": "BRA",
+        "JAPANESE": "JPN",
+        "CHINESE": "CHN",
+        "RUSSIAN": "RUS",
+        "PERSIAN": "PER",
+        "FARSI": "PER",
+        "NORWEGIAN": "NOR",
+        "SWEDISH": "SWE",
+        "DANISH": "DAN",
+        "POLISH": "POL",
+        "HINDI": "HIN",
+        "TURKISH": "TUR",
+        "ARABIC": "ARA",
+        "KOREAN": "KOR",
+        "VIETNAMESE": "VIE",
+        "INDONESIAN": "IND"
     }
 
     @staticmethod
-    def convert_iso(code) -> list[str] | None:
+    def convert_iso(code) -> list[str] | str:
         """ Convert iso 2 to 3 """
         code = code.upper()
-
         # if it's 'multilang'
         if '-' in code:
             codes = code.split('-')
         else:
             codes = [code]
+
+        if code in ManageTitles.long_name:
+            codes = [ManageTitles.long_name[code]]
 
         result = []
         for part in codes:
@@ -64,13 +99,14 @@ class ManageTitles:
             if match:
                 iso_code = match.group(1)
                 if len(iso_code) == 2:  # // alpha-2
-                    return ManageTitles.iso_3166_alpha2_to_alpha3.get(code, None)
+                    return ManageTitles.iso_3166_alpha2_to_alpha3.get(code, "")
                 elif len(iso_code) == 3:  # // alpha3
                     # return the same code provided it is an alpha3
                     if iso_code in ManageTitles.iso_3166_alpha3:
                         if iso_code:
                             result.append(iso_code)
         return result
+
 
     @staticmethod
     def clean(filename: str) -> str:
