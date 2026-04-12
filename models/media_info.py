@@ -4,7 +4,7 @@ from __future__ import annotations
 # Based on the old code unit3dup 0.8.21
 import re, os
 from dataclasses import dataclass, field
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Any
 
 
 @dataclass(slots=True)
@@ -86,7 +86,7 @@ class MediaFile:
         return [t for t in self.video_tracks if t.get("track_type") == "Text"]
 
     @property
-    def available_languages(self) -> List[str]:
+    def available_languages(self) -> list[Any | None] | list[str]:
         langs = {
             t.get("language")
             for t in (self.audio_tracks + self.subtitle_tracks)

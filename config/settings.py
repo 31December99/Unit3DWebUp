@@ -40,7 +40,7 @@ class TrackerConfig(BaseConfigModel):
     SIS_URL: HttpUrl
     SIS_APIKEY: str | None = None
     SIS_PID: str | None = None
-    MULTI_TRACKER: list[str] | None = None
+    MULTI_TRACKER: list[str]
     TMDB_APIKEY: str = None
     TVDB_APIKEY: str = None
     IMGBB_KEY: str = None
@@ -117,6 +117,9 @@ class TorrentClientConfig(BaseConfigModel):
 
 # /// USER PREFERENCES
 class UserPreferences(BaseConfigModel):
+    RELEASER_SIGN: str = ""
+    TAG_POSITION_MOVIE: list[str]
+    TAG_POSITION_SERIE: list[str]
     PTSCREENS_PRIORITY: int = 0
     LENSDUMP_PRIORITY: int = 1
     FREE_IMAGE_PRIORITY: int = 2
@@ -151,13 +154,20 @@ class UserPreferences(BaseConfigModel):
             raise ValueError("WATCHER_INTERVAL too low")
         return v
 
+    @field_validator("TAG_POSITION_MOVIE", "TAG_POSITION_SERIE", mode="before")
+    @classmethod
+    def parse_tag_position(cls, v):
+        if isinstance(v, str):
+            return [x.strip() for x in v.split(",") if x.strip()]
+        return v
+
 
 # /// APP SETTINGS
 class Settings(BaseSettings):
     """
     Set default settings
     """
-    unit3DwebUp: Unit3DwebUp = Field(default=Unit3DwebUp)
+    unit3DwebUp: Unit3DwebUp = Field(default_factory=Unit3DwebUp)
     tracker: TrackerConfig = Field(default_factory=TrackerConfig)
     torrent: TorrentClientConfig = Field(default_factory=TorrentClientConfig)
     prefs: UserPreferences = Field(default_factory=UserPreferences)

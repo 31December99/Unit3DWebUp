@@ -53,7 +53,7 @@ TORRENT__RTORR_PORT=5000
 TORRENT__SHARED_RTORR_PATH=.
 
 ####################################### -> ! DO NOT EDIT ! <- ###########################
-UNIT3DWEBUP__VERSION=0.0.9
+UNIT3DWEBUP__VERSION=0.0.10
 # CONFIGURAZIONE OPZIONALE NON OBBLIGATORIA
 # SCRIVIBILI DA BROWSER
 PREFS__WATCHER_DESTINATION_PATH=.
@@ -66,6 +66,9 @@ PREFS__SCAN_PATH=.
 # SCRIVIBILI DA BROWSER
 TORRENT__TORRENT_CLIENT=qbittorrent
 TORRENT__TAG=TAG1
+PREFS__RELEASER_SIGN=
+PREFS__TAG_POSITION_MOVIE=["title","year","part","version","resolution","uhd","platform","source","remux","multi","acodec","channels","flag","subtitle","hdr","vcodec","video_encoder"]
+PREFS__TAG_POSITION_SERIE=["title","season","version","resolution","uhd","platform","source","remux","multi","acodec","channels","flag","subtitle","hdr","vcodec","video_encoder"]
 PREFS__IMGBB_PRIORITY='4'
 PREFS__LENSDUMP_PRIORITY='0'
 PREFS__FREE_IMAGE_PRIORITY=3

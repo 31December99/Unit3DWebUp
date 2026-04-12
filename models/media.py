@@ -10,6 +10,7 @@ from services.utility import ManageTitles, System
 from models.media_info import MediaFile
 from config.constants import MediaStatus
 from config.settings import get_settings
+from config.tags import SIGNS_LIST, TAGS_LIST, BAN_LIST
 from services import utility
 
 settings = get_settings()
@@ -30,7 +31,7 @@ class Media:
         """
         self.folder: Path = Path(folder)
         self.subfolder: str = subfolder
-        self.title: str = (Path(self.folder) /  self.subfolder).name
+        self.title: str = (Path(self.folder) / self.subfolder).name
         self._torrent_file_path = Path(torrent_archive_path) / "ITT" / f"{self.title}.torrent"
 
         # // Assign a job id
@@ -52,6 +53,11 @@ class Media:
         self._subtitle: str | None = None
         self._torrent_path: Path | None = None
         self._media_to_string: str | None = None
+        self.signs_list: dict[str, str] = SIGNS_LIST
+        self.tags_list: dict[str, str] = TAGS_LIST
+        self.ban_list: dict[str, str] = BAN_LIST
+        self.releaser_sign: str = settings.prefs.RELEASER_SIGN
+        self._tag_position: list[str] = []
 
         # // Contents
         self._file_name: str | None = None
@@ -351,6 +357,12 @@ class Media:
     @category.setter
     def category(self, value: str | None):
         self._category = value
+
+    @property
+    def tag_position(self) -> list[str]:
+        self._tag_position = settings.prefs.TAG_POSITION_SERIE if self.category == 'series' \
+            else settings.prefs.TAG_POSITION_MOVIE
+        return self._tag_position
 
     @property
     def keyword(self) -> str | None:

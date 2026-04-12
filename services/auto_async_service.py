@@ -7,11 +7,13 @@ from pathlib import Path
 
 from repositories.media_info_factory import MediaFileFactory
 from services.utility import ManageTitles
+from services.tags_service import SearchTags
 from config.constants import MediaStatus
 from config.logger import get_logger
 from models.media import Media
 
 from fastapi import FastAPI
+
 
 class AsyncMediaManager:
     """
@@ -150,13 +152,30 @@ class AsyncMediaManager:
 
         # Add a Mediainfo object
         if success:
-            media.mediafile = await MediaFileFactory.from_path(media.file_name)
-            assert media.mediafile is not None, "MediaFileFactory ha restituito None"
-            await self.app.state.ws_manager.broadcast({
-                "type": "log",
-                "level": "success",
-                "message": f"Process media -> {media.display_name}",
-            })
+            if media.file_name:
+                media.mediafile = await MediaFileFactory.from_path(media.file_name)
+                assert media.mediafile is not None, "MediaFileFactory ha restituito None"
+                await self.app.state.ws_manager.broadcast({
+                    "type": "log",
+                    "level": "success",
+                    "message": f"Process media -> {media.display_name}",
+                })
+                ######################################################
+                search_tags = SearchTags(filename=media.title,
+                                         title=media.guess_filename.guessit_title,  # guess.get("title", None),
+                                         year=media.guess_filename.guessit_year,  # guess.get("year", ""),
+                                         season=media.guess_season,
+                                         episode=media.guess_episode,
+                                         releaser_sign=media.releaser_sign,
+                                         # config_settings.user_preferences.RELEASER_SIGN,
+                                         tags_position=media.tag_position,
+                                         tags_list=media.tags_list,
+                                         signs_list=media.signs_list,
+                                         ban_list=media.ban_list,
+                                         media=media,
+                                         )
+                media.display_name = search_tags.process()
+            #######################################################
             return media
 
         return None
