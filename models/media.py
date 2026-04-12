@@ -63,7 +63,7 @@ class Media:
         self._file_name: str | None = None
         self._display_name: str | None = None
         self._category: str | None = None
-        self._audio_languages: list[str] | None = None
+        self._audio_languages: list[str] = []
         self._media_file: MediaFile | None = None
         self._languages: list[str] | None = None
         self._resolution: str | None = None
@@ -309,13 +309,19 @@ class Media:
         return self._audio_codec
 
     @property
-    def audio_languages(self) -> list[str] | None:
+    def audio_languages(self):
         if not self._audio_languages:
-            for code in (self.display_name or "").upper().split():
-                if converted := ManageTitles.convert_iso(code):
-                    self._audio_languages = converted
-                    return self._audio_languages
-            self._audio_languages = self.languages
+            # Get languages from the title
+            filename_split = self.display_name.upper().split(" ")
+
+            for code in filename_split:
+                converted_code = ManageTitles.convert_iso(code)
+                if converted_code:
+                    self._audio_languages.append(converted_code[0])
+
+            if not self._audio_languages:
+                # get from the audio track
+                self._audio_languages = self.languages
         return self._audio_languages
 
     @property
