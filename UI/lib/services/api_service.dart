@@ -72,7 +72,7 @@ class ApiService {
   ) async {
     try {
       final response = await http.post(
-        Uri.parse('http://127.0.0.1:8000/$endpoint'),
+        Uri.parse('http://127.0.0.1:10000/$endpoint'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(body),
       );
@@ -91,7 +91,7 @@ class ApiService {
   }
 
   static Future<List<PosterItem>> scan() async {
-    final response = await _post("scan", {'scan': "nothing"});
+    final response = await _post("scan", {'path': "nothing"});
     if (response == null) {
       return [PosterItem(snackBarError: "Backend offline")];
     }
