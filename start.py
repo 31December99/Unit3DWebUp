@@ -35,7 +35,7 @@ from fastapi.responses import JSONResponse
 from fastapi import WebSocket
 from fastapi import FastAPI
 from fastapi import status
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from dotenv import load_dotenv, dotenv_values
 
 import aiohttp
@@ -214,28 +214,35 @@ app.add_middleware(
 )
 
 
-class HttpRequest(BaseModel):
-    """
-       Represents the payload of a request for uploading or processing jobs.
+class ScanRequest(BaseModel):
+    path: str = Field(..., description="Filesystem path to scan")
 
-       Attributes:
-           title (str | None): Used to search title in the tracker
-           path (str | None): the user path for the scan endpoint
-           job_id (str | None): Identifier for a single job. Corresponds to Media.job_id (Poster)
-                                Received from the frontend
-           field_id (str | None): Identifier for a specific field related to the job
-           new_id (str | None): Optional new identifier for updates
-           job_list_id (str | None): Identifier for a list of jobs received from the frontend
-       """
 
-    title: str | None = None
-    path: str | None = None
-    job_id: str | None = None
-    job_list_id: str | None = None
-    field_id: str | None = None
-    new_id: str | None = None
-    key: str | None = None
-    value: str | None = None
+class ProcessAllRequest(BaseModel):
+    job_list_id: str = Field(..., description="ID of the job list")
+
+
+class JobRequest(BaseModel):
+    job_id: str = Field(..., description="Unique job identifier")
+
+
+class UpdatePosterRequest(BaseModel):
+    job_id: str
+    field_id: str
+    new_id: str
+
+
+class ClearJobListRequest(BaseModel):
+    job_list_id: str
+
+
+class SetEnvRequest(BaseModel):
+    key: str
+    value: str
+
+
+class FilterRequest(BaseModel):
+    title: str
 
 
 @app.websocket("/ws")
@@ -259,12 +266,17 @@ async def websocket_endpoint(ws: WebSocket):
 
 
 @app.post("/cjoblist")
-async def clear_job_list_id(payload: HttpRequest):
+async def clear_job_list_id(payload: ClearJobListRequest):
     """
-    :param payload: Job_list id
-    :return: None
-     Client request to delete a job_list ( the home page where the poster are displayed )
-    """
+        This endpoint deletes a job list and all related posters
+
+        Required:
+        - job_list_id: identifier of the job list
+
+        Returns:
+        - status: operation result
+        """
+
     # Load the job list
     # Carica la joblist per ottenere il percorso e inviarlo a log. Mi sembra troppo per una stampa
     job_list = await app.state.job.get_job_list(job_id=payload.job_list_id)
@@ -295,23 +307,25 @@ async def clear_job_list_id(payload: HttpRequest):
 
 
 @app.post("/scan")
-async def scan(payload: HttpRequest) -> JSONResponse:
+async def scan(payload: ScanRequest) -> JSONResponse:
     """
-    # This endpoint scans the local files and creates a Media object for each associating it with its descriptione
-    :param payload: HttpRequest payload
-        - path: User path for the scan process. The path on the hdd
+    This endpoint scans the local files and creates a Media object for each associating it with its description
 
-    :prerequisite: path
+    Required
+    - path: user path for the scan process, filesystem path on the hdd
 
-    :return http:
-            - status: the http status code
-            - source: Set a flag for the source of the poster Local(hdd) or remote(Tracker)
-            - results: Dict that contains source and a list of Media objects (poster)
+    Prerequisite
+    - path must be valid and accessible
 
-    :return websocket:
-            - type: a type of log for the frontend. Color changes based on the type
-            - level: result of the process ( success, error ecc)
-            - message: what the frontend should write in the console window
+    Http response
+    - status: http status code
+    - source: indicates source of the posters local hdd or remote tracker
+    - results: dictionary containing source and list of Media objects
+
+    Websocket events
+    - type: log type for frontend display
+    - level: result of the process success or error
+    - message: message displayed in the frontend console
     """
 
     frame = inspect.currentframe()
@@ -414,15 +428,18 @@ async def scan(payload: HttpRequest) -> JSONResponse:
 
 
 @app.post("/processall")
-async def process_all(payload: HttpRequest):
+async def process_all(payload: ProcessAllRequest):
     """
-    Start a 'chain' : Load the joblist , Filter for existing torrent, create torrent, upload the complete joblist
+    Start a chain load the joblist filter for existing torrent create torrent upload the complete joblist
 
-    :param payload: HttpRequest payload
-        - job_list_id: Identifies the list created by the scan endpoint
+    Required
+    - job_list_id identifies the list created by the scan endpoint
 
-    :prerequisite: a valid Description status ( Media Class attribute)
-    :return: none
+    Prerequisite
+    - valid description status media class attribute
+
+    Return
+    - none
     """
 
     use_case = ProcessAllUseCase(app=app, job_list_id=payload.job_list_id,
@@ -431,96 +448,126 @@ async def process_all(payload: HttpRequest):
 
 
 @app.post("/maketorrent")
-async def make(payload: HttpRequest):
+async def make(payload: JobRequest):
     """
     Create one or more torrent files
 
-    :param payload: - job_id: Identifies each poster. Corresponds to Media.job_id -
-    :return: none
-    """
+    Required
+    - job_id identifies each poster corresponds to Media.job_id
 
+    Return
+    - none
+    """
     torrent_service = MakeTorrentUseCase(app=app, job_id=payload.job_id)
     await torrent_service.execute()
 
 
 @app.post("/upload")
-async def upload(payload: HttpRequest):
+async def upload(payload: JobRequest):
     """
-     Upload a single torrent file
+    Upload a single torrent file
 
-    :param payload: - job_id: Identifies each poster. Corresponds to Media.job_id -
-    :return: none
+    Required
+    - job_id identifies each poster corresponds to Media.job_id
+
+    Return
+    - none
+
+    WebSocket events emitted
+    - posterLogMessage: sent for each uploaded torrent
+    - job_id: media identifier
+    - message: upload result message
     """
+
     upload_service = UploadUseCase(app=app, job_id=payload.job_id)
     await upload_service.execute()
 
 
 @app.post("/seed")
-async def seed(payload: HttpRequest) -> JSONResponse:
+async def seed(payload: JobRequest) -> JSONResponse:
     """
-    :param payload:  - job_id: Identifies each poster. Corresponds to Media.job_id
-    :return: none
+    Required
+    - job_id identifies each poster corresponds to Media.job_id
+
+    Return
+    - none
     """
+
     use_case = SeedUseCase(app=app, client=app.state.settings.torrent.TORRENT_CLIENT, job_id=payload.job_id)
     return await use_case.execute()
 
 
 @app.post("/settmdbid")
-async def set_poster_id(payload: HttpRequest):
+async def set_poster_id(payload: UpdatePosterRequest):
     """
-    Set a Tmdb id ( for example when tmdb returns an empty result)
+    Set a Tmdb id for example when tmdb returns an empty result
 
-    :param payload:  - job_id: Identifies each poster. Corresponds to Media.job_id
-    :return: none
+    Required
+    - job_id identifies each poster corresponds to Media.job_id
+
+    Return
+    - none
     """
 
     await update_poster(msg="TMDB", job_id=payload.job_id, field_id=payload.field_id, new_id=payload.new_id)
 
 
 @app.post("/settvdbid")
-async def set_tvdb_id(payload: HttpRequest):
+async def set_tvdb_id(payload: UpdatePosterRequest):
     """
-    Set a TVdb id (for example, when tvdb returns an empty result)
+    Set a TVdb id for example when tvdb returns an empty result
 
-    :param payload:  - job_id: Identifies each poster. Corresponds to Media.job_id
-    :return: none
+    Required
+    - job_id identifies each poster corresponds to Media.job_id
+
+    Return
+    - none
     """
 
     await update_poster(msg="TVDB", job_id=payload.job_id, field_id=payload.field_id, new_id=payload.new_id)
 
 
 @app.post("/setimdbid")
-async def set_imdb_id(payload: HttpRequest):
+async def set_imdb_id(payload: UpdatePosterRequest):
     """
-    Set an Imdb id (for example, when the remote list of tvdb is empty)
+    Set an Imdb id for example when the remote list of tvdb is empty
 
-    :param payload:  - job_id: Identifies each poster. Corresponds to Media.job_id
-    :return: none
+    Required
+    - job_id identifies each poster corresponds to Media.job_id
+
+    Return
+    - none
     """
 
     await update_poster(msg="IMDB", job_id=payload.job_id, field_id=payload.field_id, new_id=payload.new_id)
 
 
 @app.post("/setposterurl")
-async def set_poster_url(payload: HttpRequest):
+async def set_poster_url(payload: UpdatePosterRequest):
     """
-    Set a poster url (for example, when tmdb returns an empty result. Only for fronte end)
+    Set a poster url for example when tmdb returns an empty result only for frontend
 
-    :param payload:  - job_id: Identifies each poster. Corresponds to Media.job_id
-    :return: none
+    Required
+    - job_id identifies each poster corresponds to Media.job_id
+
+    Return
+    - none
     """
 
     await update_poster(msg="TMDB Poster Url", job_id=payload.job_id, field_id=payload.field_id, new_id=payload.new_id)
 
 
 @app.post("/setposterdname")
-async def set_poster_dname(payload: HttpRequest):
+async def set_poster_dname(payload: UpdatePosterRequest):
     """
-    Set a poster display name (for example, if you dont like it)
+    Set a poster display name for example if you dont like it
     Display name is the name shown on the dedicated torrent page
 
-    :param payload:  - job_id: Identifies each poster. Corresponds to Media.job_id
-    :return: none
+    Required
+    - job_id identifies each poster corresponds to Media.job_id
+
+    Return
+    - none
     """
 
     await update_poster(msg="Update DisplayName", job_id=payload.job_id, field_id=payload.field_id,
@@ -528,12 +575,15 @@ async def set_poster_dname(payload: HttpRequest):
 
 
 @app.post("/setting")
-async def configuration(payload: HttpRequest):
+async def configuration():
     """
-    load setting from the local configuration file
+    Load setting from the local configuration file
 
-    :param payload: - Job_id is fixed to zero
-    :return: none
+    Required
+    - job_id is fixed to zero
+
+    Return
+    - none
     """
 
     # Logger
@@ -576,7 +626,19 @@ async def configuration(payload: HttpRequest):
 
 
 @app.post("/setenv")
-async def set_env(payload: HttpRequest):
+async def set_env(payload: SetEnvRequest):
+    """
+    Set the environment variables from the frontend
+    User need to restart the docker
+
+    Required
+    - Key: dictionary key
+    - Value: new value for the environment variable
+
+    Return
+    - none
+    """
+
     # Load env file
     load_dotenv(dotenv_path=app.state.env_file, override=True)
 
@@ -642,7 +704,17 @@ async def set_env(payload: HttpRequest):
 
 
 @app.post("/filter")
-async def filter_search(payload: HttpRequest):
+async def filter_search(payload: FilterRequest):
+    """
+    Search words or title in the tracker
+
+    Required
+    - title: title or part of it
+
+    Return
+    - none
+    """
+
     # Search for a title in the tracker
     async with aiohttp.ClientSession() as session:
         # A new ITT tracker instance with interface
@@ -665,7 +737,7 @@ async def filter_search(payload: HttpRequest):
 
 
 def main():
-    uvicorn.run("start:app", host="127.0.0.1", port=8000, reload=False)
+    uvicorn.run("start:app", host="127.0.0.1", port=10000, reload=False)
 
 
 if __name__ == "__main__":
