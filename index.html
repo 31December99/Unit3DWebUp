@@ -4,11 +4,11 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="description" content="None">
+        <meta name="description" content="Guida in italiano per Unit3DwebUp">
         
         
         <link rel="shortcut icon" href="img/favicon.ico">
-        <title>My Docs</title>
+        <title>Unit3D-webUp</title>
         <link href="css/bootstrap.min.css" rel="stylesheet">
         <link href="css/fontawesome.min.css" rel="stylesheet">
         <link href="css/brands.min.css" rel="stylesheet">
@@ -24,10 +24,23 @@
     <body class="homepage">
         <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
-                <a class="navbar-brand" href=".">My Docs</a>
+                <a class="navbar-brand" href=".">Unit3D-webUp</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
                 <!-- Expanded navigation -->
                 <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="." class="nav-link active" aria-current="page">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="install.md" class="nav-link">Installa unit3Dup</a>
+                            </li>
+                        </ul>
 
                     <ul class="nav navbar-nav ms-md-auto">
                         <li class="nav-item">
@@ -117,10 +130,10 @@
 <h2 id="come-funziona">Come funziona</h2>
 <p>Il backend espone alcuni endpoints.
 Per ogni file video, Unit3Dwup crea un job_id che corrisponde all’hash del suo percorso.</p>
-<p>Una lista di job_id compone una job_list rappresentata nel frontend come un elenco di poster o locandine.
-Per ogni pagina, Unit3Dwup crea un job_list_id che corrisponde all’hash del percorso principale scansionato</p>
-<p>Un WebSocket è stato inizialmente creato per inviare aggiornamenti di avanzamento durante la creazione del file torrent
-In un secondo momento per inviare i log di stato del server.</p>
+<p>Una lista di job_id compone una job_list rappresentata nel frontend come un elenco di poster o locandine.</p>
+<p>Per ogni pagina, Unit3Dwup crea un job_list_id che corrisponde all’hash del percorso principale scansionato</p>
+<p>Un WebSocket è stato inizialmente creato per inviare aggiornamenti di avanzamento durante la creazione del file torrent</p>
+<p>In un secondo momento per inviare i log di stato del server.</p>
 <p>Al contrario della versione CLI tutto il processo non viene eseguito in uno solo step se non espressamente
 richiesto:</p>
 <h3 id="pulsante-scansiona">Pulsante scansiona</h3>
@@ -230,5 +243,5 @@ verranno scansionati solo i nuovi file senza ripetere l'intero processo.</p></di
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2026-04-21 21:39:42.573124+00:00
+Build Date UTC : 2026-04-21 22:59:38.422593+00:00
 -->
