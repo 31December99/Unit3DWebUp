@@ -21,7 +21,7 @@ void main() {
         ChangeNotifierProvider(
           create: (context) => LogProvider(
             //TODO for the moment is hardcoded
-            url: 'ws://localhost:10000/ws',
+            url: 'ws://localhost:8000/ws',
             posterProvider: context.read<PosterProvider>(),
           ),
         ),

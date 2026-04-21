@@ -72,7 +72,7 @@ class ApiService {
   ) async {
     try {
       final response = await http.post(
-        Uri.parse('http://127.0.0.1:10000/$endpoint'),
+        Uri.parse('http://127.0.0.1:8000/$endpoint'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(body),
       );
