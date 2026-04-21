@@ -16,7 +16,7 @@ Auto Torrent Generator and Uploader
 
 Reworked from the original Unit3Dup:
 https://github.com/31December99/Unit3Dup
-
+This code is under testing..
 
 
 .. image:: images/home.png
@@ -112,7 +112,7 @@ flutter build web --release --wasm
 # Build Container
 ===================
 
-docker-compose build --no-cache -f build.yml
+docker-compose -f build.yml build --no-cache
 
 docker-compose up
 
@@ -121,13 +121,13 @@ docker-compose up
 
 docker login
 
-docker tag unit3dwebup-backend:latest parzival2025/backend_app:0.0.1
+docker tag unit3dwebup-backend:latest parzival2025/backend_app:x.y.z
 
-docker tag unit3dwebup-frontend:latest parzival2025/frontend_app:0.0.1
+docker tag unit3dwebup-frontend:latest parzival2025/frontend_app:x.y.z
 
-docker push parzival2025/backend_app:0.0.1
+docker push parzival2025/backend_app:x.y.z
 
-docker push parzival2025/frontend_app:0.0.1
+docker push parzival2025/frontend_app:x.y.z
 
 
 work in progress..
