@@ -1,0 +1,6 @@
+site_name: Unit3D-webUp
+site_description: Guida in italiano per Unit3DwebUp
+
+nav:
+  - Home: index.md
+  - Installa unit3Dup: install.md
