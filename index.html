@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="None">
+        
+        
+        <link rel="shortcut icon" href="img/favicon.ico">
+        <title>My Docs</title>
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/fontawesome.min.css" rel="stylesheet">
+        <link href="css/brands.min.css" rel="stylesheet">
+        <link href="css/solid.min.css" rel="stylesheet">
+        <link href="css/v4-font-face.min.css" rel="stylesheet">
+        <link href="css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body class="homepage">
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href=".">My Docs</a>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#welcome-to-unit3dwebup-0013-alpha" class="nav-link">Welcome to Unit3DwebUp 0.0.13-alpha</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#installazione-versione-docker" class="nav-link">Installazione versione Docker</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#come-funziona" class="nav-link">Come funziona</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="welcome-to-unit3dwebup-0013-alpha">Welcome to Unit3DwebUp 0.0.13-alpha</h1>
+<ul>
+<li>
+<p><a href="https://github.com/31December99/Unit3DWebUp">Github</a></p>
+</li>
+<li>
+<p><a href="https://streamable.com/agoizj">Demo video Here</a></p>
+</li>
+<li>
+<p><a href="https://github.com/31December99/Unit3Dup">Basato su Unit3dup</a></p>
+</li>
+</ul>
+<p>Funzioni attualmente implementate</p>
+<ul>
+<li>Scansiona cartelle e sottocartelle (livello 1)</li>
+<li>Crea uno o più torrents</li>
+<li>Crea automaticamente il titolo per la pagina del tracker facendo differenza tra movie e serie </li>
+<li>Estrae screenshots</li>
+<li>Aggiunge un webp alla descrizione</li>
+<li>Aggiunge il link del trailer alla descrizione</li>
+<li>Cerca l'ID per TMDB, IMDB, TVDB</li>
+<li>Seeding in qBittorrent</li>
+<li>Ottiene mediainfo output per ogni video</li>
+<li>Carica uno o più torrents sul tracker</li>
+</ul>
+<p>Funzioni non ancora testate ma presenti nella versione CLI</p>
+<ul>
+<li>Estrae la prima pagina come cover da file PDF</li>
+<li>Reseeding uno o più torrents</li>
+<li>Seeding del torrent tra due O.S.</li>
+<li>Assegna un titolo differente dall'originale a una stagione durante il caricamento</li>
+<li>Windows</li>
+</ul>
+<p>Funzioni non ancora testate ma presenti nella versione CLI</p>
+<ul>
+<li>Genera meta-info per Games (IGDB)</li>
+<li>Seeding in Transmission e rTorrent</li>
+</ul>
+<h2 id="installazione-versione-docker">Installazione versione Docker</h2>
+<ul>
+<li>Configura Unit3Dwup utilizzando il file .env(example)</li>
+<li>Rinominalo in .env</li>
+<li>run docker-compose pull</li>
+</ul>
+<h2 id="come-funziona">Come funziona</h2>
+<p>Il backend espone alcuni endpoints.
+Per ogni file video, Unit3Dwup crea un job_id che corrisponde all’hash del suo percorso.</p>
+<p>Una lista di job_id compone una job_list rappresentata nel frontend come un elenco di poster o locandine.
+Per ogni pagina, Unit3Dwup crea un job_list_id che corrisponde all’hash del percorso principale scansionato</p>
+<p>Un WebSocket è stato inizialmente creato per inviare aggiornamenti di avanzamento durante la creazione del file torrent
+In un secondo momento per inviare i log di stato del server.</p>
+<p>Al contrario della versione CLI tutto il processo non viene eseguito in uno solo step se non espressamente
+richiesto:</p>
+<h3 id="pulsante-scansiona">Pulsante scansiona</h3>
+<ul>
+<li>Ricerca di file o cartelle</li>
+<li>Estrazione del titolo e ricerca su TMDb in base alla categoria, film o serie TV</li>
+<li>Ricerca su TVDB ed estrazione dell’id IMDb dal campo remote_ids</li>
+<li>Creazione degli screenshot e file webp</li>
+<li>Creazione della descrizione con MediaInfo</li>
+</ul>
+<p>Una volta completato il processo di scansione otterrai un pagina di poster ognuno dei quali rappresenta 
+un job_id sui cui lavorare.</p>
+<h3 id="cliccare-su-ogni-locandina">Cliccare su ogni locandina</h3>
+<p><strong><em>Cliccando su una o più locandine</em></strong> è possibile aggiornare alcuni dati:</p>
+<ul>
+<li>titolo</li>
+<li>TMDb/TVDB/IMDb IDs</li>
+<li>Link del poster (solo per frontend)</li>
+</ul>
+<p>Per ogni poster è anche possibile creare il suo torrent, eseguire l’upload o avviare il seeding
+Le tre opzioni dipendono dalla loro effettiva disponibilità in quanto non esiste una sequenza obbligata.
+Ad esempio l'esistenza di un torrent creato il giorno prima permette di fare uploading o seeding.</p>
+<p>A questo punto è possibile anche chiudere l’applicazione senza perdere i dati processati.</p>
+<h3 id="caricare-tutto">Caricare tutto</h3>
+<p>Se invece vogliamo caricare tutta la pagina di torrents sul tracker dobbiamo cliccare sul pulsante "Carica"
+in alto.</p>
+<p>Se elimini o aggiungi file nella cartella di scansione, devi cliccare nuovamente su “scan” per aggiornare la pagina
+verranno scansionati solo i nuovi file senza ripetere l'intero processo.</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = ".",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="js/base.js"></script>
+        <script src="search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
+
+<!--
+MkDocs version : 1.6.1
+Build Date UTC : 2026-04-21 21:39:42.573124+00:00
+-->
