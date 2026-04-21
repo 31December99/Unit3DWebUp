@@ -81,7 +81,7 @@ A questo punto è possibile anche chiudere l’applicazione senza perdere i dati
 ### Caricare tutto
 
 Se invece vogliamo caricare tutta la pagina di torrents sul tracker dobbiamo cliccare sul pulsante "Carica"
-in alto.
 
 Se elimini o aggiungi file nella cartella di scansione, devi cliccare nuovamente su “scan” per aggiornare la pagina
-verranno scansionati solo i nuovi file senza ripetere l'intero processo.
+
+Verranno scansionati solo i nuovi file senza ripetere l'intero processo.
