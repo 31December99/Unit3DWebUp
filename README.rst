@@ -145,34 +145,22 @@ united by a shared passion for torrents and more
 | ``ITT``          | https://itatorrents.xyz/   |
 +------------------+----------------------------+
 
-
-.. image:: https://img.shields.io/badge/Telegram-Join-blue?logo=telegram
-   :target: https://t.me/+hj294GabGWJlMDI8
-   :alt: Unisciti su Telegram
-
 .. image:: https://img.shields.io/discord/1214696147600408698?label=Discord&logo=discord&style=flat
-   :target: https://discord.gg/Skvune9P
+   :target: https://discord.gg/8RpwN2Khcz
    :alt: Discord Server
 
 
-
-🎯 Streaming Community
+# AstraeLabs
 ======================
 
- `GitHub Project <https://github.com/Arrowar/StreamingCommunity>`_
+ `GitHub Project <https://github.com/AstraeLabs/VibraVid>`_
 
 An open-source script for downloading movies, TV shows, and anime from various websites,
 built by a community of people with a shared interest in programming.
 
-.. image:: https://img.shields.io/badge/Telegram-Join-blue?logo=telegram
-   :target: https://t.me/+hj294GabGWJlMDI8
-   :alt: Unisciti su Telegram
-
-.. image:: https://img.shields.io/badge/StreamingCommunity-blue.svg
-   :target: https://github.com/Arrowar/StreamingCommunity
-   :alt: StreamingCommunity Badge
-
-
+.. image:: https://img.shields.io/badge/AstraeLabs-blue.svg
+   :target: https://github.com/AstraeLabs/VibraVid
+   :alt: AstraeLabs Badge
 
 
 
