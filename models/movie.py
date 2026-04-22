@@ -213,6 +213,7 @@ class Movie(MediaRepoInterface):
     video: bool = False
     vote_average: float = 0.0
     vote_count: int = 0
+    softcore: str | None = None
 
     def get_title(self) -> str:
         return self.title
