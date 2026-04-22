@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 dynamic = ["dependencies"]
 name = "Unit3DupWeb"
-version = "0.0.13"
+version = "0.0.14"
 description = "A Unit3D uploader with a web interface"
 readme = "README.rst"
 requires-python = ">=3.12"

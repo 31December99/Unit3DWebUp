@@ -128,6 +128,7 @@ class TVShowDetails(MediaRepoInterface):
     spoken_languages: list[SpokenLanguage] = field(default_factory=list)
     origin_country: list[str] = field(default_factory=list)
 
+
     def get_title(self) -> str:
         return self.name
 
@@ -238,6 +239,8 @@ class TvShow(MediaRepoInterface):
     backdrop_path: str | None = None
     poster_path: str | None = None
     adult: bool = False
+    softcore: str | None = None
+
 
     def get_title(self) -> str:
         return self.name
