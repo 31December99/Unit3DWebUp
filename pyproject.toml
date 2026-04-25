@@ -24,7 +24,7 @@ dependencies = [
     "uvicorn[standard]==0.40.0"
 ]
 name = "Unit3DwebUp"
-version = "0.0.17"
+version = "0.0.18"
 description = "A Unit3D uploader with a web interface"
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.12"
@@ -41,7 +41,7 @@ Homepage = "https://github.com/31December99/Unit3DupWeb"
 [tool.setuptools.packages.find]
 where = ["."]
 exclude = ["venv*", ".venv*", "tests*", "docs*"]
-include = ["unit3dwebup*"]
+include = ["unit3dwup*"]
 
 [project.scripts]
 unit3dupweb = "unit3dwup.start:main"
