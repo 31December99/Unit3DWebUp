@@ -44,6 +44,6 @@ exclude = ["venv*", ".venv*", "tests*", "docs*"]
 include = ["unit3dwebup*"]
 
 [project.scripts]
-unit3dupweb = "start:main"
+unit3dupweb = "unit3dwup.start:main"
 
 
