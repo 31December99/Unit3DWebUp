@@ -3,16 +3,35 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-dynamic = ["dependencies"]
-name = "Unit3DupWeb"
+dynamic = []
+dependencies = [
+    "aiohttp==3.13.3",
+    "fastapi==0.129.0",
+    "guessit==3.8.0",
+    "numpy==2.4.2",
+    "pathvalidate==3.3.1",
+    "pillow==12.1.1",
+    "pydantic==2.12.5",
+    "pydantic_core==2.41.5",
+    "pymediainfo==7.0.1",
+    "pydantic-settings==2.12.0",
+    "qbittorrent-api==2025.11.1",
+    "python-dotenv==1.2.1",
+    "redis==7.1.1",
+    "thefuzz==0.22.1",
+    "torf==4.3.1",
+    "watchdog==6.0.0",
+    "uvicorn[standard]==0.40.0"
+]
+name = "Unit3DwebUp"
 version = "0.0.14"
 description = "A Unit3D uploader with a web interface"
-readme = "README.rst"
+readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.12"
-license =  "GPL 3.0"
+license = "GPL-3.0-only"
 
 authors = [
-  { name = "Parzival" }
+    { name = "Parzival" }
 ]
 
 [project.urls]
@@ -21,11 +40,7 @@ Homepage = "https://github.com/31December99/Unit3DupWeb"
 
 [tool.setuptools.packages.find]
 where = ["."]
-exclude = ["venv*",".venv*", "tests*", "docs*"]
-
-[tool.setuptools.dynamic]
-dependencies = {file = ["requirements.txt"]}
-
+exclude = ["venv*", ".venv*", "tests*", "docs*"]
 
 [project.scripts]
 unit3dupweb = "start:main"
