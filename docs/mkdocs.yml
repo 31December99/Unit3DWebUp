@@ -3,4 +3,6 @@ site_description: Guida in italiano per Unit3DwebUp
 
 nav:
   - Home: index.md
-  - Installa unit3DwUp: install.md
+  - Installa unit3DwebUp: install.md
+  - Build: build.md
+  - Guide: guide.md

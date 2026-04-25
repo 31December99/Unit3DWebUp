@@ -6,6 +6,19 @@
 
 * [Basato su Unit3dup](https://github.com/31December99/Unit3Dup)
 
+
+* Wup nasce con un frontend e un backend
+
+* Wup è installabile con un solo comando docker
+
+* Wup frontend lo installi a casa o sullo stesso server del backend
+
+* Wup è accessibile solo da locale oppure da remoto attraverso ssh
+
+* Wup può essere installato come backend anche senza docker (ad esempio su server remoto senza sudo)
+
+* Wup frontend è consigliabile installarlo con docker 
+
 Funzioni attualmente implementate
 
 * Scansiona cartelle e sottocartelle (livello 1)
@@ -40,6 +53,7 @@ Funzioni non ancora testate ma presenti nella versione CLI
 
 ## Come funziona
 Il backend espone alcuni endpoints.
+
 Per ogni file video, Unit3Dwup crea un job_id che corrisponde all’hash del suo percorso.
 
 Una lista di job_id compone una job_list rappresentata nel frontend come un elenco di poster o locandine.
