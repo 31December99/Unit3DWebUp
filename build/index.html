@@ -7,14 +7,14 @@
         
         
         
-        <link rel="shortcut icon" href="/img/favicon.ico">
-        <title>Unit3D-webUp</title>
-        <link href="/css/bootstrap.min.css" rel="stylesheet">
-        <link href="/css/fontawesome.min.css" rel="stylesheet">
-        <link href="/css/brands.min.css" rel="stylesheet">
-        <link href="/css/solid.min.css" rel="stylesheet">
-        <link href="/css/v4-font-face.min.css" rel="stylesheet">
-        <link href="/css/base.css" rel="stylesheet">
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>Build - Unit3D-webUp</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../css/brands.min.css" rel="stylesheet">
+        <link href="../css/solid.min.css" rel="stylesheet">
+        <link href="../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
         <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
         <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
@@ -24,7 +24,7 @@
     <body>
         <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
-                <a class="navbar-brand" href="/.">Unit3D-webUp</a>
+                <a class="navbar-brand" href="..">Unit3D-webUp</a>
                 <!-- Expander button -->
                 <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -35,16 +35,16 @@
                         <!-- Main navigation -->
                         <ul class="nav navbar-nav">
                             <li class="nav-item">
-                                <a href="/." class="nav-link">Home</a>
+                                <a href=".." class="nav-link">Home</a>
                             </li>
                             <li class="nav-item">
-                                <a href="/install/" class="nav-link">Installa unit3DwebUp</a>
+                                <a href="../install/" class="nav-link">Installa unit3DwebUp</a>
                             </li>
                             <li class="nav-item">
-                                <a href="/build/" class="nav-link">Build</a>
+                                <a href="./" class="nav-link active" aria-current="page">Build</a>
                             </li>
                             <li class="nav-item">
-                                <a href="/guide/" class="nav-link">Guide</a>
+                                <a href="../guide/" class="nav-link">Guide</a>
                             </li>
                         </ul>
 
@@ -54,6 +54,16 @@
                                 <i class="fa fa-search"></i> Search
                             </a>
                         </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../install/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../guide/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
                     </ul>
                 </div>
             </div>
@@ -61,15 +71,55 @@
 
         <div class="container">
             <div class="row">
-
-    <div class="row-fluid">
-      <div id="main-content" class="span12">
-        <h1 id="404-page-not-found" style="text-align: center">404</h1>
-        <p style="text-align: center"><strong>Page not found</strong></p>
-      </div>
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
     </div>
 
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="2"><a href="#frontend-build" class="nav-link">Frontend build</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            
+            <li class="nav-item" data-bs-level="2"><a href="#backend-build" class="nav-link">Backend build</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            
+            <li class="nav-item" data-bs-level="2"><a href="#docker-hub" class="nav-link">Docker Hub</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
 
+<h2 id="frontend-build">Frontend build</h2>
+<pre><code class="language-bash">flutter pub get
+flutter build web --release --wasm
+</code></pre>
+<hr />
+<h2 id="backend-build">Backend build</h2>
+<pre><code class="language-bash">docker-compose -f build.yml build --no-cache
+docker-compose up
+</code></pre>
+<hr />
+<h2 id="docker-hub">Docker Hub</h2>
+<pre><code class="language-bash">docker login
+
+docker tag unit3dwebup-backend:latest parzival2025/backend_app:x.y.z
+docker tag unit3dwebup-frontend:latest parzival2025/frontend_app:x.y.z
+
+docker push parzival2025/backend_app:x.y.z
+docker push parzival2025/frontend_app:x.y.z
+</code></pre></div>
             </div>
         </div>
 
@@ -77,13 +127,13 @@
             <hr>
             <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
         </footer>
-        <script src="/js/bootstrap.bundle.min.js"></script>
+        <script src="../js/bootstrap.bundle.min.js"></script>
         <script>
-            var base_url = "/",
+            var base_url = "..",
                 shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
         </script>
-        <script src="/js/base.js"></script>
-        <script src="/search/main.js"></script>
+        <script src="../js/base.js"></script>
+        <script src="../search/main.js"></script>
 
         <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
