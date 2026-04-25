@@ -15,17 +15,15 @@ RUN apt-get update && \
 
 
 # /// Requirements
-COPY requirements.txt /home/app/
-RUN pip install --no-cache-dir -r requirements.txt
+# COPY requirements.txt /home/app/
+# RUN pip install --no-cache-dir -r requirements.txt
+COPY pyproject.toml /home/app/
+COPY unit3dwup/ /home/app/
+
+RUN pip install --no-cache-dir .
 
 # /// Copy backend
-COPY *.py /home/app/
-COPY config/ /home/app/config/
-COPY external/ /home/app/external/
-COPY models/ /home/app/models/
-COPY repositories/ /home/app/repositories/
-COPY services/ /home/app/services/
-COPY use_case/ /home/app/use_case/
+COPY unit3dwup/ /home/app/
 
 USER app
 

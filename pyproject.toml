@@ -41,6 +41,7 @@ Homepage = "https://github.com/31December99/Unit3DupWeb"
 [tool.setuptools.packages.find]
 where = ["."]
 exclude = ["venv*", ".venv*", "tests*", "docs*"]
+include = ["unit3dwebup*"]
 
 [project.scripts]
 unit3dupweb = "start:main"
