@@ -6,3 +6,5 @@ tracker_list = {'ITT': itt_data, 'SIS': sis_data}
 from .settings import get_settings
 from .constants import MediaStatus
 from .logger import get_logger
+
+__version__ = "0.0.19rc4"

@@ -5,6 +5,8 @@ from pathlib import Path
 from fastapi import FastAPI
 from unit3dwup.config.settings import Settings
 from unit3dwup.config.logger import get_logger
+from unit3dwup.config import __version__
+
 
 
 async def update_mounted_paths(app: FastAPI):
@@ -33,7 +35,7 @@ async def update_mounted_paths(app: FastAPI):
 
     # Main folder
     logger.info("\nChecking Unit3DwebUp configuration file..\n")
-    logger.info(f"Unit3DwebUp          : v.{settings.unit3DwebUp.VERSION}")
+    logger.info(f"Unit3DwebUp          : v.{__version__}")
     logger.info(f"Docker mode          : '{os.getenv("DOCKER")}'")
     logger.info(f"Env Path             : '{app.state.env_file}'\n")
 
