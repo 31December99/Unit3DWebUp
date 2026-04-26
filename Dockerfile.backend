@@ -14,9 +14,7 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/*
 
 #PyPi
-ARG UNIT3DWEBUP_VERSION=latest
-
-RUN pip install --no-cache-dir unit3dwebup==${UNIT3DWEBUP_VERSION}
+RUN pip install --no-cache-dir unit3dwebup==0.0.19rc2
 
 USER app
 
