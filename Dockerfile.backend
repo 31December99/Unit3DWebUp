@@ -14,10 +14,10 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/*
 
 #PyPi
-RUN pip install --no-cache-dir unit3dwebup==0.0.19rc4
+RUN pip install --no-cache-dir unit3dwebup==0.0.19rc5
 
 USER app
 
 EXPOSE 8000
 
-CMD ["uvicorn", "unit3dwup.start:app", "--host", "127.0.0.1", "--port", "8000"]
+CMD ["uvicorn", "unit3dwup.start:app", "--host", "0.0.0.0", "--port", "8000"]
