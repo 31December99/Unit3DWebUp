@@ -3,29 +3,23 @@ FROM python:3.12-slim
 RUN useradd -ms /bin/bash app
 WORKDIR /home/app
 
-# Exists when running inside Docker
 ENV RUNNING_DOCKER=1
+ENV PYTHONPATH=/home/app
 
-# /// FFMPEG / Poppler (PDF)
+# system deps
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         ffmpeg \
         poppler-utils \
     && rm -rf /var/lib/apt/lists/*
 
+#PyPi
+ARG UNIT3DWEBUP_VERSION=latest
 
-# /// Requirements
-# COPY requirements.txt /home/app/
-# RUN pip install --no-cache-dir -r requirements.txt
-COPY pyproject.toml /home/app/
-COPY unit3dwup/ /home/app/
-
-RUN pip install --no-cache-dir .
-
-# /// Copy backend
-COPY unit3dwup/ /home/app/
+RUN pip install --no-cache-dir unit3dwebup==${UNIT3DWEBUP_VERSION}
 
 USER app
 
 EXPOSE 8000
-CMD ["uvicorn", "start:app", "--host", "0.0.0.0", "--port", "8000"]
+
+CMD ["uvicorn", "unit3dwup.start:app", "--host", "127.0.0.1", "--port", "8000"]
