@@ -82,7 +82,7 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-bs-level="1"><a href="#installazione-di-unit3dwebup-unit3dwup" class="nav-link">Installazione di Unit3DwebUp (Unit3Dwup)</a>
+            <li class="nav-item" data-bs-level="1"><a href="#installazione-di-unit3dwebup-unit3dwup-su-macchina-locale-no-server" class="nav-link">Installazione di Unit3DwebUp (Unit3Dwup) su macchina locale (no server)</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -91,7 +91,7 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="installazione-di-unit3dwebup-unit3dwup">Installazione di Unit3DwebUp (Unit3Dwup)</h1>
+<h1 id="installazione-di-unit3dwebup-unit3dwup-su-macchina-locale-no-server">Installazione di Unit3DwebUp (Unit3Dwup) su macchina locale (no server)</h1>
 <p>Per installare wup devi scaricare questi due file e configurare ssh:</p>
 <ul>
 <li>scarica il file <a href="https://raw.githubusercontent.com/31December99/Unit3DwebUp/master/.env(example)">.env(example)</a></li>
@@ -112,17 +112,6 @@
 </ul>
 <pre><code class="language-bash">docker-compose pull
 docker-compose up
-</code></pre>
-<p>Ora puoi collegarti attraverso il browser all'indirizzo http://127.0.0.1:8080/</p>
-<h4 id="configura-tunnel-ssh-per-raggiungere-il-backend-remoto-dal-tuo-browser-locale">Configura tunnel ssh per raggiungere il backend remoto dal tuo browser locale</h4>
-<p>ssh -L 7000:localhost:7000 -L 8000:localhost:8000 utente_tuo_server@ip_del_tuo_server -N</p>
-<p>Ora puoi collegarti attraverso il browser all'indirizzo 127.0.0.1:8000</p>
-<h4 id="installazione-di-unit3dwebup-con-frontend-and-backend-su-differenti-host">Installazione di unit3DwebUp con frontend and backend su differenti host</h4>
-<p>Installa solo il backend sul tuo server remoto</p>
-<pre><code>docker-compose up -d backend redis
-</code></pre>
-<p>Installa solo il frontend sulla tua macchina locale</p>
-<pre><code>docker run -d -p 8080:80 parzival2025/unit3dwebup_frontend:latest
 </code></pre>
 <p>Ora puoi collegarti attraverso il browser all'indirizzo http://127.0.0.1:8080/</p></div>
             </div>
