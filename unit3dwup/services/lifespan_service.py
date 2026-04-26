@@ -29,7 +29,7 @@ async def update_mounted_paths(app: FastAPI):
     app.state.torrent_archive_path = torrent_archive_path.expanduser().resolve()
 
     # Env file mount: used to edit Env file from the frontend
-    app.state.env_file = "/home/app/config/.env" if os.getenv("DOCKER") == "true" else Path(".env") # ENVPATH
+    app.state.env_file = "/home/app/config/.env" if os.getenv("DOCKER") == "true" else Path(settings.ENV_FILE)
 
     # Main folder
     logger.info("\nChecking Unit3DwebUp configuration file..\n")

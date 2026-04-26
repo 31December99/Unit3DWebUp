@@ -172,11 +172,13 @@ class Settings(BaseSettings):
     torrent: TorrentClientConfig = Field(default_factory=TorrentClientConfig)
     prefs: UserPreferences = Field(default_factory=UserPreferences)
 
+    # enable storing the .env file outside site_packages or project folder
+    env_path: str | None = os.getenv("ENVPATH")
+    ENV_FILE: str = str(Path(env_path) / ".env") if env_path else ".env"
+
     model_config = SettingsConfigDict(
         env_nested_delimiter="__",
-        # /// lo utilizzo quando lo testo in locale
-        # docker utilizza 'env_file:' nel suo file yml
-        env_file=".env" if not os.getenv("DOCKER") else None,
+        env_file= ENV_FILE if not os.getenv("DOCKER") else None,
         extra="ignore"
     )
 
