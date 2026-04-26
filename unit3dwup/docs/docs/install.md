@@ -20,13 +20,14 @@ Ora crea una variabile ambiente (una)
 docker-compose pull
 docker-compose up
 ```
+Ora puoi collegarti attraverso il browser all'indirizzo http://127.0.0.1:8080/
 
 
 #### Configura tunnel ssh per raggiungere il backend remoto dal tuo browser locale
 
 ssh -L 7000:localhost:7000 -L 8000:localhost:8000 utente_tuo_server@ip_del_tuo_server -N
 
-Ora puoi collegarti al bot attraverso il browser all'indirizzo 127.0.0.1:8000
+Ora puoi collegarti attraverso il browser all'indirizzo 127.0.0.1:8000
 
 
 
@@ -42,7 +43,4 @@ Installa solo il frontend sulla tua macchina locale
 docker run -d -p 8080:80 parzival2025/unit3dwebup_frontend:latest
 ```
 
-Nota:
-```
--p 8080(porta del tuo browser): 80 ( la porta fissa dentro il docker) 
-```
+Ora puoi collegarti attraverso il browser all'indirizzo http://127.0.0.1:8080/

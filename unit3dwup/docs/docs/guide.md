@@ -33,3 +33,18 @@ Nel caso servisse chiudere redis
 
 - nc 127.0.0.1 7000
 - ping -> il server deve rispondere PONG
+
+
+#### Installazione Docker
+
+- sudo apt update
+- sudo apt install docker.io docker-compose -y
+- sudo systemctl enable --now docker
+- docker --version
+- docker-compose --version
+
+## Run docker senza sudo
+
+- sudo usermod -aG docker $USER
+- newgrp docker
+- riavvia sessione
