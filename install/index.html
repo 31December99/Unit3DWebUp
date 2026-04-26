@@ -113,9 +113,10 @@
 <pre><code class="language-bash">docker-compose pull
 docker-compose up
 </code></pre>
+<p>Ora puoi collegarti attraverso il browser all'indirizzo http://127.0.0.1:8080/</p>
 <h4 id="configura-tunnel-ssh-per-raggiungere-il-backend-remoto-dal-tuo-browser-locale">Configura tunnel ssh per raggiungere il backend remoto dal tuo browser locale</h4>
 <p>ssh -L 7000:localhost:7000 -L 8000:localhost:8000 utente_tuo_server@ip_del_tuo_server -N</p>
-<p>Ora puoi collegarti al bot attraverso il browser all'indirizzo 127.0.0.1:8000</p>
+<p>Ora puoi collegarti attraverso il browser all'indirizzo 127.0.0.1:8000</p>
 <h4 id="installazione-di-unit3dwebup-con-frontend-and-backend-su-differenti-host">Installazione di unit3DwebUp con frontend and backend su differenti host</h4>
 <p>Installa solo il backend sul tuo server remoto</p>
 <pre><code>docker-compose up -d backend redis
@@ -123,9 +124,7 @@ docker-compose up
 <p>Installa solo il frontend sulla tua macchina locale</p>
 <pre><code>docker run -d -p 8080:80 parzival2025/unit3dwebup_frontend:latest
 </code></pre>
-<p>Nota:</p>
-<pre><code>-p 8080(porta del tuo browser): 80 ( la porta fissa dentro il docker) 
-</code></pre></div>
+<p>Ora puoi collegarti attraverso il browser all'indirizzo http://127.0.0.1:8080/</p></div>
             </div>
         </div>
 

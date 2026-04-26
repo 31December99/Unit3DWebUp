@@ -91,6 +91,11 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            
+            <li class="nav-item" data-bs-level="2"><a href="#run-docker-senza-sudo" class="nav-link">Run docker senza sudo</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
         </ul>
     </div>
 </div></div>
@@ -137,6 +142,20 @@
 <ul>
 <li>nc 127.0.0.1 7000</li>
 <li>ping -&gt; il server deve rispondere PONG</li>
+</ul>
+<h4 id="installazione-docker">Installazione Docker</h4>
+<ul>
+<li>sudo apt update</li>
+<li>sudo apt install docker.io docker-compose -y</li>
+<li>sudo systemctl enable --now docker</li>
+<li>docker --version</li>
+<li>docker-compose --version</li>
+</ul>
+<h2 id="run-docker-senza-sudo">Run docker senza sudo</h2>
+<ul>
+<li>sudo usermod -aG docker $USER</li>
+<li>newgrp docker</li>
+<li>riavvia sessione</li>
 </ul></div>
             </div>
         </div>
