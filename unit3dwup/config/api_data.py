@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Same as the old code 08.21
-from config.settings import get_settings
+from unit3dwup.config.settings import get_settings
 
 settings = get_settings()
 

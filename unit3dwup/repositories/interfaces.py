@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from abc import ABC, abstractmethod
 
-from models.interfaces import MediaRepoInterface
-from models.movie import Movie, NowPlaying
-from models.keywords import Keyword
-from models.videos import Data
+from unit3dwup.models.interfaces import MediaRepoInterface
+from unit3dwup.models.movie import Movie, NowPlaying
+from unit3dwup.models.keywords import Keyword
+from unit3dwup.models.videos import Data
 
 from fastapi import FastAPI
 

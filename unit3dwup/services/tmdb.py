@@ -2,16 +2,16 @@
 from typing import TypeVar
 import aiohttp
 
-from models.movie import (Movie, AltTitle, Title, NowPlaying, MovieDetails, Genre,
+from unit3dwup.models.movie import (Movie, AltTitle, Title, NowPlaying, MovieDetails, Genre,
                           ProductionCompany, SpokenLanguage, ProductionCountry)
-from models.tv import (TVShowDetails, CreatedBy, Network, LastEpisodeToAir, Season,
+from unit3dwup.models.tv import (TVShowDetails, CreatedBy, Network, LastEpisodeToAir, Season,
                        OnTheAir, TvShow, DataResponse, Alternative)
-from models.videos import Videos, Data
-from models.keywords import Keyword
+from unit3dwup.external.async_http_client_service import AsyncHttpClient
+from unit3dwup.models.videos import Videos, Data
+from unit3dwup.models.keywords import Keyword
 
-from external.async_http_client_service import AsyncHttpClient
 
-from config.settings import get_settings
+from unit3dwup.config.settings import get_settings
 
 settings = get_settings()
 BASE_URL = "https://api.themoviedb.org/3"

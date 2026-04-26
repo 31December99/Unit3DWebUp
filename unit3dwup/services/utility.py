@@ -7,7 +7,7 @@ import unicodedata
 import os
 import re
 
-from config.tags import additions
+from unit3dwup.config.tags import additions
 from thefuzz import fuzz
 import guessit
 

@@ -35,7 +35,7 @@ authors = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/31December99/Unit3DupWeb"
+Homepage = "https://github.com/31December99/Unit3DWebUp"
 
 
 [tool.setuptools.packages.find]
@@ -44,6 +44,4 @@ exclude = ["venv*", ".venv*", "tests*", "docs*"]
 include = ["unit3dwup*"]
 
 [project.scripts]
-unit3dupweb = "unit3dwup.start:main"
-
-
+unit3dwup = "unit3dwup.start:main"

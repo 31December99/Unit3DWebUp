@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 from typing import Iterable
 from fastapi import FastAPI
-from models.media import Media
+from unit3dwup.models.media import Media
 
 
 class VideoServiceInterface(ABC):

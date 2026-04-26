@@ -2,9 +2,9 @@
 import json
 from pathlib import Path
 
-from services.interfaces import TorrentClientServiceInterface
-from services.torrent_client_service import QbittorrentClientService
-from models.media import Media
+from unit3dwup.services.interfaces import TorrentClientServiceInterface
+from unit3dwup.services.torrent_client_service import QbittorrentClientService
+from unit3dwup.models.media import Media
 from fastapi import FastAPI, status
 from fastapi.responses import JSONResponse
 

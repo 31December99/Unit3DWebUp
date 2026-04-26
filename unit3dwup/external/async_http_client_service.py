@@ -1,6 +1,6 @@
 import aiohttp
 
-from config.logger import get_logger
+from unit3dwup.config.logger import get_logger
 
 
 class AsyncHttpClient:

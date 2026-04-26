@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 import asyncio
-
-from services.create_torrent_service import MyTorrentService
-from models.media import Media
 from threading import Thread
-from fastapi import FastAPI
 from multiprocessing import Manager
+
+from unit3dwup.services.create_torrent_service import MyTorrentService
+from unit3dwup.models.media import Media
+
+from fastapi import FastAPI
 
 
 class TorrentService:

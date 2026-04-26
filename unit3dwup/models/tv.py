@@ -2,7 +2,7 @@
 
 # Same as the old code unit3dup 0.8.21
 from dataclasses import dataclass, field
-from models.interfaces import MediaRepoInterface
+from unit3dwup.models.interfaces import MediaRepoInterface
 
 
 @dataclass(slots=True)

@@ -6,7 +6,7 @@ import aiohttp
 
 from pathlib import Path
 from urllib.parse import urljoin
-from config.api_data import trackers_api_data
+from unit3dwup.config.api_data import trackers_api_data
 
 
 class Myhttp:

@@ -3,8 +3,8 @@ import os
 from pathlib import Path
 
 from fastapi import FastAPI
-from config.settings import Settings
-from config.logger import get_logger
+from unit3dwup.config.settings import Settings
+from unit3dwup.config.logger import get_logger
 
 
 async def update_mounted_paths(app: FastAPI):
@@ -29,7 +29,7 @@ async def update_mounted_paths(app: FastAPI):
     app.state.torrent_archive_path = torrent_archive_path.expanduser().resolve()
 
     # Env file mount: used to edit Env file from the frontend
-    app.state.env_file = "/home/app/config/.env" if os.getenv("DOCKER") == "true" else Path(".env")
+    app.state.env_file = "/home/app/config/.env" if os.getenv("DOCKER") == "true" else Path(".env") # ENVPATH
 
     # Main folder
     logger.info("\nChecking Unit3DwebUp configuration file..\n")

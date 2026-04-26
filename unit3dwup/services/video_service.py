@@ -7,13 +7,13 @@ import io
 from pathlib import Path
 from PIL import Image
 
-from services.interfaces import VideoServiceInterface, DescriptionBuilderInterface
-from config.host_data import upload_hosts, master_uploaders
-from external.async_http_client_service import AsyncHttpClient
-from config.constants import MediaStatus
-from config.settings import get_settings
-from config.logger import get_logger
-from models.media import Media
+from unit3dwup.services.interfaces import VideoServiceInterface, DescriptionBuilderInterface
+from unit3dwup.config.host_data import upload_hosts, master_uploaders
+from unit3dwup.external.async_http_client_service import AsyncHttpClient
+from unit3dwup.config.constants import MediaStatus
+from unit3dwup.config.settings import get_settings
+from unit3dwup.config.logger import get_logger
+from unit3dwup.models.media import Media
 
 from pymediainfo import MediaInfo
 from aiohttp import FormData

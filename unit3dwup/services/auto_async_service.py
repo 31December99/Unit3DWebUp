@@ -5,12 +5,12 @@ import asyncio
 import json
 from pathlib import Path
 
-from repositories.media_info_factory import MediaFileFactory
-from services.utility import ManageTitles
-from services.tags_service import SearchTags
-from config.constants import MediaStatus
-from config.logger import get_logger
-from models.media import Media
+from unit3dwup.repositories.media_info_factory import MediaFileFactory
+from unit3dwup.services.utility import ManageTitles
+from unit3dwup.services.tags_service import SearchTags
+from unit3dwup.config.constants import MediaStatus
+from unit3dwup.config.logger import get_logger
+from unit3dwup.models.media import Media
 
 from fastapi import FastAPI
 

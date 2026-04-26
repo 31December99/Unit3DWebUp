@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
-from models.movie import AltTitle
-from models.tv import Alternative, DataResponse
-from repositories.interfaces import MovieRepositoryInterface
-from services.utility import ManageTitles
-from config.settings import get_settings
+from unit3dwup.repositories.interfaces import MovieRepositoryInterface
+from unit3dwup.models.tv import Alternative, DataResponse
+from unit3dwup.models.movie import AltTitle
+from unit3dwup.services.utility import ManageTitles
+from unit3dwup.config.settings import get_settings
 
 
 # based on old code unit3dup 0.8.21

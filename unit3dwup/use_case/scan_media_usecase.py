@@ -2,13 +2,13 @@
 import asyncio
 import aiohttp
 
-from repositories.interfaces import JobRepositoryInterface
-from config.constants import MediaStatus
-from config.logger import get_logger
+from unit3dwup.repositories.interfaces import JobRepositoryInterface
+from unit3dwup.config.constants import MediaStatus
+from unit3dwup.config.logger import get_logger
 
-from services.video_service import VideoService, BuildService
-from services.media_service import MediaService, MediaService2
-from services.auto_async_service import AsyncMediaManager
+from unit3dwup.services.video_service import VideoService, BuildService
+from unit3dwup.services.media_service import MediaService, MediaService2
+from unit3dwup.services.auto_async_service import AsyncMediaManager
 
 
 class ScanMediaUseCase:

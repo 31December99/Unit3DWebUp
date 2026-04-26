@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 import json
+import asyncio
 from typing import Any
 
-from services.interfaces import TrackerServiceInterface
-from services.itt_tracker_service import ITTtrackerService
-from models.media import Media
+from unit3dwup.services.interfaces import TrackerServiceInterface
+from unit3dwup.services.itt_tracker_service import ITTtrackerService
+from unit3dwup.models.media import Media
+from unit3dwup.config.logger import get_logger
 
-import asyncio
 import aiohttp
-
-from config.logger import get_logger
 from fastapi import FastAPI
 
 

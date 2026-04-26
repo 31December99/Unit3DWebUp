@@ -3,7 +3,7 @@
 import asyncio
 
 from pymediainfo import MediaInfo
-from models.media_info import MediaFile
+from unit3dwup.models.media_info import MediaFile
 
 
 class MediaFileFactory:

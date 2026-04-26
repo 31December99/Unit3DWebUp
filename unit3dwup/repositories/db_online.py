@@ -2,16 +2,16 @@
 from typing import TypeVar
 import aiohttp
 
-from models.interfaces import MediaRepoInterface
-from models.movie import AltTitle, NowPlaying
-from models.tv import OnTheAir, DataResponse
-from models.keywords import Keyword
-from models.videos import Data
+from unit3dwup.models.interfaces import MediaRepoInterface
+from unit3dwup.models.movie import AltTitle, NowPlaying
+from unit3dwup.models.tv import OnTheAir, DataResponse
+from unit3dwup.models.keywords import Keyword
+from unit3dwup.models.videos import Data
 
-from repositories.interfaces import MovieRepositoryInterface
+from unit3dwup.repositories.interfaces import MovieRepositoryInterface
 
-from services.tmdb import TmdbAsyncAPI
-from services.tvdb import TvdbAsyncAPI
+from unit3dwup.services.tmdb import TmdbAsyncAPI
+from unit3dwup.services.tvdb import TvdbAsyncAPI
 
 T = TypeVar('T')
 

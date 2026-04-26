@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from models.interfaces import MediaRepoInterface
+from unit3dwup.models.interfaces import MediaRepoInterface
 
 
 # slots, non avendo la necessità di aggiungere nuovi attributi al volo

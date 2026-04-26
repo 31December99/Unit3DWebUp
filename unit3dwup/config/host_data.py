@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from config.settings import get_settings
+from unit3dwup.config.settings import get_settings
 
 settings = get_settings()
 

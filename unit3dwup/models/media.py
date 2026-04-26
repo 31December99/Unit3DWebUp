@@ -5,13 +5,15 @@ import hashlib
 import os
 import re
 
-from config.tags import crew_patterns, platform_patterns
-from services.utility import ManageTitles, System
-from models.media_info import MediaFile
-from config.constants import MediaStatus
-from config.settings import get_settings
-from config.tags import SIGNS_LIST, TAGS_LIST, BAN_LIST
-from services import utility
+from unit3dwup.config.tags import crew_patterns, platform_patterns
+from unit3dwup.config.tags import SIGNS_LIST, TAGS_LIST, BAN_LIST
+from unit3dwup.config.constants import MediaStatus
+from unit3dwup.config.settings import get_settings
+
+from unit3dwup.services.utility import ManageTitles, System
+from unit3dwup.services import utility
+
+from unit3dwup.models.media_info import MediaFile
 
 settings = get_settings()
 

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import re
-from services.utility import ManageTitles
-from config.logger import get_logger
-from models.media import Media
+from unit3dwup.services.utility import ManageTitles
+from unit3dwup.config.logger import get_logger
+from unit3dwup.models.media import Media
 
 # From hdr format
 hdr_map = {

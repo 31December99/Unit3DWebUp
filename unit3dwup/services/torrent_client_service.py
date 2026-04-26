@@ -6,9 +6,9 @@ from fastapi import FastAPI
 
 logging.getLogger("urllib3.connectionpool").setLevel(logging.DEBUG)
 
-from services.interfaces import TorrentClientServiceInterface
-from config.settings import get_settings
-from config.logger import get_logger
+from unit3dwup.services.interfaces import TorrentClientServiceInterface
+from unit3dwup.config.settings import get_settings
+from unit3dwup.config.logger import get_logger
 
 import qbittorrentapi
 from qbittorrentapi import APIConnectionError

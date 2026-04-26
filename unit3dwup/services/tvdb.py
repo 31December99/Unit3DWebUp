@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 from typing import TypeVar
 
-from models.tvdb_search import TvdbSearchResult
-from models.interfaces import MediaRepoInterface
-
-from external.async_http_client_service import AsyncHttpClient
-from config.settings import get_settings
+from unit3dwup.external.async_http_client_service import AsyncHttpClient
+from unit3dwup.models.interfaces import MediaRepoInterface
+from unit3dwup.models.tvdb_search import TvdbSearchResult
+from unit3dwup.config.settings import get_settings
 
 import aiohttp
 

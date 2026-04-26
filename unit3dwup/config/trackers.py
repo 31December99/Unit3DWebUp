@@ -2,8 +2,8 @@
 # Same as the old code 0.8.21
 
 from dataclasses import dataclass
-from services.utility import ManageTitles
-from config import tracker_list
+from unit3dwup.services.utility import ManageTitles
+from unit3dwup.config import tracker_list
 
 @dataclass
 class TRACKData:

@@ -6,8 +6,8 @@ import json
 from dataclasses import dataclass, field
 from typing import Any
 
-from config.logger import get_logger
-from models.interfaces import MediaRepoInterface
+from unit3dwup.config.logger import get_logger
+from unit3dwup.models.interfaces import MediaRepoInterface
 
 
 @dataclass(slots=True)
@@ -20,7 +20,7 @@ class Title:
     type: str | None = None
 
     @staticmethod
-    def from_data(data: dict[str, any]) -> Title | None:
+    def from_data(data: dict[str, Any]) -> Title | None:
         try:
             return Title(
                 iso_3166_1=data["iso_3166_1"],

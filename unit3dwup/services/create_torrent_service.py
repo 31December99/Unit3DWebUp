@@ -3,11 +3,11 @@ import os
 from multiprocessing import Pool, cpu_count, Manager
 from pathlib import Path
 
-from services.interfaces import TorrentServiceInterface
-from config.api_data import trackers_api_data
-from config.constants import MediaStatus
-from config.settings import get_settings
-from models.media import Media
+from unit3dwup.services.interfaces import TorrentServiceInterface
+from unit3dwup.config.api_data import trackers_api_data
+from unit3dwup.config.constants import MediaStatus
+from unit3dwup.config.settings import get_settings
+from unit3dwup.models.media import Media
 
 from fastapi import FastAPI
 import torf

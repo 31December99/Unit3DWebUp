@@ -3,10 +3,11 @@
 import json
 import os
 import signal
-from config.logger import get_logger
 from fastapi import FastAPI
 
-from repositories.interfaces import JobRepositoryInterface
+from unit3dwup.config.logger import get_logger
+from unit3dwup.repositories.interfaces import JobRepositoryInterface
+
 import redis.asyncio as redis
 from redis import exceptions as redis_exceptions, Redis
 

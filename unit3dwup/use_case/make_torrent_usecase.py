@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 import json
-import os
 from pathlib import Path
 
-from services.torrent_service import TorrentService
-from models.media import Media
+from unit3dwup.services.torrent_service import TorrentService
+from unit3dwup.models.media import Media
 from fastapi import FastAPI
 
 

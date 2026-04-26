@@ -6,7 +6,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, field_validator, model_validator, HttpUrl, Field, ValidationError
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from config.logger import get_logger
+from unit3dwup.config.logger import get_logger
 
 
 # /// Class to help avoid typos...

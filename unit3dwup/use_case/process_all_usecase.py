@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 import json
 
-from use_case.make_torrent_usecase import MakeTorrentUseCase
-from use_case.upload_usecase import UploadUseCase
-from use_case.seed_usecase import SeedUseCase
+from unit3dwup.use_case.make_torrent_usecase import MakeTorrentUseCase
+from unit3dwup.use_case.upload_usecase import UploadUseCase
+from unit3dwup.use_case.seed_usecase import SeedUseCase
+from unit3dwup.models.media import Media
 
 from fastapi import FastAPI
-from models.media import Media
 
 
 class ProcessAllUseCase:

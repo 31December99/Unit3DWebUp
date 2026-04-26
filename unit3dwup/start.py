@@ -9,26 +9,26 @@ import time
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from config.settings import get_settings
-from config.constants import MediaStatus
-from config.logger import get_logger
+from unit3dwup.config import get_settings
+from unit3dwup.config import MediaStatus
+from unit3dwup.config import get_logger
 
-from repositories.job_repos import JobRedisRepo
-from repositories.db_online import Tmdb, Tvdb
+from unit3dwup.repositories.job_repos import JobRedisRepo
+from unit3dwup.repositories.db_online import Tmdb, Tvdb
 
-from services.media_service import MediaService, MediaService2
-from services.itt_tracker_service import ITTtrackerService
-from services.auto_async_service import AsyncMediaManager
-from services.interfaces import TrackerServiceInterface
-from services.lifespan_service import update_mounted_paths, checking_env_file
+from unit3dwup.services.media_service import MediaService, MediaService2
+from unit3dwup.services.itt_tracker_service import ITTtrackerService
+from unit3dwup.services.auto_async_service import AsyncMediaManager
+from unit3dwup.services.interfaces import TrackerServiceInterface
+from unit3dwup.services.lifespan_service import update_mounted_paths, checking_env_file
 
-from use_case.scan_media_usecase import ScanMediaUseCase
-from use_case.process_all_usecase import ProcessAllUseCase
-from use_case.upload_usecase import UploadUseCase
-from use_case.seed_usecase import SeedUseCase
-from use_case.make_torrent_usecase import MakeTorrentUseCase
+from unit3dwup.use_case.scan_media_usecase import ScanMediaUseCase
+from unit3dwup.use_case.process_all_usecase import ProcessAllUseCase
+from unit3dwup.use_case.upload_usecase import UploadUseCase
+from unit3dwup.use_case.seed_usecase import SeedUseCase
+from unit3dwup.use_case.make_torrent_usecase import MakeTorrentUseCase
 
-from external.websocket import WebSocketManager
+from unit3dwup.external.websocket import WebSocketManager
 
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -737,7 +737,7 @@ async def filter_search(payload: FilterRequest):
 
 
 def main():
-    uvicorn.run("start:app", host="127.0.0.1", port=8000, reload=False)
+    uvicorn.run("unit3dwup.start:app", host="127.0.0.1", port=8000, reload=False)
 
 
 if __name__ == "__main__":

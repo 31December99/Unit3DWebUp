@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-from config.constants import MediaStatus
-from config.trackers import TRACKData
-from config.settings import get_settings
+from unit3dwup.config.constants import MediaStatus
+from unit3dwup.config.trackers import TRACKData
+from unit3dwup.config.settings import get_settings
 
-from services.interfaces import TrackerServiceInterface
-from services.itt_tracker_helper import Unit3D
-from models.media import Media
+from unit3dwup.services.interfaces import TrackerServiceInterface
+from unit3dwup.services.itt_tracker_helper import Unit3D
+from unit3dwup.models.media import Media
 
 from fastapi import FastAPI
 import aiohttp
