@@ -11,15 +11,26 @@ Per installare wup devi scaricare questi due file e configurare ssh:
 * Configura il file `.env.example`
 * rinominalo in  `.env`
 
-Ora crea una variabile ambiente (una)
-
-* `export ENVPATH=/il_percorso/del/tuo_file_env`
-* Run docker-compose:
+Scarica l'immagine docker
 
 ```bash
 docker-compose pull
-docker-compose up
+```
+
+Avvia il backend
+
+```bash
+ENVPATH=/percorso/del_tuo/file_env docker compose up
 ```
 Ora puoi collegarti attraverso il browser all'indirizzo http://127.0.0.1:8080/
+
+
+# Installazione del solo Backend
+
+Se vuoi installare solo il backend e richiamarlo attraverso il tuo frontend
+
+```bash
+ENVPATH=/percorso/del_tuo/file_env docker compose up backend
+```
 
 
