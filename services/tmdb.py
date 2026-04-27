@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from dataclasses import fields
 from typing import TypeVar
 import aiohttp
 
@@ -17,6 +18,18 @@ settings = get_settings()
 BASE_URL = "https://api.themoviedb.org/3"
 TMDB_APIKEY = settings.tracker.TMDB_APIKEY
 T = TypeVar('T')
+
+# TMDB occasionally adds new fields to its responses (e.g. `softcore`). The
+# local dataclasses don't declare them, so passing the raw payload via
+# `Movie(**item)` blows up with TypeError. Filter to known fields before
+# instantiation so the upstream payload doesn't break the parser.
+_MOVIE_FIELDS = {f.name for f in fields(Movie)}
+_TV_FIELDS = {f.name for f in fields(TvShow)}
+
+
+def _only_known(item: dict, allowed: set[str]) -> dict:
+    """Return a copy of ``item`` with only the keys present in ``allowed``."""
+    return {k: v for k, v in item.items() if k in allowed}
 
 
 # Endpoints TMDB
@@ -99,10 +112,10 @@ class TmdbAsyncAPI:
             items = data["results"]
             if category == "movie":
                 for item in items:
-                    results.append(Movie(**item))  # converte JSON in dataclass Movie
+                    results.append(Movie(**_only_known(item, _MOVIE_FIELDS)))
             else:  # "tv"
                 for item in items:
-                    results.append(TvShow(**item))  # converte JSON in dataclass TvShow
+                    results.append(TvShow(**_only_known(item, _TV_FIELDS)))
 
         return results
 
