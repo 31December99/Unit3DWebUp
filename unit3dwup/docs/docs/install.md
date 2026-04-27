@@ -1,5 +1,5 @@
 
-# Installazione di Unit3DwebUp (Unit3Dwup) 
+# Installazione di Unit3DwebUp (Unit3Dwup) su macchina locale (no server)
 
 Per installare wup devi scaricare questi due file e configurare ssh:
 
@@ -23,24 +23,3 @@ docker-compose up
 Ora puoi collegarti attraverso il browser all'indirizzo http://127.0.0.1:8080/
 
 
-#### Configura tunnel ssh per raggiungere il backend remoto dal tuo browser locale
-
-ssh -L 7000:localhost:7000 -L 8000:localhost:8000 utente_tuo_server@ip_del_tuo_server -N
-
-Ora puoi collegarti attraverso il browser all'indirizzo 127.0.0.1:8000
-
-
-
-#### Installazione di unit3DwebUp con frontend and backend su differenti host
-
-Installa solo il backend sul tuo server remoto
-```
-docker-compose up -d backend redis
-```
-
-Installa solo il frontend sulla tua macchina locale
-```
-docker run -d -p 8080:80 parzival2025/unit3dwebup_frontend:latest
-```
-
-Ora puoi collegarti attraverso il browser all'indirizzo http://127.0.0.1:8080/
