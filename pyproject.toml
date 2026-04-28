@@ -24,7 +24,7 @@ dependencies = [
     "uvicorn[standard]==0.40.0"
 ]
 name = "Unit3DwebUp"
-version = "0.0.20"
+version = "0.0.21"
 
 description = "A Unit3D uploader with a web interface"
 readme = { file = "README.md", content-type = "text/markdown" }
