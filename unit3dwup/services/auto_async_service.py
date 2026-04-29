@@ -226,6 +226,10 @@ class AsyncMediaManager:
         media.display_name = ManageTitles.clean_text(Path(media.torrent_path).name)
         media.torrent_name = Path(media.torrent_path).name
         media.doc_description = "\n".join(files)
+        # A folder with multiple video files is a season pack: trackers (Unit3D)
+        # require episode_number=0 in this case, and the title builder skips
+        # the per-episode suffix.
+        media.torrent_pack = len(files) > 1
 
         entries = await asyncio.to_thread(lambda: list(self.scan_folder(media.torrent_path)))
         sizes = [e.stat().st_size for e in entries]

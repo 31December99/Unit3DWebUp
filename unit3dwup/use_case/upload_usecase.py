@@ -57,12 +57,8 @@ class UploadUseCase:
             # Send a message to frontend for each uploaded media
             await self.broadcast_messages(uploaded_torrents=uploaded_torrents)
 
-            for torrent in uploaded_torrents:
-                await self.app.state.ws_manager.broadcast({
-                    "type": "posterLogMessage",
-                    "job_id": torrent['job_id'],
-                    "message": f"{torrent['message']}"})
-        return True
+        # Overall execution outcome: True iff every torrent reported HTTP 200.
+        return all(_is_successful(t) for t in uploaded_torrents)
 
     async def broadcast_messages(self, uploaded_torrents: tuple[Any]) -> None:
         """
@@ -73,4 +69,15 @@ class UploadUseCase:
             await self.app.state.ws_manager.broadcast({
                 "type": "posterLogMessage",
                 "job_id": torrent['job_id'],
+                # Distinguish success from failure so the frontend can colour
+                # the poster correctly and clients listening on /ws can react
+                # to an error without having to parse `message` heuristically.
+                "level": "success" if _is_successful(torrent) else "error",
                 "message": f"{torrent['message']}"})
+
+
+def _is_successful(torrent: dict) -> bool:
+    """A torrent dict from `ITTtrackerService.upload` reports `status: '200'`
+    on success and `'404'` / `'409'` (or other non-2xx) on failure."""
+    status = str(torrent.get('status') or '')
+    return status.startswith('2')
