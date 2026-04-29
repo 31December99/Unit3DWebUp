@@ -497,10 +497,23 @@ class Media:
     def resolution(self) -> str | None:
         if not self._resolution:
             if self.mediafile and self.mediafile.video_height:
-                closest_resolution = min(
-                    System.RESOLUTIONS,
-                    key=lambda x: abs(int(x) - int(self.mediafile.video_height))
+                # Pick the highest standard resolution whose height fits the
+                # video. The previous `min(abs())` heuristic mis-classified
+                # 1080p widescreen content as 720p (a 1080p movie in 2.39:1
+                # has a video_height of ~800, which is closer to 720 than to
+                # 1080). A 50px tolerance rounds up when the height is just
+                # below a step (cropped masters, encoder padding).
+                tolerance = 50
+                ladder = sorted(
+                    (int(r) for r in System.RESOLUTIONS), reverse=True
                 )
+                height = int(self.mediafile.video_height)
+                chosen = ladder[-1]
+                for step in ladder:
+                    if height >= step - tolerance:
+                        chosen = step
+                        break
+                closest_resolution = str(chosen)
                 scan_type = self.mediafile.video_scan_type
                 if scan_type:
                     closest_resolution = f"{closest_resolution}p" if scan_type.lower() == "progressive" else f"{closest_resolution}i"
