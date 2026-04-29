@@ -67,6 +67,11 @@ class QbittorrentClientService(TorrentClientServiceInterface):
         if not self.qbt_client or not self.qbt_client.is_logged_in:
             await self.login()
 
+        # Apply the configured tag (TORRENT__TAG) so users can find their bot
+        # uploads in qBittorrent's "Tags" sidebar. qbittorrentapi creates the
+        # tag automatically if it doesn't exist yet.
+        tag = (settings.torrent.TAG or "").strip() or None
+
         try:
             await asyncio.to_thread(
             self.qbt_client.torrents_add,
@@ -74,7 +79,8 @@ class QbittorrentClientService(TorrentClientServiceInterface):
             save_path=save_path, # Host
             autoTMM=False,
             paused=False,
-            is_skip_checking=True
+            is_skip_checking=True,
+            tags=tag,
             )
         except qbittorrentapi.exceptions.TorrentFileError as e:
             logging.info(f"Add torrents {e}")
