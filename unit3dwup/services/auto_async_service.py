@@ -226,6 +226,22 @@ class AsyncMediaManager:
         media.display_name = ManageTitles.clean_text(Path(media.torrent_path).name)
         media.torrent_name = Path(media.torrent_path).name
         media.doc_description = "\n".join(files)
+        ######################################################################################
+        # A folder with multiple video files is a season pack: trackers (Unit3D)
+        # require episode_number=0 in this case, and the title builder skips
+        # the per-episode suffix.
+        media.torrent_pack = len(files) > 1
+        # Unit3D requires `season_number` and `episode_number` to be integers.
+        # For season packs (a folder containing multiple episodes) the
+        # convention is `episode_number=0`. Sending an empty string makes
+        # Unit3D respond with `{'episode_number': ['... required.']}` and
+        # silently drops the upload.
+        media.guess_season = media.guess_season if media.guess_season else 0
+        if media.torrent_pack:
+            media.episode_number = 0
+        else:
+            media.episode_number = media.guess_episode if media.guess_episode else 0
+        ######################################################################################
 
         entries = await asyncio.to_thread(lambda: list(self.scan_folder(media.torrent_path)))
         sizes = [e.stat().st_size for e in entries]

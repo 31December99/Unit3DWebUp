@@ -191,13 +191,13 @@ class SearchTags(object):
                 self.tags_dict.update(updated_category)
 
         # /// Add S#E#, title, Year
-        se_str = ''
-        if self.season is not None and self.episode is not None:
-            se_str = f"S{self.season:02d}E{self.episode:02d}"
-        elif self.season is not None:
-            se_str = f"S{self.season:02d}"
-        elif self.episode is not None:
-            se_str = f"E{self.episode:02d}"
+        se_str = ""
+        if self.season is not None:
+            se_str += f"S{self.season:02d}"
+
+        if self.episode is not None:
+            if self.episode > 0:
+                se_str += f"E{self.episode:02d}"
 
         self.tags_dict.update({'title': self.title})
         if self.year:
