@@ -41,10 +41,6 @@ class ITTtrackerService(TrackerServiceInterface):
         # Unit3D respond with `{'episode_number': ['... required.']}` and
         # silently drops the upload.
         season_number = int(media.guess_season) if media.guess_season else 0
-        if media.torrent_pack:
-            episode_number = 0
-        else:
-            episode_number = int(media.guess_episode) if media.guess_episode else 0
         return {
             "name": media.display_name,
             "tmdb": media.tmdb_id or 0,
@@ -58,8 +54,9 @@ class ITTtrackerService(TrackerServiceInterface):
             "description": media.description,
             "sd": media.is_hd,
             "type_id": self.tracker_data.filter_type(media.file_name),
-            "season_number": season_number,
-            "episode_number": episode_number,
+            "season_number": media.guess_season,
+            "episode_number": media.guess_episode,
+
             "personal_release": int(settings.prefs.PERSONAL_RELEASE)
         }
 

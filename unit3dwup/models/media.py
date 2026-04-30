@@ -48,7 +48,7 @@ class Media:
         self._guess_title: str | None = None
         self._guess_filename: utility.Guessit | None = None
         self._guess_season: int | None = None
-        self._episode: int | None = None
+        self._guess_episode: int | None = None
         self._source: str | None = None
         self._screen_size: str | None = None
         self._audio_codec: str | None = None
@@ -281,14 +281,25 @@ class Media:
     @property
     def guess_season(self) -> int | None:
         if not self._guess_season and System.category_list.get(System.TV_SHOW) in self.category:
-            self._guess_season = self.guess_filename.guessit_season
+            self._guess_season = int(str(self.guess_filename.guessit_season))
         return self._guess_season
 
     @property
     def guess_episode(self) -> int | None:
-        if not self._episode and System.category_list.get(System.TV_SHOW) in self.category:
-            self._episode = self.guess_filename.guessit_episode
-        return self._episode
+        if not self._guess_episode and System.category_list.get(System.TV_SHOW) in self.category:
+            if isinstance(self.guess_filename.guessit_episode,list):
+                self._guess_episode = 0
+            else:
+                self._guess_episode = int(str(self.guess_filename.guessit_episode))
+        return self._guess_episode
+
+    @guess_episode.setter
+    def guess_episode(self, value):
+        self._guess_episode = value
+
+    @guess_season.setter
+    def guess_season(self, value):
+        self._guess_season = value
 
     @property
     def source(self) -> str | None:
