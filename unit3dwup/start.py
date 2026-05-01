@@ -39,8 +39,6 @@ from pydantic import BaseModel, Field
 from dotenv import load_dotenv, dotenv_values
 
 import aiohttp
-import uvicorn
-
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
@@ -249,7 +247,25 @@ class FilterRequest(BaseModel):
 async def websocket_endpoint(ws: WebSocket):
     """
     :param ws: websocket connection.Currently used to report the progress of the process (%)
-    :return: None
+    URL:
+        ws://host:8000/ws
+
+    Purpose:
+        Push notifications from backend to frontend.
+
+    Events sent by server:
+        {
+            "type": "log",
+            "level": "success | error | warn | info",
+            "message": "text"
+        }
+
+        {
+            "type": "progress",
+            "job_id": "abc123",
+            "value": 45
+        }
+
     """
 
     manager = app.state.ws_manager
