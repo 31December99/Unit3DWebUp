@@ -1,6 +1,6 @@
 services:
   backend:
-    image: parzival2025/unit3dwebup_backend:0.0.24
+    image: parzival2025/unit3dwebup_backend:0.0.25rc1
     container_name: unit3DwebUp_backend
     ports:
       - "8000:8000"
@@ -23,7 +23,7 @@ services:
       - ${ENVPATH:-.}/.env:/home/app/config/.env
 
   frontend:
-    image: parzival2025/unit3dwebup_frontend:0.0.24
+    image: parzival2025/unit3dwebup_frontend:0.0.25rc1
     container_name: unit3dwebup_frontend
     ports:
       - "8080:80"
