@@ -14,7 +14,7 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/*
 
 #PyPi
-RUN pip install --no-cache-dir unit3dwebup==0.0.23
+RUN pip install --no-cache-dir unit3dwebup==0.0.24
 
 USER app
 

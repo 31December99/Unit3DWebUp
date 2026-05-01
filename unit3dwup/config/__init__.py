@@ -7,4 +7,4 @@ from .settings import get_settings
 from .constants import MediaStatus
 from .logger import get_logger
 
-__version__ = "0.0.23"
+__version__ = "0.0.24"
