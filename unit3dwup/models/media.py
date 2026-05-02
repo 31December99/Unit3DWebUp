@@ -9,6 +9,7 @@ from unit3dwup.config.tags import crew_patterns, platform_patterns
 from unit3dwup.config.tags import SIGNS_LIST, TAGS_LIST, BAN_LIST
 from unit3dwup.config.constants import MediaStatus
 from unit3dwup.config.settings import get_settings
+from unit3dwup.config.logger import get_logger
 
 from unit3dwup.services.utility import ManageTitles, System
 from unit3dwup.services import utility
@@ -35,6 +36,7 @@ class Media:
         self.subfolder: str = subfolder
         self.title: str = (Path(self.folder) / self.subfolder).name
         self._torrent_file_path = Path(torrent_archive_path) / "ITT" / f"{self.title}.torrent"
+        self.logger = get_logger(self.__class__.__name__)
 
         # // Assign a job id
         path = Path(self.folder) / self.subfolder
@@ -287,7 +289,7 @@ class Media:
     @property
     def guess_episode(self) -> int | None:
         if not self._guess_episode and System.category_list.get(System.TV_SHOW) in self.category:
-            if isinstance(self.guess_filename.guessit_episode,list):
+            if isinstance(self.guess_filename.guessit_episode, list):
                 self._guess_episode = 0
             else:
                 if self.guess_filename.guessit_episode:
@@ -508,34 +510,39 @@ class Media:
         return self._languages
 
     @property
-    def resolution(self) -> str | None:
-        if not self._resolution:
-            if self.mediafile and self.mediafile.video_height:
-                # Pick the highest standard resolution whose height fits the
-                # video. The previous `min(abs())` heuristic mis-classified
-                # 1080p widescreen content as 720p (a 1080p movie in 2.39:1
-                # has a video_height of ~800, which is closer to 720 than to
-                # 1080). A 50px tolerance rounds up when the height is just
-                # below a step (cropped masters, encoder padding).
-                tolerance = 50
-                ladder = sorted(
-                    (int(r) for r in System.RESOLUTIONS), reverse=True
-                )
-                height = int(self.mediafile.video_height)
-                chosen = ladder[-1]
-                for step in ladder:
-                    if height >= step - tolerance:
-                        chosen = step
-                        break
-                closest_resolution = str(chosen)
-                scan_type = self.mediafile.video_scan_type
-                if scan_type:
-                    closest_resolution = f"{closest_resolution}p" if scan_type.lower() == "progressive" else f"{closest_resolution}i"
-                else:
-                    closest_resolution = f"{closest_resolution}i" if self.mediafile.is_interlaced else f"{closest_resolution}p"
-                self._resolution = closest_resolution
-            else:
-                self._resolution = System.NO_RESOLUTION
+    def detected_resolution(self):
+        if not self.mediafile or not self.mediafile.video_width:
+            return None
+
+        width = int(self.mediafile.video_width)
+
+        for limit, label in (
+                (3200, "2160p"),
+                (1600, "1080p"),
+                (1100, "720p"),
+                (960, "576p"),
+        ):
+            if width >= limit:
+                return label
+
+        return f"{self.mediafile.video_height}p"
+
+    @property
+    def resolution(self):
+        if self._resolution:
+            return self._resolution
+
+        if not self.mediafile:
+            self._resolution = System.NO_RESOLUTION
+            return self._resolution
+
+        detected = self.detected_resolution
+
+        if detected:
+            self._resolution = detected
+        else:
+            self.logger.warning(f"{self.__class__.__name__}: video resolution not found in {self.file_name}")
+            self._resolution = System.NO_RESOLUTION
         return self._resolution
 
     @staticmethod
