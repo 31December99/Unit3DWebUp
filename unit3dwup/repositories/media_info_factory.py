@@ -19,10 +19,12 @@ class MediaFileFactory:
         video = [track for track in data if track.get("track_type") == "Video"]
         audio = [track for track in data if track.get("track_type") == "Audio"]
         general = next((track for track in data if track.get("track_type") == "General"), {})
+        text = [track for track in data if track.get("track_type") == "Text"]
 
         return MediaFile(
             file_path=path,
             video_tracks=video,
             audio_tracks=audio,
             general_track=general,
+            text_tracks=text,
         )
