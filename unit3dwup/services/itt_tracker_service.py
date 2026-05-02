@@ -35,12 +35,6 @@ class ITTtrackerService(TrackerServiceInterface):
         The Media object processed helps to build the payload for the tracker
         """
         settings = get_settings()
-        # Unit3D requires `season_number` and `episode_number` to be integers.
-        # For season packs (a folder containing multiple episodes) the
-        # convention is `episode_number=0`. Sending an empty string makes
-        # Unit3D respond with `{'episode_number': ['... required.']}` and
-        # silently drops the upload.
-        season_number = int(media.guess_season) if media.guess_season else 0
         return {
             "name": media.display_name,
             "tmdb": media.tmdb_id or 0,
@@ -56,7 +50,6 @@ class ITTtrackerService(TrackerServiceInterface):
             "type_id": self.tracker_data.filter_type(media.file_name),
             "season_number": media.guess_season,
             "episode_number": media.guess_episode,
-
             "personal_release": int(settings.prefs.PERSONAL_RELEASE)
         }
 
@@ -67,7 +60,6 @@ class ITTtrackerService(TrackerServiceInterface):
         """
         # Payload ready
         payload = await self.prepare_payload(media)
-
         # Load the file and send to the tracker
         response = await self.tracker.upload_t(data=payload, torrent_path=media.torrent_file_path)
 
