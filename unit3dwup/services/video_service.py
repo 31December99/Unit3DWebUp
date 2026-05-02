@@ -254,7 +254,6 @@ class BuildService(DescriptionBuilderInterface):
         self.app = app
         self.screenshots = []
         self.logger = get_logger(self.__class__.__name__)
-        settings = get_settings()
         self.sign = (
             f"[url=https://github.com/31December99/Unit3DWebUp][code][color=#00BFFF][size=14]Uploaded with Unit3DwUp"
             f" {__version__}[/size][/color][/code][/url]")
