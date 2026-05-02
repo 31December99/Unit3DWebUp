@@ -290,7 +290,10 @@ class Media:
             if isinstance(self.guess_filename.guessit_episode,list):
                 self._guess_episode = 0
             else:
-                self._guess_episode = int(str(self.guess_filename.guessit_episode))
+                if self.guess_filename.guessit_episode:
+                    self._guess_episode = int(str(self.guess_filename.guessit_episode))
+                else:
+                    self._guess_episode = 0
         return self._guess_episode
 
     @guess_episode.setter
