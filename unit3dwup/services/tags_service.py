@@ -16,6 +16,7 @@ hdr_map = {
     "HDR10": "HDR10",
     "BLU-RAY / HDR10": "HDR10",
     "HDR10 / HDR10": "HDR10",
+    "HDR10 / HDR10 / HDR10": "HDR10",
     "HDR10 / HDR10+": "HDR10+",
     "HDR10 / HDR10 / HDR10+": "HDR10+",
     "SMPTE ST 2086": "HDR10",
@@ -54,6 +55,16 @@ video_encoder_translate = {
     "X264": "x.264",
 }
 
+TAG_NORMALIZE = {
+    "BLURAY": "BluRay",
+    "WEB": "WEB-DL",
+    "WEBDL": "WEB-DL",
+    "WEBMUX": "WEBMux",
+    "BDRIP": "BDRip",
+    "WEBRIP": "WEBRip",
+    "UHDRIP": "UHDRip",
+}
+
 
 class SearchTags(object):
     def __init__(self, filename, title: str, year: str | None, season: int | None, episode: int | None,
@@ -63,6 +74,7 @@ class SearchTags(object):
         self.tags_position = tags_position
         self.releaser_sign = releaser_sign
         self.mediafile = media.mediafile
+        self.media: Media = media
         self.filename = filename
         self.episode = episode
         self.season = season
@@ -151,6 +163,10 @@ class SearchTags(object):
             regex = re.compile(r'(?<!\w)' + p + r'(?!\w)', re.IGNORECASE)
             matches = regex.findall(self.filename)
             if matches:
+                # Normalize Tag_list
+                normalized_tag = TAG_NORMALIZE.get(matches[0].upper(), None)
+                if normalized_tag:
+                    matches[0] = normalized_tag
                 self.tags_dict.setdefault(category, []).append(matches[0])
 
         # /// Tags with no categories
@@ -273,6 +289,7 @@ class SearchTags(object):
             for video in self.mediafile.video_tracks:
                 hdr_format_commercial = video.get('hdr_format_commercial', "")
                 hdr_format = video.get('hdr_format', "")
+                other_hdr_format = video.get('other_hdr_format', "")
                 colour_primaries = video.get('color_primaries', "")
                 matrix_coefficients = video.get('matrix_coefficients', "")
                 bit_depth = video.get('bit_depth', "")
@@ -292,6 +309,19 @@ class SearchTags(object):
                         self.logger.info(
                             f"<> HDR Warning: '{hdr_format_commercial}' not found in hdr_map")
                     if 'DOLBY VISION' in hdr_format_commercial.upper() or 'DOLBY VISION' in hdr_format.upper():
+                        # Search for fake remux
+                        if any("dvhe.08" in s or "Profile 8" in s for s in other_hdr_format):
+                            remux = self.tags_dict.get('remux', '')
+                            if remux:
+                                remux = remux[0]
+                                if 'remux' in remux.lower():
+                                    del self.tags_dict[remux.lower()]
+                                    self.tags_dict.update({'source': 'ENCODE'})
+                                    self.media.file_name = self.media.file_name.replace(remux, 'ENCODE')
+                                    self.logger.warning(f"<> Warning: Detected REMUX with {other_hdr_format}")
+                                    hdr = f"DOLBY VISION {hdr}"
+                                    return {category: f"{hdr_map.get(hdr, '*HDR')}"}
+
                         hdr = f"DOLBY VISION {hdr}"
                     return {category: hdr_map.get(hdr, '*HDR')}
                 else:
@@ -311,43 +341,17 @@ class SearchTags(object):
         """
         identify resolution based on Height and Width tolerance 5%
         """
-        result = {}
-        if self.mediafile.video_tracks:
-            video_height = int(self.mediafile.video_tracks[0].get('height', 0))
-            video_width = int(self.mediafile.video_tracks[0].get('width', 0))
-
-            # print(f"VideoTrack : W{video_width} x H{video_height}")
-
-            # Calculate range 5%
-            def in_range(value, standard):
-                tol = standard * 0.05
-                return standard - tol <= value <= standard + tol
-
-            # /// UHD
-            if in_range(video_width, 3840) or in_range(video_height, 2160):
-                result[category] = 'UHD'
-                result['resolution'] = '2160p'
-            # /// Full HD
-            elif in_range(video_height, 1080) or in_range(video_width, 1920):
-                result[category] = 'FullHD'
-                result['resolution'] = '1080p'
-            # /// HD
-            elif in_range(video_height, 720) or in_range(video_width, 1280):
-                result[category] = 'HD'
-                result['resolution'] = '720p'
-            # /// SD 576p
-            elif in_range(video_height, 576) or in_range(video_width, 768):
-                result[category] = 'SD'
-                result['resolution'] = '576p'
-            # /// SD 480p
-            elif in_range(video_height, 480) or in_range(video_width, 640):
-                result[category] = 'SD'
-                result['resolution'] = '480p'
-            else:
-                result[category] = 'unknown'
-                result['resolution'] = f'{video_width}x{video_height}'
-
-        return result
+        mapping = {
+            '2160p': 'UHD',
+            '1080p': 'FullHD',
+            '720p': 'HD',
+            '576p': 'SD',
+            '480p': 'SD',
+        }
+        return {
+            'resolution': self.media.resolution,
+            'uhd': mapping.get(self.media.resolution, 'unknown')
+        }
 
     @staticmethod
     def detect_releaser(name: str, signs_list: dict) -> str:
