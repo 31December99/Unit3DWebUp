@@ -365,18 +365,15 @@ async def scan(payload: ScanRequest) -> JSONResponse:
     # Load the jobs list using the previous id
     job_list = await app.state.job.get_job_list(job_id=job_list_id)
 
+    # Load the jobs list using the previous id
+    job_list = await app.state.job.get_job_list(job_id=job_list_id)
+
     # Load Media for each job id from the job_list
-    if job_list:
-        jobs = await asyncio.gather(*(app.state.job.get_job(job_id) for job_id in job_list))
-        job_list_results = [json.loads(job) for job in jobs if job]
-        # return to frontend the new posters
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content={
-                "source": "local",
-                "results": job_list_results,
-            }
-        )
+    job_list_results = []
+    for job_id in job_list:
+        job = await app.state.job.get_job(job_id)
+        if job:
+            job_list_results.append(json.loads(job))
 
     # New session
     async with aiohttp.ClientSession() as session:
