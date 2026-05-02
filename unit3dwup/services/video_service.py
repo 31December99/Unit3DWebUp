@@ -13,6 +13,7 @@ from unit3dwup.external.async_http_client_service import AsyncHttpClient
 from unit3dwup.config.constants import MediaStatus
 from unit3dwup.config.settings import get_settings
 from unit3dwup.config.logger import get_logger
+from unit3dwup.config import __version__
 from unit3dwup.models.media import Media
 
 from pymediainfo import MediaInfo
@@ -255,8 +256,8 @@ class BuildService(DescriptionBuilderInterface):
         self.logger = get_logger(self.__class__.__name__)
         settings = get_settings()
         self.sign = (
-            f"[url=https://github.com/31December99/Unit3DWebUp][code][color=#00BFFF][size=14]Uploaded with Unit3DwebUp"
-            f" {settings.unit3DwebUp.VERSION}[/size][/color][/code][/url]")
+            f"[url=https://github.com/31December99/Unit3DWebUp][code][color=#00BFFF][size=14]Uploaded with Unit3DwUp"
+            f" {__version__}[/size][/color][/code][/url]")
 
     async def description(self):
 
