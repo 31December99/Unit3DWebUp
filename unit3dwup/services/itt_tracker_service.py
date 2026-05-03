@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+from pathlib import Path
+
+import requests
 from unit3dwup.config.constants import MediaStatus
 from unit3dwup.config.trackers import TRACKData
 from unit3dwup.config.settings import get_settings
@@ -70,8 +73,12 @@ class ITTtrackerService(TrackerServiceInterface):
                     'job_id': media.job_id}
 
         if response.get('success', None):
+            self.download_file(url=response.get('data'), destination_path=media.torrent_file_path)
+
             media.status = MediaStatus.TRACKER_UPLOADED
             await self.app.state.job.update_job(job_id=media.job_id, new_data=media.to_dict())
+
+
             return {'status': '200', 'message': 'Torrent uploaded', 'file': media.torrent_file_path,
                     'job_id': media.job_id}
         else:
@@ -82,3 +89,14 @@ class ITTtrackerService(TrackerServiceInterface):
 
     async def search(self, query: str) -> dict:
         return await self.tracker.name(query)
+
+
+    @staticmethod
+    def download_file(url: str, destination_path: Path) -> bool:
+        download = requests.get(url)
+        if download.status_code == 200:
+            # File archived
+            with open(destination_path, "wb") as file:
+                file.write(download.content)
+            return True
+        return False
