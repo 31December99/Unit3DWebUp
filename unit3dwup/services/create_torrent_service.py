@@ -7,6 +7,7 @@ from unit3dwup.services.interfaces import TorrentServiceInterface
 from unit3dwup.config.api_data import trackers_api_data
 from unit3dwup.config.constants import MediaStatus
 from unit3dwup.config.settings import get_settings
+from unit3dwup.config import __version__
 from unit3dwup.models.media import Media
 
 from fastapi import FastAPI
@@ -29,7 +30,7 @@ def worker(args) -> dict:
     mytorr = torf.Torrent(path=torrent_path, trackers=announces)
     mytorr.comment = settings.prefs.TORRENT_COMMENT
     mytorr.name = torrent_name
-    mytorr.created_by = ""
+    mytorr.created_by = f"Unit3DwebUp {__version__}"
     mytorr.private = True
     mytorr.source = trackers_list[0] if trackers_list else None
     mytorr.segments = 16 * 1024 * 1024
