@@ -113,7 +113,7 @@ class TorrentClientConfig(BaseConfigModel):
 
 # /// USER PREFERENCES
 class UserPreferences(BaseConfigModel):
-    RELEASER_SIGN: str = ""
+    RELEASER_SIGN: str | None = None
     TAG_POSITION_MOVIE: list[str]
     TAG_POSITION_SERIE: list[str]
     PTSCREENS_PRIORITY: int = 0

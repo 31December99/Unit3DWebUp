@@ -132,7 +132,10 @@ class SearchTags(object):
             else:
                 build.append(str(v))
 
-        refactored = ' '.join(build) + '-' + self.releaser_sign
+        if self.releaser_sign:
+            self.releaser_sign = '-' + self.releaser_sign
+
+        refactored = ' '.join(build) + self.releaser_sign
         return refactored
 
     def process(self) -> str:
@@ -389,5 +392,5 @@ class SearchTags(object):
                 if match_len == 0:
                     # Capture any characters from the start to the end of base_name
                     sign = base_name[match.start(): match.end()]
-                    return f"-{sign}"
+                    return sign
         return ""
