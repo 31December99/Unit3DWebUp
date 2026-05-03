@@ -29,7 +29,7 @@ def worker(args) -> dict:
     mytorr = torf.Torrent(path=torrent_path, trackers=announces)
     mytorr.comment = settings.prefs.TORRENT_COMMENT
     mytorr.name = torrent_name
-    mytorr.created_by = ""
+    mytorr.created_by = f"https://github.com/31December99/Unit3DWebUp "
     mytorr.private = True
     mytorr.source = trackers_list[0] if trackers_list else None
     mytorr.segments = 16 * 1024 * 1024

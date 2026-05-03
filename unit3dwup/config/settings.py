@@ -27,11 +27,6 @@ class BaseConfigModel(BaseModel):
         return v
 
 
-# /// version
-class Unit3DwebUp(BaseConfigModel):
-    VERSION: str = "build"
-
-
 # /// TRACKER CONFIG
 class TrackerConfig(BaseConfigModel):
     ITT_URL: HttpUrl
@@ -167,7 +162,6 @@ class Settings(BaseSettings):
     """
     Set default settings
     """
-    unit3DwebUp: Unit3DwebUp = Field(default_factory=Unit3DwebUp)
     tracker: TrackerConfig = Field(default_factory=TrackerConfig)
     torrent: TorrentClientConfig = Field(default_factory=TorrentClientConfig)
     prefs: UserPreferences = Field(default_factory=UserPreferences)
@@ -178,7 +172,7 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(
         env_nested_delimiter="__",
-        env_file= ENV_FILE if not os.getenv("DOCKER") else None,
+        env_file=ENV_FILE if not os.getenv("DOCKER") else None,
         extra="ignore"
     )
 

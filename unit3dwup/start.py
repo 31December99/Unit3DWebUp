@@ -365,6 +365,9 @@ async def scan(payload: ScanRequest) -> JSONResponse:
     # Load the jobs list using the previous id
     job_list = await app.state.job.get_job_list(job_id=job_list_id)
 
+    # Load the jobs list using the previous id
+    job_list = await app.state.job.get_job_list(job_id=job_list_id)
+
     # Load Media for each job id from the job_list
     job_list_results = []
     for job_id in job_list:

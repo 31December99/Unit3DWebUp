@@ -206,6 +206,9 @@ class ManageTitles:
         # Remove v version
         filename_sanitized = re.sub(r"v\d+(?:[ .]\d+)*", "", filename_sanitized).strip()
 
+        # Remove '꞉:'
+        filename_sanitized = re.sub(r"[꞉:]", "", filename_sanitized).strip()
+
         # Remove dots, extra spaces
         filename_sanitized = re.sub(r"[._]", " ", filename_sanitized)
 
@@ -241,6 +244,7 @@ class ManageTitles:
             (r'\bH \b264\b', 'H.264'),
             (r'\bH \b265\b', 'H.265'),
             (r'\bAAC2 \b0\b', 'AAC2.0'),
+            (r'\bAAC5 \b1\b', 'AAC5.1'),
         ]
 
         for tag, replacement in replacements:

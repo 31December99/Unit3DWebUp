@@ -5,6 +5,7 @@ from __future__ import annotations
 import re, os
 from dataclasses import dataclass, field
 from typing import Optional, List, Dict, Any
+from unit3dwup.models.subtitles import SubtitleTrack
 
 
 @dataclass(slots=True)
@@ -18,6 +19,7 @@ class MediaFile:
     video_tracks: List[Dict] = field(default_factory=list)
     audio_tracks: List[Dict] = field(default_factory=list)
     general_track: Dict = field(default_factory=dict)
+    text_tracks: List[Dict] = field(default_factory=list)
 
     @property
     def media_description(self) -> str:
@@ -82,16 +84,30 @@ class MediaFile:
         return self.audio_tracks[0].get("language", "Unknown") if self.audio_tracks else "Unknown"
 
     @property
-    def subtitle_tracks(self) -> List[Dict]:
-        return [t for t in self.video_tracks if t.get("track_type") == "Text"]
+    def subtitles(self) -> list:
+        tracks: list[SubtitleTrack] = []
+
+        def parse_bool(value: str) -> bool:
+            return str(value).lower() in ("yes", "true", "1")
+
+        for t in self.text_tracks:
+            if t.get("track_type") != "Text":
+                continue
+
+            tracks.append(
+                SubtitleTrack(
+                    track_id=int(t.get("track_id", 0)),
+                    language=t.get("language", "und"),
+                    title=t.get("title", ""),
+                    default=parse_bool(t.get("default", "No")),
+                    forced=parse_bool(t.get("forced", "No")),
+                )
+            )
+        return tracks
 
     @property
-    def available_languages(self) -> list[Any | None] | list[str]:
-        langs = {
-            t.get("language")
-            for t in (self.audio_tracks + self.subtitle_tracks)
-            if t.get("language")
-        }
+    def available_languages(self) -> list[str]:
+        langs = {t.language for t in self.subtitles if t.language}
         return list(langs) or ["not found"]
 
     @property
@@ -123,6 +139,7 @@ class MediaFile:
             "media_to_string": self.media_to_string,
             "video_tracks": self.video_tracks,
             "audio_tracks": self.audio_tracks,
+            "text_tracks": self.text_tracks,
             "general_track": self.general_track,
         }
 
@@ -139,4 +156,5 @@ class MediaFile:
             video_tracks=data.get("video_tracks", []),
             audio_tracks=data.get("audio_tracks", []),
             general_track=data.get("general_track", {}),
+            text_tracks=data.get("text_tracks", []),
         )
