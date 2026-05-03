@@ -160,7 +160,7 @@ class UserPreferences(BaseConfigModel):
     @field_validator("PREFERRED_LANG")
     @classmethod
     def validate_preferred_lang(cls, v):
-        if ManageTitles.convert_iso(v):
+        if ManageTitles.convert_iso(v) or v.lower() == "all":
             return v
         raise ValueError(f"invalid {v} value for PREFERRED_LANG")
 
