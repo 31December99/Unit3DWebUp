@@ -132,7 +132,7 @@ class SearchTags(object):
             else:
                 build.append(str(v))
 
-        refactored = ' '.join(build) + self.releaser_sign
+        refactored = ' '.join(build) + '-' + self.releaser_sign
         return refactored
 
     def process(self) -> str:
