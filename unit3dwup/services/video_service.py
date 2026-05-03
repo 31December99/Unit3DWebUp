@@ -255,7 +255,7 @@ class BuildService(DescriptionBuilderInterface):
         self.screenshots = []
         self.logger = get_logger(self.__class__.__name__)
         self.sign = (
-            f"[url=https://github.com/31December99/Unit3DWebUp][code][color=#00BFFF][size=14]Uploaded with Unit3DwUp"
+            f"[url=https://github.com/31December99/Unit3DWebUp][code][color=#00BFFF][size=12]by Unit3DwebUp"
             f" {__version__}[/size][/color][/code][/url]")
 
     async def description(self):
