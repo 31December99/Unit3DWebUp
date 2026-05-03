@@ -1,4 +1,4 @@
-# Unit3DupWeb
+# Unit3DwebUp
 
 ![version](https://img.shields.io/pypi/v/unit3dupWeb.svg)
 ![online](https://img.shields.io/badge/Online-green)
