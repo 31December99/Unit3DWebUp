@@ -48,7 +48,8 @@ class UploadUseCase:
             tracker_service: TrackerServiceInterface = ITTtrackerService(session, self.app)
 
             # Build a list of media
-            tasks = [tracker_service.upload(media) for media in self.media_list]
+            # only if the preferred language is available in the audio tracks
+            tasks = [tracker_service.upload(media) for media in self.media_list if media.can_upload]
 
             # Concurrent execution
             uploaded_torrents = await asyncio.gather(*tasks)

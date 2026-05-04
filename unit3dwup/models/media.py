@@ -97,6 +97,7 @@ class Media:
         self._screen_shots: list | None = None
         self._job_id_list: str | None = None
         self._imdb_from_tvdb: str | None = None
+        self._can_upload: bool = True
 
     @property
     def title_sanitized(self) -> str:
@@ -477,6 +478,14 @@ class Media:
         self._is_folder = value
 
     @property
+    def can_upload(self) -> bool:
+        return self._can_upload
+
+    @can_upload.setter
+    def can_upload(self, value: bool):
+        self._can_upload = value
+
+    @property
     def screen_shots(self) -> list[str]:
         return self._screen_shots
 
@@ -596,7 +605,7 @@ class Media:
             "platform_list": self.platform_list,
             "screen_shots": self.screen_shots,
             "job_id_list": self.job_id_list,
-
+            "can_upload": self.can_upload,
         }
 
     @classmethod
@@ -630,4 +639,5 @@ class Media:
         m.category = data.get("category")
         m.screen_shots = data.get("screen_shots")
         m.job_id_list = data.get("job_id_list")
+        m.can_upload = data.get("can_upload", False)
         return m
