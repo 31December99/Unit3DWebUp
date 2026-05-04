@@ -7,6 +7,7 @@ from pathlib import Path
 from pydantic import BaseModel, field_validator, model_validator, HttpUrl, Field, ValidationError
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from unit3dwup.config.logger import get_logger
+from unit3dwup.services.utility import ManageTitles
 
 
 # /// Class to help avoid typos...
@@ -25,11 +26,6 @@ class BaseConfigModel(BaseModel):
         if v == "":
             return None
         return v
-
-
-# /// version
-class Unit3DwebUp(BaseConfigModel):
-    VERSION: str = "build"
 
 
 # /// TRACKER CONFIG
@@ -66,7 +62,7 @@ class TrackerConfig(BaseConfigModel):
     def validate_api_keys(cls, v, info):
         if info.field_name.endswith("_KEY") or "APIKEY" in info.field_name:
             if v is not None and len(v) < 5:
-                raise ValueError(f"{info.field_name} too short")
+                raise ValueError(f"{v} too short")
         return v
 
 
@@ -98,7 +94,7 @@ class TorrentClientConfig(BaseConfigModel):
     @classmethod
     def validate_ports(cls, v):
         if not 1 <= v <= 65535:
-            raise ValueError("invalid port range")
+            raise ValueError(f"{v} invalid port range")
         return v
 
     @model_validator(mode="after")
@@ -117,7 +113,7 @@ class TorrentClientConfig(BaseConfigModel):
 
 # /// USER PREFERENCES
 class UserPreferences(BaseConfigModel):
-    RELEASER_SIGN: str = ""
+    RELEASER_SIGN: str | None = None
     TAG_POSITION_MOVIE: list[str]
     TAG_POSITION_SERIE: list[str]
     PTSCREENS_PRIORITY: int = 0
@@ -141,7 +137,7 @@ class UserPreferences(BaseConfigModel):
     SCAN_PATH: str = None
     COMPRESS_SCSHOT: int = 4
     TORRENT_COMMENT: str | None = "no_comment"
-    PREFERRED_LANG: str | None = "all"
+    PREFERRED_LANG: str = "all"
     ANON: bool = False
     WEBP_ENABLED: bool = False
     PERSONAL_RELEASE: bool = False
@@ -151,7 +147,7 @@ class UserPreferences(BaseConfigModel):
     @classmethod
     def validate_interval(cls, v):
         if v < 5:
-            raise ValueError("WATCHER_INTERVAL too low")
+            raise ValueError(f"WATCHER_INTERVAL {v} too low")
         return v
 
     @field_validator("TAG_POSITION_MOVIE", "TAG_POSITION_SERIE", mode="before")
@@ -161,13 +157,19 @@ class UserPreferences(BaseConfigModel):
             return [x.strip() for x in v.split(",") if x.strip()]
         return v
 
+    @field_validator("PREFERRED_LANG")
+    @classmethod
+    def validate_preferred_lang(cls, v):
+        if ManageTitles.convert_iso(v) or v.lower() == "all":
+            return v
+        raise ValueError(f"invalid {v} value for PREFERRED_LANG")
+
 
 # /// APP SETTINGS
 class Settings(BaseSettings):
     """
     Set default settings
     """
-    unit3DwebUp: Unit3DwebUp = Field(default_factory=Unit3DwebUp)
     tracker: TrackerConfig = Field(default_factory=TrackerConfig)
     torrent: TorrentClientConfig = Field(default_factory=TorrentClientConfig)
     prefs: UserPreferences = Field(default_factory=UserPreferences)
@@ -178,7 +180,7 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(
         env_nested_delimiter="__",
-        env_file= ENV_FILE if not os.getenv("DOCKER") else None,
+        env_file=ENV_FILE if not os.getenv("DOCKER") else None,
         extra="ignore"
     )
 
@@ -193,10 +195,17 @@ def get_settings() -> Settings:
     try:
         settings = Settings()
     except ValidationError as e:
+        """
+        https://pydantic.dev/docs/validation/latest/errors/validation_errors/
+        /// Pydantic Validation Error example
+            "loc": ("prefs", "PREFERRED_LANG"),
+            "msg": "Value error, invalid fr value for PREFERRED_LANG",
+            "type": "value_error"
+        """
         for err in e.errors():
             field_path = ".".join(str(loc) for loc in err["loc"])
-            logger.warning(f"{field_path} value not set or invalid")
-            logger.warning("-" * 50)
+            logger.warning(f"{field_path}: {err['msg']}")
+        logger.warning("-" * 50)
 
         raise SystemExit(1)
 

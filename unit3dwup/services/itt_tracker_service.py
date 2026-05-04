@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+from pathlib import Path
+
+import requests
 from unit3dwup.config.constants import MediaStatus
 from unit3dwup.config.trackers import TRACKData
 from unit3dwup.config.settings import get_settings
@@ -35,12 +38,6 @@ class ITTtrackerService(TrackerServiceInterface):
         The Media object processed helps to build the payload for the tracker
         """
         settings = get_settings()
-        # Unit3D requires `season_number` and `episode_number` to be integers.
-        # For season packs (a folder containing multiple episodes) the
-        # convention is `episode_number=0`. Sending an empty string makes
-        # Unit3D respond with `{'episode_number': ['... required.']}` and
-        # silently drops the upload.
-        season_number = int(media.guess_season) if media.guess_season else 0
         return {
             "name": media.display_name,
             "tmdb": media.tmdb_id or 0,
@@ -56,7 +53,6 @@ class ITTtrackerService(TrackerServiceInterface):
             "type_id": self.tracker_data.filter_type(media.file_name),
             "season_number": media.guess_season,
             "episode_number": media.guess_episode,
-
             "personal_release": int(settings.prefs.PERSONAL_RELEASE)
         }
 
@@ -67,7 +63,6 @@ class ITTtrackerService(TrackerServiceInterface):
         """
         # Payload ready
         payload = await self.prepare_payload(media)
-
         # Load the file and send to the tracker
         response = await self.tracker.upload_t(data=payload, torrent_path=media.torrent_file_path)
 
@@ -78,8 +73,12 @@ class ITTtrackerService(TrackerServiceInterface):
                     'job_id': media.job_id}
 
         if response.get('success', None):
+            self.download_file(url=response.get('data'), destination_path=media.torrent_file_path)
+
             media.status = MediaStatus.TRACKER_UPLOADED
             await self.app.state.job.update_job(job_id=media.job_id, new_data=media.to_dict())
+
+
             return {'status': '200', 'message': 'Torrent uploaded', 'file': media.torrent_file_path,
                     'job_id': media.job_id}
         else:
@@ -90,3 +89,14 @@ class ITTtrackerService(TrackerServiceInterface):
 
     async def search(self, query: str) -> dict:
         return await self.tracker.name(query)
+
+
+    @staticmethod
+    def download_file(url: str, destination_path: Path) -> bool:
+        download = requests.get(url)
+        if download.status_code == 200:
+            # File archived
+            with open(destination_path, "wb") as file:
+                file.write(download.content)
+            return True
+        return False

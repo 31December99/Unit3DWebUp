@@ -3,14 +3,13 @@ from typing import TypeVar
 import aiohttp
 
 from unit3dwup.models.movie import (Movie, AltTitle, Title, NowPlaying, MovieDetails, Genre,
-                          ProductionCompany, SpokenLanguage, ProductionCountry)
+                                    ProductionCompany, SpokenLanguage, ProductionCountry)
 from unit3dwup.models.tv import (TVShowDetails, CreatedBy, Network, LastEpisodeToAir, Season,
-                       OnTheAir, TvShow, DataResponse, Alternative)
-from unit3dwup.external.async_http_client_service import AsyncHttpClient
+                                 OnTheAir, TvShow, DataResponse, Alternative)
 from unit3dwup.models.videos import Videos, Data
 from unit3dwup.models.keywords import Keyword
 
-
+from unit3dwup.external.async_http_client_service import AsyncHttpClient
 from unit3dwup.config.settings import get_settings
 
 settings = get_settings()
@@ -76,9 +75,18 @@ class TmdbEndpoints:
 class TmdbAsyncAPI:
     def __init__(self, session: aiohttp.ClientSession | None = None):
         self.api_key = TMDB_APIKEY
-        self.language = "it-IT"
         self.session = session or aiohttp.ClientSession()
         self.http = AsyncHttpClient(self.session)
+
+        if settings.prefs.PREFERRED_LANG.lower() == 'all':
+            selected_language = "en-EN"
+        else:
+            selected_language = settings.prefs.PREFERRED_LANG
+
+        self.params = {
+            "api_key": TMDB_APIKEY,
+            "language": f"{selected_language.lower()}-{selected_language.upper()}",  # "it-IT",
+        }
 
     async def close(self):
         await self.session.close()
@@ -90,8 +98,7 @@ class TmdbAsyncAPI:
         :return:
         """
         url = TmdbEndpoints.movie_search(query) if category == "movie" else TmdbEndpoints.tv_search(query)
-        params = {"api_key": self.api_key, "query": query, "language": self.language}
-
+        params = {**self.params, "query": query}
         data = await self.http.get(url, params=params)
 
         results: list[T] = []
@@ -117,9 +124,7 @@ class TmdbAsyncAPI:
         """
         url = TmdbEndpoints.alternative_movie(movie_id) if category == "movie" else TmdbEndpoints.alternative_show(
             movie_id)
-        params = {"api_key": self.api_key, "language": self.language}
-
-        data = await self.http.get(url, params=params)
+        data = await self.http.get(url, params={**self.params})
 
         if not data:
             return None
@@ -141,9 +146,7 @@ class TmdbAsyncAPI:
         Get trailers o associated video
         """
         url = TmdbEndpoints.videos_movie(movie_id) if category == "movie" else TmdbEndpoints.videos_show(movie_id)
-        params = {"api_key": self.api_key, "language": self.language}
-
-        data = await self.http.get(url, params=params)
+        data = await self.http.get(url, params={**self.params})
 
         if not data:
             return None
@@ -160,9 +163,7 @@ class TmdbAsyncAPI:
         Get details about a movie or serie
         """
         url = TmdbEndpoints.movie_details(video_id) if category == "movie" else TmdbEndpoints.tv_details(video_id)
-        params = {"api_key": self.api_key, "language": self.language}
-
-        data = await self.http.get(url, params=params)
+        data = await self.http.get(url, params={**self.params})
 
         if not data:
             return None
@@ -201,8 +202,7 @@ class TmdbAsyncAPI:
         Get the keywords associated with a movie or serie
         """
         url = TmdbEndpoints.movie_keywords(movie_id) if category == "movie" else TmdbEndpoints.tv_keywords(movie_id)
-        params = {"api_key": self.api_key, "language": self.language}
-        data = await self.http.get(url, params=params)
+        data = await self.http.get(url, params={**self.params})
         if not data:
             return None
 
@@ -228,9 +228,7 @@ class TmdbAsyncAPI:
         else:
             raise ValueError(f"Invalid category: {category}")
 
-        params = {"api_key": self.api_key, "language": self.language}
-
-        data = await self.http.get(url, params=params)
+        data = await self.http.get(url, params={**self.params})
 
         if not data or "results" not in data:
             return None

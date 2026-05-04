@@ -112,6 +112,8 @@ class Tracker(Myhttp):
 
         # Fill the form
         for k, v in data.items():
+            if v is None:
+                continue
             form.add_field(k, str(v))
 
         # Prepare the field for the file
