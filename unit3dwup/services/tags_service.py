@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 import re
 from unit3dwup.services.utility import ManageTitles
+from unit3dwup.config.settings import get_settings
 from unit3dwup.config.logger import get_logger
 from unit3dwup.models.media import Media
+
+settings = get_settings()
 
 # From hdr format
 hdr_map = {
@@ -270,6 +273,13 @@ class SearchTags(object):
                             languages.append(c)
                         break
                 languages = list(dict.fromkeys(languages))
+
+                # Check preferred user language
+                # Set flag to block media upload if the preferred language is not available in the audio tracks
+                preferred = ManageTitles.convert_iso(settings.prefs.PREFERRED_LANG)
+                if not any(preferred in ManageTitles.convert_iso(lang) for lang in languages):
+                    self.media.can_upload = False
+
                 # Add multilanguage tag when languages > 2
                 if len(languages) > 2:
                     self.tags_dict.update({'multi': 'MULTI'})
