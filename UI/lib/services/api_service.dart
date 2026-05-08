@@ -92,6 +92,7 @@ class ApiService {
 
   static Future<List<PosterItem>> scan() async {
     final response = await _post("scan", {'path': "nothing"});
+
     if (response == null) {
       return [PosterItem(snackBarError: "Backend offline")];
     }
@@ -103,6 +104,11 @@ class ApiService {
     if (response.statusCode == 403) {
       final result = jsonDecode(response.body);
       return [PosterItem(snackBarStatus: result['message'])];
+    }
+
+    if (response.statusCode == 429) {
+      final result = jsonDecode(response.body);
+      return [PosterItem(snackBarError: result['message'])];
     }
 
     return [PosterItem(snackBarStatus: response.statusCode.toString())];
@@ -121,6 +127,12 @@ class ApiService {
     if (response == null) {
       return PosterItem(snackBarError: "Backend offline");
     } else {
+
+      if (response.statusCode == 429) {
+        final result = jsonDecode(response.body);
+        return PosterItem(snackBarError: result['message']);
+      }
+
       return PosterItem(
         snackBarStatus: 'Make Torrent job $jobId Please wait...',
       );
@@ -133,8 +145,14 @@ class ApiService {
     if (response == null) {
       return PosterItem(snackBarError: "Backend offline");
     } else {
+
+      if (response.statusCode == 429) {
+        final result = jsonDecode(response.body);
+        return PosterItem(snackBarError: result['message']);
+      }
+
       return PosterItem(
-        snackBarStatus: "Upload ALL job $jobListId Please wait...",
+      snackBarStatus: "Upload ALL job $jobListId Please wait...",
       );
     }
   }
@@ -145,6 +163,12 @@ class ApiService {
     if (response == null) {
       return PosterItem(snackBarError: "Backend offline");
     } else {
+
+      if (response.statusCode == 429) {
+        final result = jsonDecode(response.body);
+        return PosterItem(snackBarError: result['message']);
+      }
+
       return PosterItem(
         snackBarStatus: 'Upload Torrent job $jobId Please wait...',
       );
@@ -162,6 +186,12 @@ class ApiService {
       if (response.statusCode == 409) {
         return PosterItem(snackBarError: "File torrent is already seeding");
       }
+
+      if (response.statusCode == 429) {
+        final result = jsonDecode(response.body);
+        return PosterItem(snackBarError: result['message']);
+      }
+
       if (response.statusCode == 404) {
         return PosterItem(snackBarError: "Torrent list is empty");
       } else {
@@ -191,6 +221,11 @@ class ApiService {
       return posterItem;
     }
 
+    if (response.statusCode == 429) {
+      final result = jsonDecode(response.body);
+      return PosterItem(snackBarError: result['message']);
+    }
+
     if (response.statusCode == 200) {
       posterItem.snackBarStatus = "Update Poster Id job $jobId Please wait...";
     } else {
@@ -215,6 +250,11 @@ class ApiService {
     if (response == null) {
       posterItem.snackBarStatus = "Backend offline";
       return posterItem;
+    }
+
+    if (response.statusCode == 429) {
+      final result = jsonDecode(response.body);
+      return PosterItem(snackBarError: result['message']);
     }
 
     if (response.statusCode == 200) {
@@ -245,6 +285,11 @@ class ApiService {
       return posterItem;
     }
 
+    if (response.statusCode == 429) {
+      final result = jsonDecode(response.body);
+      return PosterItem(snackBarError: result['message']);
+    }
+
     if (response.statusCode == 200) {
       posterItem.snackBarStatus = "Update IMDB job $jobId Please wait...";
       return posterItem;
@@ -271,6 +316,11 @@ class ApiService {
     if (response == null) {
       posterItem.snackBarStatus = "Backend offline";
       return posterItem;
+    }
+
+    if (response.statusCode == 429) {
+      final result = jsonDecode(response.body);
+      return PosterItem(snackBarError: result['message']);
     }
 
     if (response.statusCode == 200) {
@@ -301,6 +351,11 @@ class ApiService {
       return posterItem;
     }
 
+    if (response.statusCode == 429) {
+      final result = jsonDecode(response.body);
+      return PosterItem(snackBarError: result['message']);
+    }
+
     if (response.statusCode == 200) {
       posterItem.snackBarStatus =
           "Update Display Name job $jobId Please wait...";
@@ -320,6 +375,11 @@ class ApiService {
       return [PosterItem(snackBarError: "Backend offline")];
     }
 
+    if (response.statusCode == 429) {
+      final result = jsonDecode(response.body);
+      return [PosterItem(snackBarError: result['message'])];
+    }
+
     if (response.statusCode == 200) {
       return getPosterUrls(jsonDecode(response.body));
     } else {
@@ -336,6 +396,12 @@ class ApiService {
     if (response == null) {
       return PosterItem(snackBarError: "Backend offline");
     } else {
+
+      if (response.statusCode == 429) {
+        final result = jsonDecode(response.body);
+        return PosterItem(snackBarError: result['message']);
+      }
+
       return PosterItem(snackBarError: "Deleted joblist $jobListId");
     }
   }
@@ -346,6 +412,10 @@ class ApiService {
       final response = await _post("setting", {'title': title});
 
       if (response == null) {
+        return null;
+      }
+
+      if (response.statusCode == 429) {
         return null;
       }
 
@@ -367,6 +437,11 @@ class ApiService {
 
     if (response == null) {
       return PosterItem(snackBarError: "Backend offline");
+    }
+
+    if (response.statusCode == 429) {
+      final result = jsonDecode(response.body);
+      return PosterItem(snackBarError: result['message']);
     }
 
     if (response.statusCode == 200) {
