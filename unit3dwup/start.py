@@ -33,8 +33,11 @@ from unit3dwup.external.websocket import WebSocketManager
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi import WebSocket
-from fastapi import FastAPI
 from fastapi import status
+from fastapi import FastAPI, Request
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv, dotenv_values
 
@@ -42,6 +45,7 @@ import aiohttp
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
+limiter = Limiter(key_func=lambda request: request.client.host)
 
 class RedisEventHandler(FileSystemEventHandler):
     """
@@ -201,6 +205,21 @@ async def lifespan(app: FastAPI):
 
 # Initialize FastApi
 app = FastAPI(lifespan=lifespan)
+# Register the error handler
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+
+@app.exception_handler(RateLimitExceeded)
+def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+    return JSONResponse(
+        status_code=429,
+        content={
+            "error": "rate_limited",
+            "message": "Too many requests"
+        }
+    )
+
 
 # TODO middleware
 app.add_middleware(
@@ -323,7 +342,8 @@ async def clear_job_list_id(payload: ClearJobListRequest):
 
 
 @app.post("/scan")
-async def scan(payload: ScanRequest) -> JSONResponse:
+@limiter.limit("5/minute")
+async def scan(payload: ScanRequest, request: Request) -> JSONResponse:
     """
     This endpoint scans the local files and creates a Media object for each associating it with its description
 
@@ -444,7 +464,8 @@ async def scan(payload: ScanRequest) -> JSONResponse:
 
 
 @app.post("/processall")
-async def process_all(payload: ProcessAllRequest):
+@limiter.limit("5/minute")
+async def process_all(payload: ProcessAllRequest, request: Request):
     """
     Start a chain load the joblist filter for existing torrent create torrent upload the complete joblist
 
@@ -464,7 +485,8 @@ async def process_all(payload: ProcessAllRequest):
 
 
 @app.post("/maketorrent")
-async def make(payload: JobRequest):
+@limiter.limit("5/minute")
+async def make(payload: JobRequest, request: Request):
     """
     Create one or more torrent files
 
@@ -479,7 +501,8 @@ async def make(payload: JobRequest):
 
 
 @app.post("/upload")
-async def upload(payload: JobRequest):
+@limiter.limit("5/minute")
+async def upload(payload: JobRequest, request: Request):
     """
     Upload a single torrent file
 
@@ -500,7 +523,8 @@ async def upload(payload: JobRequest):
 
 
 @app.post("/seed")
-async def seed(payload: JobRequest) -> JSONResponse:
+@limiter.limit("5/minute")
+async def seed(payload: JobRequest, request: Request) -> JSONResponse:
     """
     Required
     - job_id identifies each poster corresponds to Media.job_id
@@ -514,7 +538,8 @@ async def seed(payload: JobRequest) -> JSONResponse:
 
 
 @app.post("/settmdbid")
-async def set_poster_id(payload: UpdatePosterRequest):
+@limiter.limit("5/minute")
+async def set_poster_id(payload: UpdatePosterRequest, request: Request):
     """
     Set a Tmdb id for example when tmdb returns an empty result
 
@@ -529,7 +554,8 @@ async def set_poster_id(payload: UpdatePosterRequest):
 
 
 @app.post("/settvdbid")
-async def set_tvdb_id(payload: UpdatePosterRequest):
+@limiter.limit("5/minute")
+async def set_tvdb_id(payload: UpdatePosterRequest, request: Request):
     """
     Set a TVdb id for example when tvdb returns an empty result
 
@@ -544,7 +570,8 @@ async def set_tvdb_id(payload: UpdatePosterRequest):
 
 
 @app.post("/setimdbid")
-async def set_imdb_id(payload: UpdatePosterRequest):
+@limiter.limit("5/minute")
+async def set_imdb_id(payload: UpdatePosterRequest, request: Request):
     """
     Set an Imdb id for example when the remote list of tvdb is empty
 
@@ -559,7 +586,8 @@ async def set_imdb_id(payload: UpdatePosterRequest):
 
 
 @app.post("/setposterurl")
-async def set_poster_url(payload: UpdatePosterRequest):
+@limiter.limit("5/minute")
+async def set_poster_url(payload: UpdatePosterRequest, request: Request):
     """
     Set a poster url for example when tmdb returns an empty result only for frontend
 
@@ -574,7 +602,8 @@ async def set_poster_url(payload: UpdatePosterRequest):
 
 
 @app.post("/setposterdname")
-async def set_poster_dname(payload: UpdatePosterRequest):
+@limiter.limit("5/minute")
+async def set_poster_dname(payload: UpdatePosterRequest, request: Request):
     """
     Set a poster display name for example if you dont like it
     Display name is the name shown on the dedicated torrent page
@@ -591,7 +620,8 @@ async def set_poster_dname(payload: UpdatePosterRequest):
 
 
 @app.post("/setting")
-async def configuration():
+@limiter.limit("5/minute")
+async def configuration(request: Request):
     """
     Load setting from the local configuration file
 
@@ -642,7 +672,8 @@ async def configuration():
 
 
 @app.post("/setenv")
-async def set_env(payload: SetEnvRequest):
+@limiter.limit("5/minute")
+async def set_env(payload: SetEnvRequest, request: Request):
     """
     Set the environment variables from the frontend
     User need to restart the docker
@@ -720,7 +751,8 @@ async def set_env(payload: SetEnvRequest):
 
 
 @app.post("/filter")
-async def filter_search(payload: FilterRequest):
+@limiter.limit("5/minute")
+async def filter_search(payload: FilterRequest, request: Request):
     """
     Search words or title in the tracker
 
@@ -754,6 +786,7 @@ async def filter_search(payload: FilterRequest):
 
 def main():
     print("Run -> uvicorn unit3dwup.start:app")
+
 
 if __name__ == "__main__":
     main()
