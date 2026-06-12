@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Depends
 from fastapi.responses import JSONResponse
+
+from unit3dwup.config import Settings
+from unit3dwup.config.limiter import limiter
 
 from unit3dwup.use_case.process_all_usecase import ProcessAllUseCase
 from unit3dwup.use_case.upload_usecase import UploadUseCase
@@ -9,11 +12,18 @@ from unit3dwup.use_case.make_torrent_usecase import MakeTorrentUseCase
 
 from unit3dwup.schemas import ProcessAllRequest, JobRequest
 
+from unit3dwup.routers.dependencies import (
+    load_settings,
+)
+
 router = APIRouter()
 
 
 @router.post("/processall")
-async def process_all(payload: ProcessAllRequest, request: Request):
+@limiter.limit("5/minute")
+async def process_all(payload: ProcessAllRequest, request: Request,
+                      settings: Settings = Depends(load_settings),
+                      ):
     """
     Start a chain load the joblist filter for existing torrent create torrent upload the complete joblist
 
@@ -30,11 +40,12 @@ async def process_all(payload: ProcessAllRequest, request: Request):
     app = request.app
 
     use_case = ProcessAllUseCase(app=app, job_list_id=payload.job_list_id,
-                                 torrent_client_name=app.state.settings.torrent.TORRENT_CLIENT)
+                                 torrent_client_name=settings.torrent.TORRENT_CLIENT)
     await use_case.execute()
 
 
 @router.post("/maketorrent")
+@limiter.limit("5/minute")
 async def make(payload: JobRequest, request: Request):
     """
     Create one or more torrent files
@@ -52,6 +63,7 @@ async def make(payload: JobRequest, request: Request):
 
 
 @router.post("/upload")
+@limiter.limit("5/minute")
 async def upload(payload: JobRequest, request: Request):
     """
     Upload a single torrent file
@@ -75,7 +87,10 @@ async def upload(payload: JobRequest, request: Request):
 
 
 @router.post("/seed")
-async def seed(payload: JobRequest, request: Request) -> JSONResponse:
+@limiter.limit("5/minute")
+async def seed(payload: JobRequest, request: Request,
+               settings: Settings = Depends(load_settings),
+               ) -> JSONResponse:
     """
     Required
     - job_id identifies each poster corresponds to Media.job_id
@@ -86,5 +101,5 @@ async def seed(payload: JobRequest, request: Request) -> JSONResponse:
 
     app = request.app
 
-    use_case = SeedUseCase(app=app, client=app.state.settings.torrent.TORRENT_CLIENT, job_id=payload.job_id)
+    use_case = SeedUseCase(app=app, client=settings.torrent.TORRENT_CLIENT, job_id=payload.job_id)
     return await use_case.execute()

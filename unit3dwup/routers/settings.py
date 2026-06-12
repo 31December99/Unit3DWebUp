@@ -3,23 +3,34 @@ import inspect
 import json
 import os
 
-from fastapi import APIRouter, Request, status
+from fastapi import APIRouter, Request, status,  Depends
 from fastapi.responses import JSONResponse
 
 from dotenv import load_dotenv, dotenv_values
 
 from unit3dwup.config import get_settings
-from unit3dwup.config import get_logger
+from unit3dwup.config import get_logger, Settings
 
 from unit3dwup.services.lifespan_service import update_mounted_paths
 
 from unit3dwup.schemas import SetEnvRequest
 
+
+from unit3dwup.external.websocket import WebSocketManager
+from unit3dwup.routers.dependencies import (
+    load_settings,
+    get_job_repo,
+    get_ws_manager,
+)
+
 router = APIRouter()
 
-
 @router.post("/setting")
-async def configuration(request: Request):
+async def configuration(request: Request,
+                        settings: Settings = Depends(load_settings),
+                        job_repo=Depends(get_job_repo),
+                        ws_manager: WebSocketManager = Depends(get_ws_manager),
+                        ):
     """
     Load setting from the local configuration file
 
@@ -30,33 +41,32 @@ async def configuration(request: Request):
     - none
     """
 
-    app = request.app
-
     # Logger
     frame = inspect.currentframe()
     logger = get_logger(frame.f_code.co_name)
 
     # Load json settings and return it to the client
-    job_data = await app.state.job.get_job(job_id='0')
+    job_data = await job_repo.get_job(job_id='0')
+
 
     # /// Check main paths
-    if app.state.settings.prefs.SCAN_PATH == os.getcwd():
+    if settings.prefs.SCAN_PATH == os.getcwd():
         logger.warning("SCAN PATHS NO SET")
-        await app.state.ws_manager.broadcast({
+        await ws_manager.broadcast({
             "type": "log",
             "level": "warn",
             "message": f"{frame.f_code.co_name} Scan Path not set",
         })
-    if app.state.settings.prefs.TORRENT_ARCHIVE_PATH == os.getcwd():
+    if settings.prefs.TORRENT_ARCHIVE_PATH == os.getcwd():
         logger.warning("TORRENT ARCHIVE PATH NOT SET")
-        await app.state.ws_manager.broadcast({
+        await ws_manager.broadcast({
             "type": "log",
             "level": "warn",
             "message": f"{frame.f_code.co_name} Torrent archive path not set",
         })
-    if os.getcwd() in [app.state.settings.prefs.WATCHER_DESTINATION_PATH, app.state.settings.prefs.WATCHER_PATH]:
+    if os.getcwd() in [settings.prefs.WATCHER_DESTINATION_PATH, settings.prefs.WATCHER_PATH]:
         logger.warning("WATCHER PATHS NO SET")
-        await app.state.ws_manager.broadcast({
+        await ws_manager.broadcast({
             "type": "log",
             "level": "warn",
             "message": f"{frame.f_code.co_name} Watcher Paths not set",
@@ -72,7 +82,11 @@ async def configuration(request: Request):
 
 
 @router.post("/setenv")
-async def set_env(payload: SetEnvRequest, request: Request):
+async def set_env(payload: SetEnvRequest, request: Request,
+                  settings: Settings = Depends(load_settings),
+                  job_repo=Depends(get_job_repo),
+                  ws_manager: WebSocketManager = Depends(get_ws_manager),
+                  ):
     """
     Set the environment variables from the frontend
     User need to restart the docker
@@ -95,7 +109,7 @@ async def set_env(payload: SetEnvRequest, request: Request):
     # Permission denied when tries to create a temporary file but it fails because the container is not running as root
     # set_key(str(app.state.env_file), payload.key, payload.value)
 
-    # Current variabiles value
+    # Current variables value
     env_vars = dotenv_values(str(app.state.env_file))
     # update the key
     env_vars[payload.key] = payload.value
@@ -110,11 +124,8 @@ async def set_env(payload: SetEnvRequest, request: Request):
     # Clear cache and reload
     get_settings.cache_clear()
 
-    # Refresh the lru cache
-    settings = get_settings()
-
-    # Update the fast api app state
-    app.state.settings = settings
+    # Call and Refresh the lru cache
+    app.state.settings = get_settings()
 
     # This key requires a Docker restart
     if payload.key.upper() in ["PREFS__WATCHER_DESTINATION_PATH", "PREFS__WATCHER_PATH", "PREFS__TORRENT_ARCHIVE_PATH",
@@ -125,7 +136,8 @@ async def set_env(payload: SetEnvRequest, request: Request):
     await update_mounted_paths(app=app)
 
     # Ricreate profile (overwrite -> it uses hset command)
-    await app.state.job.create_profile(dict(settings.prefs))
+    await job_repo.create_profile(dict(settings.prefs))
+
 
     # Logger
     frame = inspect.currentframe()
@@ -135,7 +147,7 @@ async def set_env(payload: SetEnvRequest, request: Request):
     logger.info(f"-> Update {payload.key} value -> {payload.value}\n")
 
     # Send log to the client
-    await app.state.ws_manager.broadcast({
+    await ws_manager.broadcast({
         "type": "log",
         "level": "success",
         "message": f"-> Update {payload.key} value -> {payload.value}\n",

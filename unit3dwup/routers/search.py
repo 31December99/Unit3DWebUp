@@ -6,6 +6,7 @@ from fastapi.responses import JSONResponse
 
 from unit3dwup.services.itt_tracker_service import ITTtrackerService
 from unit3dwup.services.interfaces import TrackerServiceInterface
+from unit3dwup.config.limiter import limiter
 
 from unit3dwup.schemas import FilterRequest
 
@@ -13,6 +14,7 @@ router = APIRouter()
 
 
 @router.post("/filter")
+@limiter.limit("5/minute")
 async def filter_search(payload: FilterRequest, request: Request):
     """
     Search words or title in the tracker

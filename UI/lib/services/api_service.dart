@@ -30,7 +30,7 @@ class ApiService {
     return results.map((map) {
       return PosterItem(
         posterUrl:
-            "https://image.tmdb.org/t/p/original/${map['backdrop_path']}",
+        "https://image.tmdb.org/t/p/original/${map['backdrop_path']}",
         displayName: map['display_name'] as String?,
         source: source,
         tmdbId: map['tmdb_id'].toString(),
@@ -67,9 +67,9 @@ class ApiService {
   }
 
   static Future<http.Response?> _post(
-    String endpoint,
-    Map<String, dynamic> body,
-  ) async {
+      String endpoint,
+      Map<String, dynamic> body,
+      ) async {
     try {
       final response = await http.post(
         Uri.parse('http://127.0.0.1:8000/$endpoint'),
@@ -92,6 +92,7 @@ class ApiService {
 
   static Future<List<PosterItem>> scan() async {
     final response = await _post("scan", {'path': "nothing"});
+
     if (response == null) {
       return [PosterItem(snackBarError: "Backend offline")];
     }
@@ -105,14 +106,19 @@ class ApiService {
       return [PosterItem(snackBarStatus: result['message'])];
     }
 
+    if (response.statusCode == 429) {
+      final result = jsonDecode(response.body);
+      return [PosterItem(snackBarError: result['message'])];
+    }
+
     return [PosterItem(snackBarStatus: response.statusCode.toString())];
   }
 
   /// Create torrents
   static Future<PosterItem> fetchTorrent(
-    String jobId,
-    String? jobListId,
-  ) async {
+      String jobId,
+      String? jobListId,
+      ) async {
     final response = await _post("maketorrent", {
       'job_id': jobId,
       'job_list_id': jobListId,
@@ -121,6 +127,12 @@ class ApiService {
     if (response == null) {
       return PosterItem(snackBarError: "Backend offline");
     } else {
+
+      if (response.statusCode == 429) {
+        final result = jsonDecode(response.body);
+        return PosterItem(snackBarError: result['message']);
+      }
+
       return PosterItem(
         snackBarStatus: 'Make Torrent job $jobId Please wait...',
       );
@@ -133,6 +145,12 @@ class ApiService {
     if (response == null) {
       return PosterItem(snackBarError: "Backend offline");
     } else {
+
+      if (response.statusCode == 429) {
+        final result = jsonDecode(response.body);
+        return PosterItem(snackBarError: result['message']);
+      }
+
       return PosterItem(
         snackBarStatus: "Upload ALL job $jobListId Please wait...",
       );
@@ -145,6 +163,12 @@ class ApiService {
     if (response == null) {
       return PosterItem(snackBarError: "Backend offline");
     } else {
+
+      if (response.statusCode == 429) {
+        final result = jsonDecode(response.body);
+        return PosterItem(snackBarError: result['message']);
+      }
+
       return PosterItem(
         snackBarStatus: 'Upload Torrent job $jobId Please wait...',
       );
@@ -162,6 +186,12 @@ class ApiService {
       if (response.statusCode == 409) {
         return PosterItem(snackBarError: "File torrent is already seeding");
       }
+
+      if (response.statusCode == 429) {
+        final result = jsonDecode(response.body);
+        return PosterItem(snackBarError: result['message']);
+      }
+
       if (response.statusCode == 404) {
         return PosterItem(snackBarError: "Torrent list is empty");
       } else {
@@ -175,11 +205,11 @@ class ApiService {
   }
 
   static Future<PosterItem> fetchPosterId(
-    String jobId,
-    String fieldId,
-    String newId,
-    PosterItem posterItem,
-  ) async {
+      String jobId,
+      String fieldId,
+      String newId,
+      PosterItem posterItem,
+      ) async {
     final response = await _post("settmdbid", {
       'job_id': jobId,
       'field_id': fieldId,
@@ -189,6 +219,11 @@ class ApiService {
     if (response == null) {
       posterItem.snackBarStatus = "Backend offline";
       return posterItem;
+    }
+
+    if (response.statusCode == 429) {
+      final result = jsonDecode(response.body);
+      return PosterItem(snackBarError: result['message']);
     }
 
     if (response.statusCode == 200) {
@@ -201,11 +236,11 @@ class ApiService {
 
   /// Update TVDB ID
   static Future<PosterItem> fetchTvdbId(
-    String jobId,
-    String fieldId,
-    String newId,
-    PosterItem posterItem,
-  ) async {
+      String jobId,
+      String fieldId,
+      String newId,
+      PosterItem posterItem,
+      ) async {
     final response = await _post("settvdbid", {
       'job_id': jobId,
       'field_id': fieldId,
@@ -215,6 +250,11 @@ class ApiService {
     if (response == null) {
       posterItem.snackBarStatus = "Backend offline";
       return posterItem;
+    }
+
+    if (response.statusCode == 429) {
+      final result = jsonDecode(response.body);
+      return PosterItem(snackBarError: result['message']);
     }
 
     if (response.statusCode == 200) {
@@ -229,11 +269,11 @@ class ApiService {
 
   /// Update IMDB from TVDB ID
   static Future<PosterItem> fetchImdbId(
-    String jobId,
-    String fieldId,
-    String newId,
-    PosterItem posterItem,
-  ) async {
+      String jobId,
+      String fieldId,
+      String newId,
+      PosterItem posterItem,
+      ) async {
     final response = await _post("setimdbid", {
       'job_id': jobId,
       'field_id': fieldId,
@@ -243,6 +283,11 @@ class ApiService {
     if (response == null) {
       posterItem.snackBarStatus = "Backend offline";
       return posterItem;
+    }
+
+    if (response.statusCode == 429) {
+      final result = jsonDecode(response.body);
+      return PosterItem(snackBarError: result['message']);
     }
 
     if (response.statusCode == 200) {
@@ -257,11 +302,11 @@ class ApiService {
 
   /// Update poster TMDB Url
   static Future<PosterItem> fetchPosterUrl(
-    String jobId,
-    String fieldId,
-    String newId,
-    PosterItem posterItem,
-  ) async {
+      String jobId,
+      String fieldId,
+      String newId,
+      PosterItem posterItem,
+      ) async {
     final response = await _post("setposterurl", {
       'job_id': jobId,
       'field_id': fieldId,
@@ -271,6 +316,11 @@ class ApiService {
     if (response == null) {
       posterItem.snackBarStatus = "Backend offline";
       return posterItem;
+    }
+
+    if (response.statusCode == 429) {
+      final result = jsonDecode(response.body);
+      return PosterItem(snackBarError: result['message']);
     }
 
     if (response.statusCode == 200) {
@@ -285,11 +335,11 @@ class ApiService {
 
   /// Update poster Display Name
   static Future<PosterItem> fetchPosterDname(
-    String jobId,
-    String fieldId,
-    String newId,
-    PosterItem posterItem,
-  ) async {
+      String jobId,
+      String fieldId,
+      String newId,
+      PosterItem posterItem,
+      ) async {
     final response = await _post("setposterdname", {
       'job_id': jobId,
       'field_id': fieldId,
@@ -301,9 +351,14 @@ class ApiService {
       return posterItem;
     }
 
+    if (response.statusCode == 429) {
+      final result = jsonDecode(response.body);
+      return PosterItem(snackBarError: result['message']);
+    }
+
     if (response.statusCode == 200) {
       posterItem.snackBarStatus =
-          "Update Display Name job $jobId Please wait...";
+      "Update Display Name job $jobId Please wait...";
       return posterItem;
     } else {
       posterItem.snackBarStatus = "Request failed (${response.statusCode})";
@@ -318,6 +373,11 @@ class ApiService {
 
     if (response == null) {
       return [PosterItem(snackBarError: "Backend offline")];
+    }
+
+    if (response.statusCode == 429) {
+      final result = jsonDecode(response.body);
+      return [PosterItem(snackBarError: result['message'])];
     }
 
     if (response.statusCode == 200) {
@@ -336,6 +396,12 @@ class ApiService {
     if (response == null) {
       return PosterItem(snackBarError: "Backend offline");
     } else {
+
+      if (response.statusCode == 429) {
+        final result = jsonDecode(response.body);
+        return PosterItem(snackBarError: result['message']);
+      }
+
       return PosterItem(snackBarError: "Deleted joblist $jobListId");
     }
   }
@@ -346,6 +412,10 @@ class ApiService {
       final response = await _post("setting", {'title': title});
 
       if (response == null) {
+        return null;
+      }
+
+      if (response.statusCode == 429) {
         return null;
       }
 
@@ -367,6 +437,11 @@ class ApiService {
 
     if (response == null) {
       return PosterItem(snackBarError: "Backend offline");
+    }
+
+    if (response.statusCode == 429) {
+      final result = jsonDecode(response.body);
+      return PosterItem(snackBarError: result['message']);
     }
 
     if (response.statusCode == 200) {
