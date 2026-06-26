@@ -6,10 +6,11 @@ import time
 
 import aiohttp
 
-from fastapi import APIRouter, Request, status
+from fastapi import APIRouter, WebSocket, status, FastAPI, Request, Depends
 from fastapi.responses import JSONResponse
 
-from unit3dwup.config import get_logger
+from unit3dwup.config import get_logger, Settings
+from unit3dwup.config.limiter import limiter
 
 from unit3dwup.repositories.db_online import Tmdb, Tvdb
 
@@ -20,11 +21,23 @@ from unit3dwup.use_case.scan_media_usecase import ScanMediaUseCase
 
 from unit3dwup.schemas import ScanRequest
 
+from unit3dwup.external.websocket import WebSocketManager
+from unit3dwup.routers.dependencies import (
+    load_settings,
+    get_job_repo,
+    get_ws_manager,
+)
+
 router = APIRouter()
 
 
 @router.post("/scan")
-async def scan(payload: ScanRequest, request: Request) -> JSONResponse:
+@limiter.limit("5/minute")
+async def scan(payload: ScanRequest, request: Request,
+               settings: Settings = Depends(load_settings),
+               job_repo=Depends(get_job_repo),
+               ws_manager: WebSocketManager = Depends(get_ws_manager),
+               ) -> JSONResponse:
     """
     This endpoint scans the local files and creates a Media object for each associating it with its description
 
@@ -62,16 +75,16 @@ async def scan(payload: ScanRequest, request: Request) -> JSONResponse:
     start_time = time.perf_counter()
 
     # Get the id for the current path
-    job_list_id = hashlib.sha256(app.state.settings.prefs.SCAN_PATH.encode()).hexdigest()
-    logger.info(f"Current joblist_id {job_list_id} {app.state.settings.prefs.SCAN_PATH}")
+    job_list_id = hashlib.sha256(settings.prefs.SCAN_PATH.encode()).hexdigest()
+    logger.info(f"Current joblist_id {job_list_id} {settings.prefs.SCAN_PATH}")
 
     # Load the jobs list using the previous id
-    job_list = await app.state.job.get_job_list(job_id=job_list_id)
+    job_list = await job_repo.get_job_list(job_id=job_list_id)
 
     # Load Media for each job id from the job_list
     job_list_results = []
     for job_id in job_list:
-        job = await app.state.job.get_job(job_id)
+        job = await job_repo.get_job(job_id)
         if job:
             job_list_results.append(json.loads(job))
 
@@ -106,7 +119,7 @@ async def scan(payload: ScanRequest, request: Request) -> JSONResponse:
         results = await use_case.execute()
 
         # Send a message to the frontend by ws
-        await app.state.ws_manager.broadcast({
+        await ws_manager.broadcast({
             "type": "log",
             "level": "success",
             "message": f"Scan completato in {time.perf_counter() - start_time:.2f} secondi",
@@ -131,7 +144,7 @@ async def scan(payload: ScanRequest, request: Request) -> JSONResponse:
 
         if new_job_list:
             # Save the new job_list
-            await app.state.job.create_job_list(
+            await job_repo.create_job_list(
                 job_id=job_list_id,
                 job_list=new_job_list
             )

@@ -5,6 +5,7 @@ from fastapi import APIRouter, Request
 
 from unit3dwup.config import MediaStatus
 from unit3dwup.config import get_logger
+from unit3dwup.config.limiter import limiter
 
 from unit3dwup.schemas import UpdatePosterRequest
 
@@ -34,6 +35,7 @@ async def update_poster(app, msg: str, job_id: str, field_id: str, new_id: str):
 
 
 @router.post("/settmdbid")
+@limiter.limit("5/minute")
 async def set_poster_id(payload: UpdatePosterRequest, request: Request):
     """
     Set a Tmdb id for example when tmdb returns an empty result
@@ -49,6 +51,7 @@ async def set_poster_id(payload: UpdatePosterRequest, request: Request):
 
 
 @router.post("/settvdbid")
+@limiter.limit("5/minute")
 async def set_tvdb_id(payload: UpdatePosterRequest, request: Request):
     """
     Set a TVdb id for example when tvdb returns an empty result
@@ -64,6 +67,7 @@ async def set_tvdb_id(payload: UpdatePosterRequest, request: Request):
 
 
 @router.post("/setimdbid")
+@limiter.limit("5/minute")
 async def set_imdb_id(payload: UpdatePosterRequest, request: Request):
     """
     Set an Imdb id for example when the remote list of tvdb is empty
@@ -79,6 +83,7 @@ async def set_imdb_id(payload: UpdatePosterRequest, request: Request):
 
 
 @router.post("/setposterurl")
+@limiter.limit("5/minute")
 async def set_poster_url(payload: UpdatePosterRequest, request: Request):
     """
     Set a poster url for example when tmdb returns an empty result only for frontend
@@ -94,6 +99,7 @@ async def set_poster_url(payload: UpdatePosterRequest, request: Request):
 
 
 @router.post("/setposterdname")
+@limiter.limit("5/minute")
 async def set_poster_dname(payload: UpdatePosterRequest, request: Request):
     """
     Set a poster display name for example if you dont like it

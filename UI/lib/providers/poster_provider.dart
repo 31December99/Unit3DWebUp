@@ -9,6 +9,9 @@ class PosterProvider extends ChangeNotifier {
   List<PosterItem> posterItems = [];
 
   /// PosterItem list received from api endpoints
+  List<PosterItem> response = [];
+
+  /// PosterItem list received from api endpoints
   PosterItem posterItem = PosterItem();
 
   /// Use different name for PosterItem list for poster Popup
@@ -35,13 +38,21 @@ class PosterProvider extends ChangeNotifier {
   /// TODO same as -scan flag in unit3dup
   /// TODO Add creation torrent for -f and -u flag
   Future<PosterItem> scan(String query) async {
-    posterItems = await ApiService.scan();
+    // posterItems = await ApiService.scan();
+    response = await ApiService.scan();
+
+    if (response[0].snackBarError != null) {
+      return response[0];
+    } else {
+      posterItems = response;
+    }
+
     isLoading = true;
     notifyListeners();
 
-    if (posterItems[0].snackBarError != null) {
-      return posterItems[0];
-    }
+    // if (posterItems[0].snackBarError != null) {
+    //   return posterItems[0];
+    // }
 
     /// Filter results based on the query string
     final filteredList = posterItems

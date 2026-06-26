@@ -3,7 +3,7 @@ from .sis import sis_data
 
 tracker_list = {'ITT': itt_data, 'SIS': sis_data}
 
-from .settings import get_settings
+from .settings import get_settings,Settings
 from .constants import MediaStatus
 from .logger import get_logger
 
