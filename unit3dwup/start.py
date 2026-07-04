@@ -11,7 +11,7 @@ from unit3dwup.lifespan import lifespan
 from unit3dwup.routers import scan, process, jobs, posters, settings, search, ws
 
 # Set a limiter
-from config.limiter import limiter
+from unit3dwup.config.limiter import limiter
 
 # Initialize FastApi
 app = FastAPI(lifespan=lifespan)
