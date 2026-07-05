@@ -8,7 +8,7 @@ from slowapi import _rate_limit_exceeded_handler
 
 from unit3dwup.lifespan import lifespan
 
-from unit3dwup.routers import scan, process, jobs, posters, settings, search, ws
+from unit3dwup.routers import login, scan, process, jobs, posters, settings, search, ws
 
 # Set a limiter
 from unit3dwup.config.limiter import limiter
@@ -30,6 +30,7 @@ app.add_middleware(
 )
 
 # Register the routers (endpoints moved out of this file, behaviour unchanged)
+app.include_router(login.router)
 app.include_router(scan.router)
 app.include_router(process.router)
 app.include_router(jobs.router)

@@ -6,7 +6,7 @@ import time
 
 import aiohttp
 
-from fastapi import APIRouter, WebSocket, status, FastAPI, Request, Depends
+from fastapi import APIRouter, status, Request, Depends
 from fastapi.responses import JSONResponse
 
 from unit3dwup.config import get_logger, Settings
@@ -18,10 +18,10 @@ from unit3dwup.services.media_service import MediaService, MediaService2
 from unit3dwup.services.auto_async_service import AsyncMediaManager
 
 from unit3dwup.use_case.scan_media_usecase import ScanMediaUseCase
-
 from unit3dwup.schemas import ScanRequest
-
 from unit3dwup.external.websocket import WebSocketManager
+from unit3dwup.external.auth import get_current_user
+
 from unit3dwup.routers.dependencies import (
     load_settings,
     get_job_repo,
@@ -30,13 +30,19 @@ from unit3dwup.routers.dependencies import (
 
 router = APIRouter()
 
+from typing import Annotated
+
+
 
 @router.post("/scan")
 @limiter.limit("5/minute")
 async def scan(payload: ScanRequest, request: Request,
+               # 05/07/2026 - creare una pagina di login prima di andare avanti
+               user: Annotated[str, Depends(get_current_user)],
                settings: Settings = Depends(load_settings),
                job_repo=Depends(get_job_repo),
                ws_manager: WebSocketManager = Depends(get_ws_manager),
+
                ) -> JSONResponse:
     """
     This endpoint scans the local files and creates a Media object for each associating it with its description
