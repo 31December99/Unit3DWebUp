@@ -12,12 +12,13 @@ async def login(
     user_login_data: Annotated[OAuth2PasswordRequestForm, Depends()]
 ):
     return {
-        "access_token": user_login_data.username,
+        "access_token": "blabla",
         "token_type": "bearer",
     }
 
 
-#TEST
+
+
 @router.get("/status")
 async def status(
     token: Annotated[str, Depends(oauth2_scheme)]

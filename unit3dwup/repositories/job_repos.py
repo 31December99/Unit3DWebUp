@@ -104,6 +104,17 @@ class JobRedisRepo(JobRepositoryInterface):
         """
         await self.create_job(job_id='0', data=data)
 
+    async def create_user(self, user_id: str , data: dict):
+        """
+        :param data: a dict che store the user data
+        :param user_id: user id in redis
+        :return:
+
+        Create a new user that includes the user data
+        """
+        # await self.create_job(job_id=, data=data)
+        pass
+
     async def get_job(self, job_id: str):
         """
         :param job_id: Job id is the file or folder path hashed stored in the Media class object
