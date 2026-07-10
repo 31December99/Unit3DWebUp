@@ -9,6 +9,7 @@ import 'app.dart';
 /// - [PosterProvider]:   manage poster (le locandine)
 /// - [LogProvider]:      manage websocket communication
 /// - [SettingProvider]:  manage configuration from the backend
+/// - [LoginProvider]:  manage Login
 void main() {
   runApp(
     MultiProvider(
@@ -28,6 +29,10 @@ void main() {
 
         /// Page settings ( the configuration file from the backend)
         ChangeNotifierProvider(create: (_) => SettingProvider()),
+
+        /// Login page
+        ChangeNotifierProvider(create: (_) => LoginProvider()),
+
       ],
 
       /// Go

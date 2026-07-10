@@ -75,6 +75,20 @@ class NavigationRailMenu extends StatelessWidget {
               ),
               label: const Text('Log'),
             ),
+
+            NavigationRailDestination(
+              icon: SvgPicture.asset(
+                'lib/assets/login-svgrepo-com.svg',
+                width: 35,
+              ),
+              selectedIcon: SvgPicture.asset(
+                'lib/assets/login-svgrepo-com.svg',
+                width: 35,
+              ),
+              label: const Text('Login'),
+            ),
+
+
           ],
         ),
       ),

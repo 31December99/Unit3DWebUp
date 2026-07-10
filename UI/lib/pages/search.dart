@@ -1,5 +1,7 @@
+import 'package:UI/providers/login_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:UI/widgets/searchPage/search.dart';
+import 'package:provider/provider.dart';
 
 /// The SearchPage
 ///
@@ -63,6 +65,17 @@ class SearchPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final app = context.read<LoginProvider>();
+
+    if (!app.logged) {
+      return const Center(
+        child: Text(
+          "No login",
+        ),
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

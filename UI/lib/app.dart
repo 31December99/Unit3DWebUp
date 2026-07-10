@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:UI/widgets/widgets.dart';
 import 'package:UI/pages/pages.dart';
+import 'package:UI/providers/login_provider.dart';
+import 'package:provider/provider.dart';
 
 /// The Main Layout
 /// Cambio pagina index di NavigationRailMenu
@@ -23,14 +25,23 @@ class MainLayout extends StatefulWidget {
 class MainLayoutState extends State<MainLayout> {
   int _selectedIndex = 0;
 
-  final List<Widget> pages = [
-    const SearchPage(),
-    const SettingPage(),
-    const JobsPage(),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final app = context.watch<LoginProvider>();
+
+    final List<Widget> pages = [
+      const LoginPage(),
+      const SearchPage(),
+      const SettingPage(),
+      const JobsPage(),
+    ];
+
+    if (!app.logged) {
+      _selectedIndex = 0;
+    } else if (_selectedIndex == 0) {
+      _selectedIndex = 1;
+    }
+
     return MaterialApp(
       home: Scaffold(
         body: Container(
